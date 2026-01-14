@@ -118,9 +118,9 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: context.surfaceColor,
                         borderRadius: BorderRadius.circular(14),
-                        boxShadow: AppColors.softShadow,
+                        boxShadow: context.softShadow,
                       ),
                       child: Icon(
                         Icons.arrow_back_rounded,
@@ -155,9 +155,9 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
                       Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.surfaceColor,
                           borderRadius: BorderRadius.circular(16),
-                          boxShadow: AppColors.softShadow,
+                          boxShadow: context.softShadow,
                         ),
                         child: Row(
                           children: [
@@ -186,7 +186,7 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
                                         size: 20,
                                         color: _selectedType == ItemType.lost
                                             ? Colors.white
-                                            : AppColors.textSecondary,
+                                            : context.textSecondary,
                                       ),
                                       const SizedBox(width: 8),
                                       Text(
@@ -196,7 +196,7 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
                                           fontWeight: FontWeight.w600,
                                           color: _selectedType == ItemType.lost
                                               ? Colors.white
-                                              : AppColors.textSecondary,
+                                              : context.textSecondary,
                                         ),
                                       ),
                                     ],
@@ -229,7 +229,7 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
                                         size: 20,
                                         color: _selectedType == ItemType.found
                                             ? Colors.white
-                                            : AppColors.textSecondary,
+                                            : context.textSecondary,
                                       ),
                                       const SizedBox(width: 8),
                                       Text(
@@ -239,7 +239,7 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
                                           fontWeight: FontWeight.w600,
                                           color: _selectedType == ItemType.found
                                               ? Colors.white
-                                              : AppColors.textSecondary,
+                                              : context.textSecondary,
                                         ),
                                       ),
                                     ],
@@ -274,10 +274,10 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
                               width: 100,
                               height: 100,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: context.surfaceColor,
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
-                                  color: AppColors.border,
+                                  color: context.borderColor,
                                   width: 2,
                                   style: BorderStyle.solid,
                                 ),
@@ -330,17 +330,18 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
                       const SizedBox(height: 12),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.surfaceColor,
                           borderRadius: BorderRadius.circular(16),
-                          boxShadow: AppColors.softShadow,
+                          boxShadow: context.softShadow,
                         ),
                         child: TextFormField(
                           controller: _titleController,
-                          decoration: const InputDecoration(
+                          style: TextStyle(color: context.textPrimary),
+                          decoration: InputDecoration(
                             hintText: 'e.g., iPhone 14 Pro, Blue Wallet',
-                            hintStyle: TextStyle(color: AppColors.textTertiary),
+                            hintStyle: TextStyle(color: context.textTertiary),
                             border: InputBorder.none,
-                            contentPadding: EdgeInsets.all(16),
+                            contentPadding: const EdgeInsets.all(16),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -379,18 +380,19 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
                       const SizedBox(height: 12),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.surfaceColor,
                           borderRadius: BorderRadius.circular(16),
-                          boxShadow: AppColors.softShadow,
+                          boxShadow: context.softShadow,
                         ),
                         child: TextFormField(
                           controller: _locationController,
+                          style: TextStyle(color: context.textPrimary),
                           decoration: InputDecoration(
                             hintText: _selectedType == ItemType.lost
                                 ? 'Where did you lose it?'
                                 : 'Where did you find it?',
                             hintStyle:
-                                TextStyle(color: AppColors.textTertiary),
+                                TextStyle(color: context.textTertiary),
                             prefixIcon: Icon(
                               Icons.location_on_rounded,
                               color: context.textSecondary,
@@ -421,19 +423,20 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
                       const SizedBox(height: 12),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.surfaceColor,
                           borderRadius: BorderRadius.circular(16),
-                          boxShadow: AppColors.softShadow,
+                          boxShadow: context.softShadow,
                         ),
                         child: TextFormField(
                           controller: _descriptionController,
                           maxLines: 4,
-                          decoration: const InputDecoration(
+                          style: TextStyle(color: context.textPrimary),
+                          decoration: InputDecoration(
                             hintText:
                                 'Provide additional details about the item...',
-                            hintStyle: TextStyle(color: AppColors.textTertiary),
+                            hintStyle: TextStyle(color: context.textTertiary),
                             border: InputBorder.none,
-                            contentPadding: EdgeInsets.all(16),
+                            contentPadding: const EdgeInsets.all(16),
                           ),
                         ),
                       ),
@@ -511,14 +514,14 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.surfaceColor,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: AppColors.softShadow,
+          boxShadow: context.softShadow,
         ),
         child: Center(
           child: Text(
             'Loading categories...',
-            style: TextStyle(color: AppColors.textSecondary),
+            style: TextStyle(color: context.textSecondary),
           ),
         ),
       );
@@ -547,9 +550,9 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
                       ? AppColors.lostGradient
                       : AppColors.foundGradient)
                   : null,
-              color: isSelected ? null : Colors.white,
+              color: isSelected ? null : context.surfaceColor,
               borderRadius: BorderRadius.circular(12),
-              boxShadow: AppColors.softShadow,
+              boxShadow: context.softShadow,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -557,7 +560,7 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
                 Icon(
                   _getIconForCategory(category.name),
                   size: 18,
-                  color: isSelected ? Colors.white : AppColors.textSecondary,
+                  color: isSelected ? Colors.white : context.textSecondary,
                 ),
                 const SizedBox(width: 8),
                 Text(
@@ -565,7 +568,7 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: isSelected ? Colors.white : AppColors.textSecondary,
+                    color: isSelected ? Colors.white : context.textSecondary,
                   ),
                 ),
               ],
