@@ -5,6 +5,8 @@ import '../../../../app/routes/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../../../dashboard/presentation/pages/dashboard_page.dart';
+import '../state/auth_state.dart';
+import '../view_model/auth_viewmodel.dart';
 import 'signup_page.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -19,7 +21,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -30,20 +31,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-
-      // TODO: Implement login logic
-      await Future.delayed(const Duration(seconds: 2));
-
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-        // Navigate to dashboard
-        AppRoutes.pushReplacement(context, const DashboardPage());
-      }
+      await ref
+          .read(authViewModelProvider.notifier)
+          .login(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+          );
     }
   }
 
@@ -68,8 +61,23 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authViewModelProvider);
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppColors.textDark;
+    final secondaryTextColor =
+        Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textMuted;
+
+    // Listen to auth state changes
+    ref.listen<AuthState>(authViewModelProvider, (previous, next) {
+      if (next.status == AuthStatus.authenticated) {
+        AppRoutes.pushReplacement(context, const DashboardPage());
+      } else if (next.status == AuthStatus.error && next.errorMessage != null) {
+        SnackbarUtils.showError(context, next.errorMessage!);
+      }
+    });
+
     return Scaffold(
-      backgroundColor: AppColors.surface,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -86,8 +94,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     'assets/svg/softwarica_logo.svg',
                     width: 200,
                     height: 70,
-                    colorFilter: const ColorFilter.mode(
-                      AppColors.primary,
+                    colorFilter: ColorFilter.mode(
+                      isDarkMode
+                          ? AppColors.darkTextPrimary
+                          : AppColors.primary,
                       BlendMode.srcIn,
                     ),
                   ),
@@ -95,18 +105,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 const SizedBox(height: 32),
 
                 // Title
-                const Text(
+                Text(
                   'Welcome Back!',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textDark,
+                    color: textColor,
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'Sign in to continue',
-                  style: TextStyle(fontSize: 16, color: AppColors.textMuted),
+                  style: TextStyle(fontSize: 16, color: secondaryTextColor),
                 ),
                 const SizedBox(height: 40),
 
@@ -114,15 +124,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
+                  style: TextStyle(color: textColor),
+                  decoration: const InputDecoration(
                     labelText: 'Email',
                     hintText: 'Enter your email',
-                    prefixIcon: const Icon(Icons.email_outlined),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    filled: true,
-                    fillColor: AppColors.inputFill,
+                    prefixIcon: Icon(Icons.email_outlined),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -140,10 +146,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
+                  style: TextStyle(color: textColor),
                   decoration: InputDecoration(
                     labelText: 'Password',
                     hintText: 'Enter your password',
-                    prefixIcon: const Icon(Icons.lock_outline),
+                    prefixIcon: Icon(Icons.lock_outline),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword
@@ -156,11 +163,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         });
                       },
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    filled: true,
-                    fillColor: AppColors.inputFill,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -179,7 +181,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: _handleForgotPassword,
-                    child: const Text(
+                    child: Text(
                       'Forgot Password?',
                       style: TextStyle(
                         color: AppColors.authPrimary,
@@ -194,7 +196,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 SizedBox(
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: _isLoading ? null : _handleLogin,
+                    onPressed: authState.status == AuthStatus.loading
+                        ? null
+                        : _handleLogin,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.authPrimary,
                       foregroundColor: Colors.white,
@@ -203,7 +207,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: _isLoading
+                    child: authState.status == AuthStatus.loading
                         ? const SizedBox(
                             width: 24,
                             height: 24,
@@ -214,7 +218,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                               ),
                             ),
                           )
-                        : const Text(
+                        : Text(
                             'Login',
                             style: TextStyle(
                               fontSize: 18,
@@ -228,18 +232,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 // Divider
                 Row(
                   children: [
-                    const Expanded(child: Divider()),
+                    Expanded(child: Divider()),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
                         'OR',
                         style: TextStyle(
-                          color: Colors.grey[600],
+                          color: secondaryTextColor,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
-                    const Expanded(child: Divider()),
+                    Expanded(child: Divider()),
                   ],
                 ),
                 const SizedBox(height: 24),
@@ -254,8 +258,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           'assets/icons/google_logo.svg',
                           width: 20,
                           height: 20,
+                          colorFilter: isDarkMode
+                              ? const ColorFilter.mode(
+                                  AppColors.darkTextPrimary,
+                                  BlendMode.srcIn,
+                                )
+                              : null,
                         ),
-                        label: const Text('Google'),
+                        label: Text('Google'),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
@@ -272,8 +282,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           'assets/icons/apple_logo.svg',
                           width: 20,
                           height: 20,
+                          colorFilter: isDarkMode
+                              ? const ColorFilter.mode(
+                                  AppColors.darkTextPrimary,
+                                  BlendMode.srcIn,
+                                )
+                              : null,
                         ),
-                        label: const Text('Apple'),
+                        label: Text('Apple'),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
@@ -290,16 +306,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
+                    Text(
                       "Don't have an account? ",
-                      style: TextStyle(color: AppColors.textMuted),
+                      style: TextStyle(color: secondaryTextColor),
                     ),
                     TextButton(
                       onPressed: _navigateToSignup,
-                      child: const Text(
+                      child: Text(
                         'Sign Up',
                         style: TextStyle(
-                          color: AppColors.authPrimary,
+                          color: AppColors.primary,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

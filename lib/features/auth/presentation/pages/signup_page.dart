@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../app/routes/app_routes.dart';
+import 'package:lost_n_found/features/auth/presentation/state/auth_state.dart';
+import 'package:lost_n_found/features/auth/presentation/view_model/auth_viewmodel.dart';
+import 'package:lost_n_found/features/batch/presentation/state/batch_state.dart';
+import 'package:lost_n_found/features/batch/presentation/view_model/batch_viewmodel.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../app/theme/theme_extensions.dart';
 import '../../../../core/widgets/gradient_button.dart';
 import '../../../../core/utils/snackbar_utils.dart';
-import '../../../dashboard/presentation/pages/dashboard_page.dart';
 
 class SignupPage extends ConsumerStatefulWidget {
   const SignupPage({super.key});
@@ -23,7 +26,6 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  bool _isLoading = false;
   bool _agreedToTerms = false;
   String? _selectedBatch;
   String _selectedCountryCode = '+977'; // Default Nepal
@@ -35,14 +37,6 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     {'code': '+1', 'name': 'USA', 'flag': '🇺🇸'},
     {'code': '+44', 'name': 'UK', 'flag': '🇬🇧'},
     {'code': '+86', 'name': 'China', 'flag': '🇨🇳'},
-  ];
-
-  // Mock batch data - will come from GET /api/v1/batches
-  final List<Map<String, String>> _batches = [
-    {'id': '1', 'name': '35A'},
-    {'id': '2', 'name': '35B'},
-    {'id': '3', 'name': '36A'},
-    {'id': '4', 'name': '36B'},
   ];
 
   @override
@@ -65,18 +59,16 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     }
 
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-
-      await Future.delayed(const Duration(seconds: 2));
-
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-        AppRoutes.pushReplacement(context, const DashboardPage());
-      }
+      await ref
+          .read(authViewModelProvider.notifier)
+          .register(
+            fullName: _nameController.text.trim(),
+            email: _emailController.text.trim(),
+            username: _emailController.text.trim().split('@').first,
+            password: _passwordController.text,
+            phoneNumber: '$_selectedCountryCode${_phoneController.text.trim()}',
+            batchId: _selectedBatch,
+          );
     }
   }
 
@@ -85,37 +77,46 @@ class _SignupPageState extends ConsumerState<SignupPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      // Call load batches when the widget is built
+      ref.read(batchViewModelProvider.notifier).getAllBatches();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final batchState = ref.watch(batchViewModelProvider);
+    final authState = ref.watch(authViewModelProvider);
+
+    // Listen to auth state changes
+    ref.listen<AuthState>(authViewModelProvider, (previous, next) {
+      if (next.status == AuthStatus.registered) {
+        SnackbarUtils.showSuccess(
+          context,
+          'Registration successful! Please login.',
+        );
+        Navigator.of(context).pop();
+      } else if (next.status == AuthStatus.error && next.errorMessage != null) {
+        SnackbarUtils.showError(context, next.errorMessage!);
+      }
+    });
+
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
         leading: IconButton(
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.surfaceColor,
               borderRadius: BorderRadius.circular(12),
-              boxShadow: AppColors.softShadow,
+              boxShadow: context.softShadow,
             ),
-            child: const Icon(
-              Icons.arrow_back,
-              color: AppColors.textPrimary,
-              size: 20,
-            ),
+            child: Icon(Icons.arrow_back, color: context.textPrimary, size: 20),
           ),
           onPressed: _navigateToLogin,
         ),
-        title: const Text(
-          'Create Account',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        centerTitle: true,
       ),
       body: SafeArea(
         child: Center(
@@ -145,19 +146,19 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                               ),
                             ],
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.person_add_rounded,
                             size: 40,
                             color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 20),
-                        const Text(
+                        Text(
                           'Join Us Today',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
+                            color: context.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -165,7 +166,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                           'Create your account to get started',
                           style: TextStyle(
                             fontSize: 14,
-                            color: AppColors.textSecondary.withAlpha(180),
+                            color: context.textSecondary.withAlpha(180),
                           ),
                         ),
                       ],
@@ -241,21 +242,19 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                 children: [
                                   Text(
                                     country['flag']!,
-                                    style: const TextStyle(fontSize: 18),
+                                    style: TextStyle(fontSize: 18),
                                   ),
                                   const SizedBox(width: 6),
                                   Text(
                                     country['code']!,
-                                    style: const TextStyle(fontSize: 14),
+                                    style: TextStyle(fontSize: 14),
                                   ),
                                 ],
                               ),
                             );
                           }).toList(),
                           onChanged: (value) {
-                            setState(() {
-                              _selectedCountryCode = value!;
-                            });
+                            _selectedCountryCode = value!;
                           },
                         ),
                       ),
@@ -292,21 +291,21 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                   // Batch Selection
                   DropdownButtonFormField<String>(
                     initialValue: _selectedBatch,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Select Batch',
-                      hintText: 'Choose your batch',
+                      hintText: batchState.status == BatchStatus.loading
+                          ? 'Loading batches...'
+                          : 'Choose your batch',
                       prefixIcon: Icon(Icons.school_rounded),
                     ),
-                    items: _batches.map((batch) {
+                    items: batchState.batches.map((batch) {
                       return DropdownMenuItem<String>(
-                        value: batch['id'],
-                        child: Text(batch['name']!),
+                        value: batch.batchId,
+                        child: Text(batch.batchName),
                       );
                     }).toList(),
                     onChanged: (value) {
-                      setState(() {
-                        _selectedBatch = value;
-                      });
+                      _selectedBatch = value;
                     },
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -324,7 +323,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                     decoration: InputDecoration(
                       labelText: 'Password',
                       hintText: 'Create a strong password',
-                      prefixIcon: const Icon(Icons.lock_outline_rounded),
+                      prefixIcon: Icon(Icons.lock_outline_rounded),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword
@@ -357,7 +356,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                     decoration: InputDecoration(
                       labelText: 'Confirm Password',
                       hintText: 'Re-enter your password',
-                      prefixIcon: const Icon(Icons.lock_outline_rounded),
+                      prefixIcon: Icon(Icons.lock_outline_rounded),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscureConfirmPassword
@@ -412,14 +411,14 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                           child: Text.rich(
                             TextSpan(
                               text: 'I agree to the ',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
-                                color: AppColors.textSecondary,
+                                color: context.textSecondary,
                               ),
                               children: [
                                 TextSpan(
                                   text: 'Terms & Conditions',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -427,7 +426,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                 const TextSpan(text: ' and '),
                                 TextSpan(
                                   text: 'Privacy Policy',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -445,7 +444,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                   GradientButton(
                     text: 'Create Account',
                     onPressed: _handleSignup,
-                    isLoading: _isLoading,
+                    isLoading: authState.status == AuthStatus.loading,
                   ),
                   const SizedBox(height: 32),
 
@@ -453,16 +452,16 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         'Already have an account? ',
                         style: TextStyle(
-                          color: AppColors.textSecondary,
+                          color: context.textSecondary,
                           fontSize: 15,
                         ),
                       ),
                       GestureDetector(
                         onTap: _navigateToLogin,
-                        child: const Text(
+                        child: Text(
                           'Login',
                           style: TextStyle(
                             color: AppColors.primary,
