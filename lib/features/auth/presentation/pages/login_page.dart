@@ -7,6 +7,8 @@ import '../../../../core/utils/snackbar_utils.dart';
 import '../../../dashboard/presentation/pages/dashboard_page.dart';
 import '../state/auth_state.dart';
 import '../view_model/auth_viewmodel.dart';
+import '../widgets/social_login_buttons.dart';
+import '../widgets/auth_link_text.dart';
 import 'signup_page.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -40,24 +42,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     }
   }
 
-  void _navigateToSignup() {
-    AppRoutes.push(context, const SignupPage());
-  }
-
-  void _handleForgotPassword() {
-    // TODO: Implement forgot password
-    SnackbarUtils.showInfo(context, 'Forgot password feature coming soon');
-  }
-
-  void _handleGoogleSignIn() {
-    // TODO: Implement Google Sign In
-    SnackbarUtils.showInfo(context, 'Google Sign In coming soon');
-  }
-
-  void _handleAppleSignIn() {
-    // TODO: Implement Apple Sign In
-    SnackbarUtils.showInfo(context, 'Apple Sign In coming soon');
-  }
+  void _navigateToSignup() => AppRoutes.push(context, const SignupPage());
+  void _handleForgotPassword() =>
+      SnackbarUtils.showInfo(context, 'Forgot password feature coming soon');
+  void _handleGoogleSignIn() =>
+      SnackbarUtils.showInfo(context, 'Google Sign In coming soon');
+  void _handleAppleSignIn() =>
+      SnackbarUtils.showInfo(context, 'Apple Sign In coming soon');
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +59,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final secondaryTextColor =
         Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textMuted;
 
-    // Listen to auth state changes
     ref.listen<AuthState>(authViewModelProvider, (previous, next) {
       if (next.status == AuthStatus.authenticated) {
         AppRoutes.pushReplacement(context, const DashboardPage());
@@ -87,246 +77,179 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 40),
-
-                // Softwarica Logo
-                Center(
-                  child: SvgPicture.asset(
-                    'assets/svg/softwarica_logo.svg',
-                    width: 200,
-                    height: 70,
-                    colorFilter: ColorFilter.mode(
-                      isDarkMode
-                          ? AppColors.darkTextPrimary
-                          : AppColors.primary,
-                      BlendMode.srcIn,
-                    ),
-                  ),
-                ),
+                _buildLogo(isDarkMode),
                 const SizedBox(height: 32),
-
-                // Title
-                Text(
-                  'Welcome Back!',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Sign in to continue',
-                  style: TextStyle(fontSize: 16, color: secondaryTextColor),
-                ),
+                _buildTitle(textColor, secondaryTextColor),
                 const SizedBox(height: 40),
-
-                // Email Field
-                TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  style: TextStyle(color: textColor),
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    hintText: 'Enter your email',
-                    prefixIcon: Icon(Icons.email_outlined),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    }
-                    if (!value.contains('@')) {
-                      return 'Please enter a valid email';
-                    }
-                    return null;
-                  },
-                ),
+                _buildEmailField(textColor),
                 const SizedBox(height: 16),
-
-                // Password Field
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: _obscurePassword,
-                  style: TextStyle(color: textColor),
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    hintText: 'Enter your password',
-                    prefixIcon: Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_outlined
-                            : Icons.visibility_off_outlined,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
-                    }
-                    if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
-                    }
-                    return null;
-                  },
-                ),
+                _buildPasswordField(textColor),
                 const SizedBox(height: 8),
-
-                // Forgot Password
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: _handleForgotPassword,
-                    child: Text(
-                      'Forgot Password?',
-                      style: TextStyle(
-                        color: AppColors.authPrimary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
+                _buildForgotPassword(),
+                const SizedBox(height: 24),
+                _buildLoginButton(authState),
+                const SizedBox(height: 24),
+                _buildDivider(secondaryTextColor),
+                const SizedBox(height: 24),
+                SocialLoginButtons(
+                  onGoogleTap: _handleGoogleSignIn,
+                  onAppleTap: _handleAppleSignIn,
                 ),
                 const SizedBox(height: 24),
-
-                // Login Button
-                SizedBox(
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: authState.status == AuthStatus.loading
-                        ? null
-                        : _handleLogin,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.authPrimary,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: authState.status == AuthStatus.loading
-                        ? const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.white,
-                              ),
-                            ),
-                          )
-                        : Text(
-                            'Login',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Divider
-                Row(
-                  children: [
-                    Expanded(child: Divider()),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(
-                        'OR',
-                        style: TextStyle(
-                          color: secondaryTextColor,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    Expanded(child: Divider()),
-                  ],
-                ),
-                const SizedBox(height: 24),
-
-                // Social Login Buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: _handleGoogleSignIn,
-                        icon: SvgPicture.asset(
-                          'assets/icons/google_logo.svg',
-                          width: 20,
-                          height: 20,
-                          colorFilter: isDarkMode
-                              ? const ColorFilter.mode(
-                                  AppColors.darkTextPrimary,
-                                  BlendMode.srcIn,
-                                )
-                              : null,
-                        ),
-                        label: Text('Google'),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: _handleAppleSignIn,
-                        icon: SvgPicture.asset(
-                          'assets/icons/apple_logo.svg',
-                          width: 20,
-                          height: 20,
-                          colorFilter: isDarkMode
-                              ? const ColorFilter.mode(
-                                  AppColors.darkTextPrimary,
-                                  BlendMode.srcIn,
-                                )
-                              : null,
-                        ),
-                        label: Text('Apple'),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-
-                // Sign Up Link
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Don't have an account? ",
-                      style: TextStyle(color: secondaryTextColor),
-                    ),
-                    TextButton(
-                      onPressed: _navigateToSignup,
-                      child: Text(
-                        'Sign Up',
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
+                AuthLinkText(
+                  text: "Don't have an account? ",
+                  linkText: 'Sign Up',
+                  onTap: _navigateToSignup,
                 ),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildLogo(bool isDarkMode) {
+    return Center(
+      child: SvgPicture.asset(
+        'assets/svg/softwarica_logo.svg',
+        width: 200,
+        height: 70,
+        colorFilter: ColorFilter.mode(
+          isDarkMode ? AppColors.darkTextPrimary : AppColors.primary,
+          BlendMode.srcIn,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTitle(Color textColor, Color secondaryTextColor) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'Welcome Back!',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: textColor,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Sign in to continue',
+          style: TextStyle(fontSize: 16, color: secondaryTextColor),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEmailField(Color textColor) {
+    return TextFormField(
+      controller: _emailController,
+      keyboardType: TextInputType.emailAddress,
+      style: TextStyle(color: textColor),
+      decoration: const InputDecoration(
+        labelText: 'Email',
+        hintText: 'Enter your email',
+        prefixIcon: Icon(Icons.email_outlined),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) return 'Please enter your email';
+        if (!value.contains('@')) return 'Please enter a valid email';
+        return null;
+      },
+    );
+  }
+
+  Widget _buildPasswordField(Color textColor) {
+    return TextFormField(
+      controller: _passwordController,
+      obscureText: _obscurePassword,
+      style: TextStyle(color: textColor),
+      decoration: InputDecoration(
+        labelText: 'Password',
+        hintText: 'Enter your password',
+        prefixIcon: const Icon(Icons.lock_outline),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _obscurePassword
+                ? Icons.visibility_outlined
+                : Icons.visibility_off_outlined,
+          ),
+          onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+        ),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) return 'Please enter your password';
+        if (value.length < 6) return 'Password must be at least 6 characters';
+        return null;
+      },
+    );
+  }
+
+  Widget _buildForgotPassword() {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: TextButton(
+        onPressed: _handleForgotPassword,
+        child: Text(
+          'Forgot Password?',
+          style: TextStyle(
+            color: AppColors.authPrimary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoginButton(AuthState authState) {
+    return SizedBox(
+      height: 56,
+      child: ElevatedButton(
+        onPressed: authState.status == AuthStatus.loading ? null : _handleLogin,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.authPrimary,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: authState.status == AuthStatus.loading
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : const Text(
+                'Login',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+      ),
+    );
+  }
+
+  Widget _buildDivider(Color secondaryTextColor) {
+    return Row(
+      children: [
+        const Expanded(child: Divider()),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            'OR',
+            style: TextStyle(
+              color: secondaryTextColor,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        const Expanded(child: Divider()),
+      ],
     );
   }
 }
