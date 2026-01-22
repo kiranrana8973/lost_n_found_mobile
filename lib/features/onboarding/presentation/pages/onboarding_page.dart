@@ -5,6 +5,7 @@ import '../widgets/onboarding_content.dart';
 import '../widgets/page_indicator.dart';
 import '../../../../core/widgets/gradient_button.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../app/theme/theme_extensions.dart';
 import '../../../../app/routes/app_routes.dart';
 import '../../../auth/presentation/pages/login_page.dart';
 
@@ -96,7 +97,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: AppColors.backgroundGradient,
         ),
         child: SafeArea(
@@ -120,12 +121,12 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                           borderRadius: BorderRadius.circular(20),
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Skip',
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                          color: context.textPrimary,
                         ),
                       ),
                     ),
@@ -172,7 +173,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                       gradient: LinearGradient(
                         colors: _onboardingItems[_currentPage].gradientColors,
                       ),
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.arrow_forward_rounded,
                         color: Colors.white,
                         size: 20,

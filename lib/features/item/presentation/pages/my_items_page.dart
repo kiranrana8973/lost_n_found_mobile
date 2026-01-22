@@ -1,70 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lost_n_found/core/api/api_endpoints.dart';
+import 'package:lost_n_found/core/services/storage/user_session_service.dart';
+import 'package:lost_n_found/features/category/presentation/view_model/category_viewmodel.dart';
+import 'package:lost_n_found/features/item/domain/entities/item_entity.dart';
+import 'package:lost_n_found/features/item/presentation/state/item_state.dart';
+import 'package:lost_n_found/features/item/presentation/view_model/item_viewmodel.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../app/theme/theme_extensions.dart';
 
-class MyItemsPage extends StatefulWidget {
+class MyItemsPage extends ConsumerStatefulWidget {
   const MyItemsPage({super.key});
 
   @override
-  State<MyItemsPage> createState() => _MyItemsPageState();
+  ConsumerState<MyItemsPage> createState() => _MyItemsPageState();
 }
 
-class _MyItemsPageState extends State<MyItemsPage>
+class _MyItemsPageState extends ConsumerState<MyItemsPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-
-  // Mock data for user's items
-  final List<Map<String, dynamic>> _myLostItems = [
-    {
-      'title': 'iPhone 14 Pro',
-      'location': 'Library, Block A',
-      'time': '2h ago',
-      'category': 'Electronics',
-      'status': 'active', // active, claimed, resolved
-    },
-    {
-      'title': 'Car Keys',
-      'location': 'Parking Lot',
-      'time': '5h ago',
-      'category': 'Keys',
-      'status': 'active',
-    },
-    {
-      'title': 'Apple Watch',
-      'location': 'Gym',
-      'time': '1d ago',
-      'category': 'Accessories',
-      'status': 'resolved',
-    },
-  ];
-
-  final List<Map<String, dynamic>> _myFoundItems = [
-    {
-      'title': 'Blue Backpack',
-      'location': 'Cafeteria',
-      'time': '3h ago',
-      'category': 'Bags',
-      'status': 'active',
-    },
-    {
-      'title': 'Student ID Card',
-      'location': 'Block C, Room 201',
-      'time': '1d ago',
-      'category': 'Documents',
-      'status': 'claimed',
-    },
-    {
-      'title': 'Wallet',
-      'location': 'Block B, Ground Floor',
-      'time': '2d ago',
-      'category': 'Personal',
-      'status': 'resolved',
-    },
-  ];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    Future.microtask(() => _loadData());
+  }
+
+  void _loadData() {
+    final userSessionService = ref.read(userSessionServiceProvider);
+    final userId = userSessionService.getCurrentUserId();
+    if (userId != null) {
+      ref.read(itemViewModelProvider.notifier).getMyItems(userId);
+    }
+    ref.read(categoryViewModelProvider.notifier).getAllCategories();
   }
 
   @override
@@ -73,10 +42,22 @@ class _MyItemsPageState extends State<MyItemsPage>
     super.dispose();
   }
 
+  String _getCategoryName(String? categoryId) {
+    if (categoryId == null) return 'Other';
+    final categoryState = ref.read(categoryViewModelProvider);
+    final category = categoryState.categories.where(
+      (c) => c.categoryId == categoryId,
+    );
+    return category.isNotEmpty ? category.first.name : 'Other';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final itemState = ref.watch(itemViewModelProvider);
+    final myLostItems = itemState.myLostItems;
+    final myFoundItems = itemState.myFoundItems;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -85,7 +66,7 @@ class _MyItemsPageState extends State<MyItemsPage>
               padding: const EdgeInsets.all(20.0),
               child: Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -94,7 +75,7 @@ class _MyItemsPageState extends State<MyItemsPage>
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: context.textPrimary,
                           ),
                         ),
                         SizedBox(height: 4),
@@ -102,7 +83,7 @@ class _MyItemsPageState extends State<MyItemsPage>
                           'Track your reports',
                           style: TextStyle(
                             fontSize: 14,
-                            color: AppColors.textSecondary,
+                            color: context.textSecondary,
                           ),
                         ),
                       ],
@@ -112,14 +93,11 @@ class _MyItemsPageState extends State<MyItemsPage>
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: context.surfaceColor,
                       borderRadius: BorderRadius.circular(14),
-                      boxShadow: AppColors.softShadow,
+                      boxShadow: context.softShadow,
                     ),
-                    child: const Icon(
-                      Icons.sort_rounded,
-                      color: AppColors.textPrimary,
-                    ),
+                    child: Icon(Icons.sort_rounded, color: context.textPrimary),
                   ),
                 ],
               ),
@@ -130,9 +108,9 @@ class _MyItemsPageState extends State<MyItemsPage>
               margin: const EdgeInsets.symmetric(horizontal: 20),
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: context.surfaceColor,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: AppColors.softShadow,
+                boxShadow: context.softShadow,
               ),
               child: TabBar(
                 controller: _tabController,
@@ -143,60 +121,66 @@ class _MyItemsPageState extends State<MyItemsPage>
                 indicatorSize: TabBarIndicatorSize.tab,
                 dividerColor: Colors.transparent,
                 labelColor: Colors.white,
-                unselectedLabelColor: AppColors.textSecondary,
-                labelStyle: const TextStyle(
+                unselectedLabelColor: context.textSecondary,
+                labelStyle: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),
                 tabs: [
                   Tab(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.search_off_rounded, size: 18),
-                        const SizedBox(width: 8),
-                        const Text('My Lost'),
-                        const SizedBox(width: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.search_off_rounded, size: 18),
+                          const SizedBox(width: 6),
+                          Text('Lost'),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withAlpha(51),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              '${myLostItems.length}',
+                              style: TextStyle(fontSize: 12),
+                            ),
                           ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withAlpha(51),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            '${_myLostItems.length}',
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                   Tab(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.check_circle_rounded, size: 18),
-                        const SizedBox(width: 8),
-                        const Text('My Found'),
-                        const SizedBox(width: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.check_circle_rounded, size: 18),
+                          const SizedBox(width: 6),
+                          Text('Found'),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withAlpha(51),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              '${myFoundItems.length}',
+                              style: TextStyle(fontSize: 12),
+                            ),
                           ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withAlpha(51),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            '${_myFoundItems.length}',
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -207,15 +191,21 @@ class _MyItemsPageState extends State<MyItemsPage>
 
             // Tab Views
             Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  // My Lost Items
-                  _buildItemsList(_myLostItems, true),
-                  // My Found Items
-                  _buildItemsList(_myFoundItems, false),
-                ],
-              ),
+              child: itemState.status == ItemStatus.loading
+                  ? Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                    )
+                  : TabBarView(
+                      controller: _tabController,
+                      children: [
+                        // My Lost Items
+                        _buildItemsList(myLostItems, true),
+                        // My Found Items
+                        _buildItemsList(myFoundItems, false),
+                      ],
+                    ),
             ),
           ],
         ),
@@ -223,7 +213,7 @@ class _MyItemsPageState extends State<MyItemsPage>
     );
   }
 
-  Widget _buildItemsList(List<Map<String, dynamic>> items, bool isLost) {
+  Widget _buildItemsList(List<ItemEntity> items, bool isLost) {
     if (items.isEmpty) {
       return Center(
         child: Column(
@@ -232,14 +222,14 @@ class _MyItemsPageState extends State<MyItemsPage>
             Icon(
               isLost ? Icons.search_off_rounded : Icons.check_circle_rounded,
               size: 64,
-              color: AppColors.textTertiary.withAlpha(128),
+              color: context.textTertiary.withAlpha(128),
             ),
             const SizedBox(height: 16),
             Text(
               isLost ? 'No lost items reported' : 'No found items reported',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
-                color: AppColors.textSecondary,
+                color: context.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -253,15 +243,20 @@ class _MyItemsPageState extends State<MyItemsPage>
       itemCount: items.length,
       itemBuilder: (context, index) {
         final item = items[index];
+        final categoryName = _getCategoryName(item.category);
+        final status = item.status ?? (item.isClaimed ? 'claimed' : 'active');
+
         return Padding(
           padding: const EdgeInsets.only(bottom: 16),
           child: _MyItemCard(
-            title: item['title'],
-            location: item['location'],
-            time: item['time'],
-            category: item['category'],
-            status: item['status'],
+            title: item.itemName,
+            location: item.location,
+            category: categoryName,
+            status: status,
             isLost: isLost,
+            imageUrl: item.media != null
+                ? ApiEndpoints.itemPicture(item.media!)
+                : null,
             onTap: () {
               // Navigate to item detail
             },
@@ -269,8 +264,7 @@ class _MyItemsPageState extends State<MyItemsPage>
               // Edit item
             },
             onDelete: () {
-              // Delete item
-              _showDeleteDialog(context, item['title']);
+              _showDeleteDialog(context, item);
             },
           ),
         );
@@ -278,32 +272,42 @@ class _MyItemsPageState extends State<MyItemsPage>
     );
   }
 
-  void _showDeleteDialog(BuildContext context, String itemTitle) {
+  void _showDeleteDialog(BuildContext context, ItemEntity item) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        title: const Text(
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
           'Delete Item',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        content: Text('Are you sure you want to delete "$itemTitle"?'),
+        content: Text('Are you sure you want to delete "${item.itemName}"?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(
               'Cancel',
-              style: TextStyle(color: AppColors.textSecondary),
+              style: TextStyle(color: context.textSecondary),
             ),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
-              // TODO: Delete item
+              Navigator.pop(dialogContext);
+              if (item.itemId != null) {
+                ref
+                    .read(itemViewModelProvider.notifier)
+                    .deleteItem(item.itemId!);
+                // Reload my items after deletion
+                final userSessionService = ref.read(userSessionServiceProvider);
+                final userId = userSessionService.getCurrentUserId();
+                if (userId != null) {
+                  Future.delayed(const Duration(milliseconds: 300), () {
+                    ref.read(itemViewModelProvider.notifier).getMyItems(userId);
+                  });
+                }
+              }
             },
-            child: const Text(
+            child: Text(
               'Delete',
               style: TextStyle(
                 color: AppColors.error,
@@ -320,10 +324,10 @@ class _MyItemsPageState extends State<MyItemsPage>
 class _MyItemCard extends StatelessWidget {
   final String title;
   final String location;
-  final String time;
   final String category;
   final String status;
   final bool isLost;
+  final String? imageUrl;
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
@@ -331,10 +335,10 @@ class _MyItemCard extends StatelessWidget {
   const _MyItemCard({
     required this.title,
     required this.location,
-    required this.time,
     required this.category,
     required this.status,
     required this.isLost,
+    this.imageUrl,
     this.onTap,
     this.onEdit,
     this.onDelete,
@@ -393,9 +397,9 @@ class _MyItemCard extends StatelessWidget {
       opacity: isResolved ? 0.6 : 1.0,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.surfaceColor,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: AppColors.softShadow,
+          boxShadow: context.softShadow,
         ),
         child: Material(
           color: Colors.transparent,
@@ -408,24 +412,71 @@ class _MyItemCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      // Item Icon
+                      // Item Image or Icon
                       Container(
                         width: 56,
                         height: 56,
                         decoration: BoxDecoration(
-                          gradient: isResolved
-                              ? null
-                              : (isLost
-                                  ? AppColors.lostGradient
-                                  : AppColors.foundGradient),
-                          color: isResolved ? AppColors.claimedColor : null,
+                          gradient: imageUrl == null
+                              ? (isResolved
+                                  ? null
+                                  : (isLost
+                                      ? AppColors.lostGradient
+                                      : AppColors.foundGradient))
+                              : null,
+                          color: isResolved && imageUrl == null
+                              ? AppColors.claimedColor
+                              : null,
                           borderRadius: BorderRadius.circular(14),
                         ),
-                        child: Icon(
-                          _getCategoryIcon(category),
-                          color: Colors.white,
-                          size: 26,
-                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: imageUrl != null
+                            ? Image.network(
+                                imageUrl!,
+                                fit: BoxFit.cover,
+                                width: 56,
+                                height: 56,
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      gradient: isLost
+                                          ? AppColors.lostGradient
+                                          : AppColors.foundGradient,
+                                    ),
+                                    child: Center(
+                                      child: SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      gradient: isLost
+                                          ? AppColors.lostGradient
+                                          : AppColors.foundGradient,
+                                    ),
+                                    child: Icon(
+                                      _getCategoryIcon(category),
+                                      color: Colors.white,
+                                      size: 26,
+                                    ),
+                                  );
+                                },
+                              )
+                            : Icon(
+                                _getCategoryIcon(category),
+                                color: Colors.white,
+                                size: 26,
+                              ),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
@@ -437,10 +488,10 @@ class _MyItemCard extends StatelessWidget {
                                 Expanded(
                                   child: Text(
                                     title,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: AppColors.textPrimary,
+                                      color: context.textPrimary,
                                     ),
                                   ),
                                 ),
@@ -450,7 +501,9 @@ class _MyItemCard extends StatelessWidget {
                                     vertical: 4,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: _getStatusColor(status).withAlpha(26),
+                                    color: _getStatusColor(
+                                      status,
+                                    ).withAlpha(26),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
@@ -467,35 +520,21 @@ class _MyItemCard extends StatelessWidget {
                             const SizedBox(height: 6),
                             Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.location_on_rounded,
                                   size: 14,
-                                  color: AppColors.textSecondary,
+                                  color: context.textSecondary,
                                 ),
                                 const SizedBox(width: 4),
                                 Expanded(
                                   child: Text(
                                     location,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 13,
-                                      color: AppColors.textSecondary,
+                                      color: context.textSecondary,
                                     ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Icon(
-                                  Icons.access_time_rounded,
-                                  size: 14,
-                                  color: AppColors.textTertiary,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  time,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.textTertiary,
                                   ),
                                 ),
                               ],
@@ -507,7 +546,7 @@ class _MyItemCard extends StatelessWidget {
                   ),
                   if (!isResolved) ...[
                     const SizedBox(height: 12),
-                    const Divider(color: AppColors.divider),
+                    Divider(color: context.dividerColor),
                     const SizedBox(height: 8),
                     Row(
                       children: [
@@ -520,7 +559,7 @@ class _MyItemCard extends StatelessWidget {
                                 color: AppColors.primary.withAlpha(26),
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
@@ -552,7 +591,7 @@ class _MyItemCard extends StatelessWidget {
                                 color: AppColors.error.withAlpha(26),
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(

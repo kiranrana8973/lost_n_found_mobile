@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../app/theme/theme_extensions.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 
 class ItemDetailPage extends StatelessWidget {
   final String title;
   final String location;
-  final String time;
   final String category;
   final bool isLost;
   final String? description;
@@ -16,7 +16,6 @@ class ItemDetailPage extends StatelessWidget {
     super.key,
     required this.title,
     required this.location,
-    required this.time,
     required this.category,
     required this.isLost,
     this.description,
@@ -46,7 +45,7 @@ class ItemDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      // backgroundColor: context.backgroundColor // Using theme default,
       body: CustomScrollView(
         slivers: [
           // Custom App Bar with Image
@@ -61,13 +60,13 @@ class ItemDetailPage extends StatelessWidget {
                 onTap: () => Navigator.pop(context),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.surfaceColor,
                     borderRadius: BorderRadius.circular(12),
-                    boxShadow: AppColors.softShadow,
+                    boxShadow: context.softShadow,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.arrow_back_rounded,
-                    color: AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
               ),
@@ -78,13 +77,13 @@ class ItemDetailPage extends StatelessWidget {
                 child: Container(
                   width: 44,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.surfaceColor,
                     borderRadius: BorderRadius.circular(12),
-                    boxShadow: AppColors.softShadow,
+                    boxShadow: context.softShadow,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.share_rounded,
-                    color: AppColors.textPrimary,
+                    color: context.textPrimary,
                     size: 22,
                   ),
                 ),
@@ -94,83 +93,189 @@ class ItemDetailPage extends StatelessWidget {
                 child: Container(
                   width: 44,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.surfaceColor,
                     borderRadius: BorderRadius.circular(12),
-                    boxShadow: AppColors.softShadow,
+                    boxShadow: context.softShadow,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.bookmark_border_rounded,
-                    color: AppColors.textPrimary,
+                    color: context.textPrimary,
                     size: 22,
                   ),
                 ),
               ),
             ],
             flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: isLost ? AppColors.lostGradient : AppColors.foundGradient,
-                ),
-                child: SafeArea(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 40),
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withAlpha(51),
-                          borderRadius: BorderRadius.circular(24),
+              background: imageUrl != null
+                  ? Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.network(
+                          imageUrl!,
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(
+                              decoration: BoxDecoration(
+                                gradient: isLost
+                                    ? AppColors.lostGradient
+                                    : AppColors.foundGradient,
+                              ),
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  value:
+                                      loadingProgress.expectedTotalBytes != null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                            loadingProgress.expectedTotalBytes!
+                                      : null,
+                                  color: Colors.white,
+                                  strokeWidth: 3,
+                                ),
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                gradient: isLost
+                                    ? AppColors.lostGradient
+                                    : AppColors.foundGradient,
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  _getCategoryIcon(category),
+                                  size: 50,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                        child: Icon(
-                          _getCategoryIcon(category),
-                          size: 50,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withAlpha(51),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              isLost ? Icons.search_off_rounded : Icons.check_circle_rounded,
-                              size: 18,
-                              color: Colors.white,
+                        // Gradient overlay for better text visibility
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.black.withAlpha(77),
+                                Colors.transparent,
+                                Colors.black.withAlpha(128),
+                              ],
                             ),
-                            const SizedBox(width: 6),
-                            Text(
-                              isLost ? 'Lost Item' : 'Found Item',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        // Lost/Found badge
+                        Positioned(
+                          bottom: 40,
+                          left: 0,
+                          right: 0,
+                          child: Center(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isLost
+                                    ? AppColors.lostColor
+                                    : AppColors.foundColor,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    isLost
+                                        ? Icons.search_off_rounded
+                                        : Icons.check_circle_rounded,
+                                    size: 18,
+                                    color: Colors.white,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    isLost ? 'Lost Item' : 'Found Item',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : Container(
+                      decoration: BoxDecoration(
+                        gradient: isLost
+                            ? AppColors.lostGradient
+                            : AppColors.foundGradient,
+                      ),
+                      child: SafeArea(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(height: 40),
+                            Container(
+                              width: 100,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withAlpha(51),
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                              child: Icon(
+                                _getCategoryIcon(category),
+                                size: 50,
                                 color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withAlpha(51),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    isLost
+                                        ? Icons.search_off_rounded
+                                        : Icons.check_circle_rounded,
+                                    size: 18,
+                                    color: Colors.white,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    isLost ? 'Lost Item' : 'Found Item',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
+                    ),
             ),
           ),
 
           // Content
           SliverToBoxAdapter(
             child: Container(
-              decoration: const BoxDecoration(
-                color: AppColors.background,
+              decoration: BoxDecoration(
+                color: context.backgroundColor,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
               ),
               child: Transform.translate(
@@ -184,9 +289,9 @@ class ItemDetailPage extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.surfaceColor,
                           borderRadius: BorderRadius.circular(20),
-                          boxShadow: AppColors.cardShadow,
+                          boxShadow: context.cardShadow,
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,10 +301,10 @@ class ItemDetailPage extends StatelessWidget {
                                 Expanded(
                                   child: Text(
                                     title,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.bold,
-                                      color: AppColors.textPrimary,
+                                      color: context.textPrimary,
                                     ),
                                   ),
                                 ),
@@ -214,7 +319,7 @@ class ItemDetailPage extends StatelessWidget {
                                   ),
                                   child: Text(
                                     category,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
                                       color: AppColors.primary,
@@ -224,18 +329,9 @@ class ItemDetailPage extends StatelessWidget {
                               ],
                             ),
                             const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                _InfoChip(
-                                  icon: Icons.location_on_rounded,
-                                  text: location,
-                                ),
-                                const SizedBox(width: 16),
-                                _InfoChip(
-                                  icon: Icons.access_time_rounded,
-                                  text: time,
-                                ),
-                              ],
+                            _InfoChip(
+                              icon: Icons.location_on_rounded,
+                              text: location,
                             ),
                           ],
                         ),
@@ -247,14 +343,14 @@ class ItemDetailPage extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.surfaceColor,
                           borderRadius: BorderRadius.circular(20),
-                          boxShadow: AppColors.softShadow,
+                          boxShadow: context.softShadow,
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Row(
+                            Row(
                               children: [
                                 Icon(
                                   Icons.description_rounded,
@@ -267,7 +363,7 @@ class ItemDetailPage extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    color: AppColors.textPrimary,
+                                    color: context.textPrimary,
                                   ),
                                 ),
                               ],
@@ -275,9 +371,9 @@ class ItemDetailPage extends StatelessWidget {
                             const SizedBox(height: 12),
                             Text(
                               description ?? 'No description provided.',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
-                                color: AppColors.textSecondary,
+                                color: context.textSecondary,
                                 height: 1.6,
                               ),
                             ),
@@ -291,9 +387,9 @@ class ItemDetailPage extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.surfaceColor,
                           borderRadius: BorderRadius.circular(20),
-                          boxShadow: AppColors.softShadow,
+                          boxShadow: context.softShadow,
                         ),
                         child: Row(
                           children: [
@@ -304,7 +400,7 @@ class ItemDetailPage extends StatelessWidget {
                                 gradient: AppColors.primaryGradient,
                                 borderRadius: BorderRadius.circular(16),
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.person_rounded,
                                 color: Colors.white,
                                 size: 28,
@@ -317,18 +413,18 @@ class ItemDetailPage extends StatelessWidget {
                                 children: [
                                   Text(
                                     isLost ? 'Reported by' : 'Found by',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
-                                      color: AppColors.textSecondary,
+                                      color: context.textSecondary,
                                     ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     reportedBy,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: AppColors.textPrimary,
+                                      color: context.textPrimary,
                                     ),
                                   ),
                                 ],
@@ -341,7 +437,7 @@ class ItemDetailPage extends StatelessWidget {
                                 color: AppColors.primary.withAlpha(26),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.chat_rounded,
                                 color: AppColors.primary,
                                 size: 22,
@@ -363,10 +459,12 @@ class ItemDetailPage extends StatelessWidget {
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.surfaceColor,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(13),
+              color: context.isDarkMode
+                  ? Colors.black.withAlpha(40)
+                  : Colors.black.withAlpha(13),
               blurRadius: 20,
               offset: const Offset(0, -5),
             ),
@@ -383,7 +481,7 @@ class ItemDetailPage extends StatelessWidget {
                   color: AppColors.primary.withAlpha(26),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.chat_bubble_rounded,
                   color: AppColors.primary,
                 ),
@@ -399,7 +497,9 @@ class ItemDetailPage extends StatelessWidget {
                   child: Container(
                     height: 56,
                     decoration: BoxDecoration(
-                      gradient: isLost ? AppColors.foundGradient : AppColors.primaryGradient,
+                      gradient: isLost
+                          ? AppColors.foundGradient
+                          : AppColors.primaryGradient,
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: AppColors.buttonShadow,
                     ),
@@ -407,13 +507,15 @@ class ItemDetailPage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          isLost ? Icons.check_circle_rounded : Icons.pan_tool_rounded,
+                          isLost
+                              ? Icons.check_circle_rounded
+                              : Icons.pan_tool_rounded,
                           color: Colors.white,
                         ),
                         const SizedBox(width: 10),
                         Text(
                           isLost ? 'I Found This Item' : 'Claim This Item',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -435,16 +537,16 @@ class ItemDetailPage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
             Container(
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                gradient: isLost ? AppColors.foundGradient : AppColors.primaryGradient,
+                gradient: isLost
+                    ? AppColors.foundGradient
+                    : AppColors.primaryGradient,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
@@ -456,7 +558,7 @@ class ItemDetailPage extends StatelessWidget {
             const SizedBox(width: 12),
             Text(
               isLost ? 'Found This Item?' : 'Claim Item',
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -468,9 +570,9 @@ class ItemDetailPage extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(
+            child: Text(
               'Cancel',
-              style: TextStyle(color: AppColors.textSecondary),
+              style: TextStyle(color: context.textSecondary),
             ),
           ),
           TextButton(
@@ -499,30 +601,28 @@ class _InfoChip extends StatelessWidget {
   final IconData icon;
   final String text;
 
-  const _InfoChip({
-    required this.icon,
-    required this.text,
-  });
+  const _InfoChip({required this.icon, required this.text});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          icon,
-          size: 16,
-          color: AppColors.textSecondary,
-        ),
-        const SizedBox(width: 6),
-        Text(
-          text,
-          style: const TextStyle(
-            fontSize: 13,
-            color: AppColors.textSecondary,
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.5,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: context.textSecondary),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              text,
+              style: TextStyle(fontSize: 13, color: context.textSecondary),
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

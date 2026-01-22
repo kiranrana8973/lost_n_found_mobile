@@ -96,3 +96,6 @@ app.*.map.json
 
 # IDE specific
 *.code-workspace
+
+# Claude Code
+.claude/

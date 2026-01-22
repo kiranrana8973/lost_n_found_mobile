@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../app/theme/theme_extensions.dart';
 import 'home_screen.dart';
 import 'profile_screen.dart';
 import '../../../item/presentation/pages/my_items_page.dart';
@@ -44,7 +45,7 @@ class _DashboardPageState extends State<DashboardPage> {
           onPressed: _onReportPressed,
           backgroundColor: Colors.transparent,
           elevation: 0,
-          child: const Icon(
+          child: Icon(
             Icons.add_rounded,
             color: Colors.white,
             size: 32,
@@ -52,16 +53,11 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: Container(
+      bottomNavigationBar: Builder(
+        builder: (context) => Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(13),
-              blurRadius: 20,
-              offset: const Offset(0, -5),
-            ),
-          ],
+          color: context.surfaceColor,
+          boxShadow: context.softShadow,
         ),
         child: SafeArea(
           child: Padding(
@@ -102,6 +98,7 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
         ),
       ),
+      ),
     );
   }
 }
@@ -123,12 +120,17 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    // Responsive horizontal padding based on screen width
+    final horizontalPadding = screenWidth < 360 ? 10.0 : 16.0;
+    final fontSize = screenWidth < 360 ? 10.0 : 11.0;
+
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 8),
         decoration: BoxDecoration(
           gradient: isSelected ? AppColors.primaryGradient : null,
           borderRadius: BorderRadius.circular(16),
@@ -141,7 +143,7 @@ class _NavItem extends StatelessWidget {
               children: [
                 Icon(
                   icon,
-                  color: isSelected ? Colors.white : AppColors.textTertiary,
+                  color: isSelected ? Colors.white : context.textTertiary,
                   size: 24,
                 ),
                 if (badge != null)
@@ -157,7 +159,7 @@ class _NavItem extends StatelessWidget {
                       ),
                       child: Text(
                         '$badge',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
@@ -171,10 +173,11 @@ class _NavItem extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                fontSize: 11,
+                fontSize: fontSize,
                 fontWeight: FontWeight.w600,
-                color: isSelected ? Colors.white : AppColors.textTertiary,
+                color: isSelected ? Colors.white : context.textTertiary,
               ),
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

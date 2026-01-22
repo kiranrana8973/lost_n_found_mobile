@@ -1,3 +1,0 @@
-app/ = App-level concerns (DI, routing, initialization)
-core/ = Reusable utilities (theme, widgets, utils)
-features/ = Business features

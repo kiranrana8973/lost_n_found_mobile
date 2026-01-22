@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../app/theme/theme_extensions.dart';
 
 class FoundScreen extends StatefulWidget {
   const FoundScreen({super.key});
@@ -22,7 +23,7 @@ class _FoundScreenState extends State<FoundScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      // backgroundColor: context.backgroundColor // Using theme default,
       body: SafeArea(
         child: Column(
           children: [
@@ -31,7 +32,7 @@ class _FoundScreenState extends State<FoundScreen> {
               padding: const EdgeInsets.all(20.0),
               child: Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -40,7 +41,7 @@ class _FoundScreenState extends State<FoundScreen> {
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: context.textPrimary,
                           ),
                         ),
                         SizedBox(height: 4),
@@ -48,7 +49,7 @@ class _FoundScreenState extends State<FoundScreen> {
                           'Browse and claim your items',
                           style: TextStyle(
                             fontSize: 14,
-                            color: AppColors.textSecondary,
+                            color: context.textSecondary,
                           ),
                         ),
                       ],
@@ -62,9 +63,9 @@ class _FoundScreenState extends State<FoundScreen> {
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: AppColors.softShadow,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.filter_list_rounded,
-                      color: AppColors.textPrimary,
+                      color: context.textPrimary,
                     ),
                   ),
                 ],
@@ -217,7 +218,7 @@ class _FoundItemCard extends StatelessWidget {
                 ),
                 child: Stack(
                   children: [
-                    const Center(
+                    Center(
                       child: Icon(
                         Icons.devices_rounded,
                         size: 60,
@@ -238,10 +239,10 @@ class _FoundItemCard extends StatelessWidget {
                         ),
                         child: Text(
                           time,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
+                            color: context.textPrimary,
                           ),
                         ),
                       ),
@@ -258,10 +259,10 @@ class _FoundItemCard extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                        color: context.textPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -269,18 +270,18 @@ class _FoundItemCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.person_outline_rounded,
                           size: 14,
-                          color: AppColors.textSecondary,
+                          color: context.textSecondary,
                         ),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             foundBy,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
-                              color: AppColors.textSecondary,
+                              color: context.textSecondary,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -291,18 +292,18 @@ class _FoundItemCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.location_on_rounded,
                           size: 14,
-                          color: AppColors.textSecondary,
+                          color: context.textSecondary,
                         ),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             location,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
-                              color: AppColors.textSecondary,
+                              color: context.textSecondary,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,

@@ -127,6 +127,21 @@ class AppColors {
     colors: [onboarding3Primary, onboarding3Secondary],
   );
 
+  // Dark Theme Colors
+  static const Color darkBackground = Color(0xFF0F1419);
+  static const Color darkSurface = Color(0xFF1A1F26);
+  static const Color darkSurfaceVariant = Color(0xFF242A32);
+  static const Color darkInputFill = Color(0xFF1E242C);
+
+  // Dark Text Colors
+  static const Color darkTextPrimary = Color(0xFFE8EAED);
+  static const Color darkTextSecondary = Color(0xFFB4B8BB);
+  static const Color darkTextTertiary = Color(0xFF7C8186);
+
+  // Dark Border & Divider
+  static const Color darkBorder = Color(0xFF2D3339);
+  static const Color darkDivider = Color(0xFF252B33);
+
   // Shadows
   static const List<BoxShadow> cardShadow = [
     BoxShadow(color: Color(0x146C63FF), blurRadius: 24, offset: Offset(0, 8)),
@@ -143,5 +158,14 @@ class AppColors {
   static const List<BoxShadow> elevatedShadow = [
     BoxShadow(color: black20, blurRadius: 30, offset: Offset(0, 15)),
     BoxShadow(color: white30, blurRadius: 20, offset: Offset(0, 5)),
+  ];
+
+  // Dark Theme Shadows
+  static const List<BoxShadow> darkCardShadow = [
+    BoxShadow(color: Color(0x26000000), blurRadius: 24, offset: Offset(0, 8)),
+  ];
+
+  static const List<BoxShadow> darkSoftShadow = [
+    BoxShadow(color: Color(0x1A000000), blurRadius: 12, offset: Offset(0, 4)),
   ];
 }
