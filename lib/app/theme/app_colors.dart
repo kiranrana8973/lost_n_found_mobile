@@ -108,6 +108,12 @@ class AppColors {
     colors: [Color(0xFFF8F9FE), Color(0xFFFFFFFF)],
   );
 
+  static const LinearGradient darkBackgroundGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFF0F1419), Color(0xFF1A1F26)],
+  );
+
   // Onboarding Gradients
   static const LinearGradient onboarding1Gradient = LinearGradient(
     begin: Alignment.topLeft,

@@ -98,7 +98,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          gradient: AppColors.backgroundGradient,
+          gradient: context.backgroundGradient,
         ),
         child: SafeArea(
           child: Column(
@@ -116,7 +116,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                           horizontal: 20,
                           vertical: 12,
                         ),
-                        backgroundColor: AppColors.white30,
+                        backgroundColor: context.isDarkMode
+                            ? Colors.white.withAlpha(20)
+                            : AppColors.white30,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),

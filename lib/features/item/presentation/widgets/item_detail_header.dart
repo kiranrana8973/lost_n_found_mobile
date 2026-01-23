@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 
@@ -27,37 +28,28 @@ class ItemDetailHeader extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        Image.network(
-          imageUrl!,
+        CachedNetworkImage(
+          imageUrl: imageUrl!,
           fit: BoxFit.cover,
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return Container(
-              decoration: BoxDecoration(
-                gradient: isLost ? AppColors.lostGradient : AppColors.foundGradient,
+          placeholder: (context, url) => Container(
+            decoration: BoxDecoration(
+              gradient: isLost ? AppColors.lostGradient : AppColors.foundGradient,
+            ),
+            child: const Center(
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 3,
               ),
-              child: Center(
-                child: CircularProgressIndicator(
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                          loadingProgress.expectedTotalBytes!
-                      : null,
-                  color: Colors.white,
-                  strokeWidth: 3,
-                ),
-              ),
-            );
-          },
-          errorBuilder: (context, error, stackTrace) {
-            return Container(
-              decoration: BoxDecoration(
-                gradient: isLost ? AppColors.lostGradient : AppColors.foundGradient,
-              ),
-              child: Center(
-                child: Icon(categoryIcon, size: 50, color: Colors.white),
-              ),
-            );
-          },
+            ),
+          ),
+          errorWidget: (context, url, error) => Container(
+            decoration: BoxDecoration(
+              gradient: isLost ? AppColors.lostGradient : AppColors.foundGradient,
+            ),
+            child: Center(
+              child: Icon(categoryIcon, size: 50, color: Colors.white),
+            ),
+          ),
         ),
         Container(
           decoration: BoxDecoration(

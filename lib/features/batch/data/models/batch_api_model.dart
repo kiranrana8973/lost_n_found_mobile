@@ -23,11 +23,7 @@ class BatchApiModel {
 
   // toEntity
   BatchEntity toEntity() {
-    return BatchEntity(
-      batchId: id,
-      batchName: 'UK - $batchName',
-      status: status,
-    );
+    return BatchEntity(batchId: id, batchName: batchName, status: status);
   }
 
   // fromEntity

@@ -122,16 +122,12 @@ class _SplashPageState extends ConsumerState<SplashPage>
     final verticalSpacing = screenHeight < 700 ? 30.0 : 40.0;
 
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: context.surfaceColor,
       body: Container(
         width: double.infinity,
         height: double.infinity,
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFFF8FAFF), Color(0xFFFFFFFF)],
-          ),
+          gradient: context.backgroundGradient,
         ),
         child: SafeArea(
           child: Column(
@@ -241,7 +237,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
                         width: bottomLogoWidth,
                         height: bottomLogoHeight,
                         colorFilter: ColorFilter.mode(
-                          AppColors.textSecondary.withAlpha(150),
+                          context.textSecondary.withAlpha(150),
                           BlendMode.srcIn,
                         ),
                       ),

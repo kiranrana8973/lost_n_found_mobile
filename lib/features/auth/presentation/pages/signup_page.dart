@@ -291,11 +291,13 @@ class _SignupPageState extends ConsumerState<SignupPage> {
               counterText: '',
             ),
             validator: (value) {
-              if (value == null || value.isEmpty)
+              if (value == null || value.isEmpty) {
                 return 'Please enter phone number';
+              }
               if (value.length != 10) return 'Phone must be 10 digits';
-              if (!RegExp(r'^[0-9]+$').hasMatch(value))
+              if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
                 return 'Only numbers allowed';
+              }
               return null;
             },
           ),

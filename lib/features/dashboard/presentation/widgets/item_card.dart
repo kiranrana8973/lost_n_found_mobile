@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/theme_extensions.dart';
@@ -90,34 +91,23 @@ class ItemCard extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: imageUrl != null
-          ? Image.network(
-              imageUrl!,
+          ? CachedNetworkImage(
+              imageUrl: imageUrl!,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  decoration: BoxDecoration(
-                    gradient:
-                        isLost ? AppColors.lostGradient : AppColors.foundGradient,
-                  ),
-                  child: Icon(
-                    _getCategoryIcon(category),
-                    color: Colors.white,
-                    size: 28,
-                  ),
-                );
-              },
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) return child;
-                return Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                        : null,
-                  ),
-                );
-              },
+              placeholder: (context, url) => const Center(
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+              errorWidget: (context, url, error) => Container(
+                decoration: BoxDecoration(
+                  gradient:
+                      isLost ? AppColors.lostGradient : AppColors.foundGradient,
+                ),
+                child: Icon(
+                  _getCategoryIcon(category),
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),
             )
           : Icon(
               _getCategoryIcon(category),
