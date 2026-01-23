@@ -29,6 +29,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _selectedFilter = 0;
   String? _selectedCategoryId;
+  String _searchQuery = '';
 
   final List<String> _filters = ['All', 'Lost', 'Found'];
 
@@ -44,12 +45,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   List<ItemEntity> _getFilteredItems(ItemState itemState) {
     List<ItemEntity> items = itemState.items;
 
+    // Filter by search query
+    if (_searchQuery.isNotEmpty) {
+      final query = _searchQuery.toLowerCase();
+      items = items.where((item) {
+        final nameMatch = item.itemName.toLowerCase().contains(query);
+        final descriptionMatch = item.description?.toLowerCase().contains(query) ?? false;
+        final locationMatch = item.location.toLowerCase().contains(query);
+        return nameMatch || descriptionMatch || locationMatch;
+      }).toList();
+    }
+
+    // Filter by type (lost/found)
     if (_selectedFilter == 1) {
       items = items.where((item) => item.type == ItemType.lost).toList();
     } else if (_selectedFilter == 2) {
       items = items.where((item) => item.type == ItemType.found).toList();
     }
 
+    // Filter by category
     if (_selectedCategoryId != null) {
       items = items
           .where((item) => item.category == _selectedCategoryId)
@@ -86,7 +100,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: const SearchBarWidget(),
+                child: SearchBarWidget(
+                  onChanged: (query) {
+                    setState(() => _searchQuery = query);
+                  },
+                ),
               ),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 20)),

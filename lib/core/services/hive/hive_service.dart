@@ -22,8 +22,8 @@ class HiveService {
     _registerAdapter();
     await _openBoxes();
     // insert dummy data
-    await insertBatchDummyData();
-    await insertCategoryDummyData();
+    // await insertBatchDummyData();
+    //await insertCategoryDummyData();
   }
 
   Future<void> insertBatchDummyData() async {
@@ -146,6 +146,14 @@ class HiveService {
     await _batchBox.delete(batchId);
   }
 
+  /// Cache all batches (clear existing and replace with new data)
+  Future<void> cacheAllBatches(List<BatchHiveModel> batches) async {
+    await _batchBox.clear();
+    for (var batch in batches) {
+      await _batchBox.put(batch.batchId, batch);
+    }
+  }
+
   // ======================= Auth Queries =========================
 
   Box<AuthHiveModel> get _authBox =>
@@ -244,6 +252,14 @@ class HiveService {
     await _itemBox.delete(itemId);
   }
 
+  /// Cache all items (clear existing and replace with new data)
+  Future<void> cacheAllItems(List<ItemHiveModel> items) async {
+    await _itemBox.clear();
+    for (var item in items) {
+      await _itemBox.put(item.itemId, item);
+    }
+  }
+
   // ======================= Category Queries =========================
 
   Box<CategoryHiveModel> get _categoryBox =>
@@ -272,5 +288,13 @@ class HiveService {
 
   Future<void> deleteCategory(String categoryId) async {
     await _categoryBox.delete(categoryId);
+  }
+
+  /// Cache all categories (clear existing and replace with new data)
+  Future<void> cacheAllCategories(List<CategoryHiveModel> categories) async {
+    await _categoryBox.clear();
+    for (var category in categories) {
+      await _categoryBox.put(category.categoryId, category);
+    }
   }
 }

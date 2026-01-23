@@ -24,12 +24,12 @@ final batchRepositoryProvider = Provider<IBatchRepository>((ref) {
 });
 
 class BatchRepository implements IBatchRepository {
-  final IBatchLocalDataSource _batchLocalDataSource;
+  final BatchLocalDatasource _batchLocalDataSource;
   final IBatchRemoteDataSource _batchRemoteDataSource;
   final NetworkInfo _networkInfo;
 
   BatchRepository({
-    required IBatchLocalDataSource batchDatasource,
+    required BatchLocalDatasource batchDatasource,
     required IBatchRemoteDataSource batchRemoteDataSource,
     required NetworkInfo networkInfo,
   }) : _batchLocalDataSource = batchDatasource,
@@ -70,33 +70,34 @@ class BatchRepository implements IBatchRepository {
 
   @override
   Future<Either<Failure, List<BatchEntity>>> getAllBatches() async {
-    // internet cha ki chaina
     if (await _networkInfo.isConnected) {
       try {
-        // api model lai capture garyu
         final apiModels = await _batchRemoteDataSource.getAllBatches();
-        // convert to entty
+        // Cache the data locally for offline access
+        final hiveModels = BatchHiveModel.fromApiModelList(apiModels);
+        await _batchLocalDataSource.cacheAllBatches(hiveModels);
         final result = BatchApiModel.toEntityList(apiModels);
-
         return Right(result);
       } on DioException catch (e) {
-        return Left(
-          ApiFailure(
-            statusCode: e.response?.statusCode,
-            message: e.response?.data['message'] ?? 'Failed to fetch batches',
-          ),
-        );
+        // API failed, try to return cached data
+        return _getCachedBatches();
       } catch (e) {
-        return Left(LocalDatabaseFailure(message: e.toString()));
+        // API failed, try to return cached data
+        return _getCachedBatches();
       }
     } else {
-      try {
-        final models = await _batchLocalDataSource.getAllBatches();
-        final entities = BatchHiveModel.toEntityList(models);
-        return Right(entities);
-      } catch (e) {
-        return Left(LocalDatabaseFailure(message: e.toString()));
-      }
+      return _getCachedBatches();
+    }
+  }
+
+  /// Helper method to get cached batches
+  Future<Either<Failure, List<BatchEntity>>> _getCachedBatches() async {
+    try {
+      final models = await _batchLocalDataSource.getAllBatches();
+      final entities = BatchHiveModel.toEntityList(models);
+      return Right(entities);
+    } catch (e) {
+      return Left(LocalDatabaseFailure(message: e.toString()));
     }
   }
 

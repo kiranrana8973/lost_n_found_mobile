@@ -63,4 +63,9 @@ class CategoryLocalDatasource implements ICategoryDataSource {
       return false;
     }
   }
+
+  /// Cache all categories from API response
+  Future<void> cacheAllCategories(List<CategoryHiveModel> categories) async {
+    await _hiveService.cacheAllCategories(categories);
+  }
 }

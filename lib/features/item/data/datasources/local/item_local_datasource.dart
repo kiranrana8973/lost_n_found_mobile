@@ -97,4 +97,9 @@ class ItemLocalDatasource implements IItemLocalDataSource {
       return false;
     }
   }
+
+  /// Cache all items from API response
+  Future<void> cacheAllItems(List<ItemHiveModel> items) async {
+    await _hiveService.cacheAllItems(items);
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:lost_n_found/core/constants/hive_table_constant.dart';
+import 'package:lost_n_found/features/item/data/models/item_api_model.dart';
 import 'package:lost_n_found/features/item/domain/entities/item_entity.dart';
 import 'package:uuid/uuid.dart';
 
@@ -96,5 +97,28 @@ class ItemHiveModel extends HiveObject {
 
   static List<ItemEntity> toEntityList(List<ItemHiveModel> models) {
     return models.map((model) => model.toEntity()).toList();
+  }
+
+  /// Convert from API model to Hive model for caching
+  factory ItemHiveModel.fromApiModel(ItemApiModel apiModel) {
+    return ItemHiveModel(
+      itemId: apiModel.id,
+      reportedBy: apiModel.reportedBy,
+      claimedBy: apiModel.claimedBy,
+      category: apiModel.category,
+      itemName: apiModel.itemName,
+      description: apiModel.description,
+      type: apiModel.type,
+      location: apiModel.location,
+      media: apiModel.media,
+      mediaType: apiModel.mediaType,
+      isClaimed: apiModel.isClaimed,
+      status: apiModel.status,
+    );
+  }
+
+  /// Convert list of API models to Hive models for caching
+  static List<ItemHiveModel> fromApiModelList(List<ItemApiModel> apiModels) {
+    return apiModels.map((model) => ItemHiveModel.fromApiModel(model)).toList();
   }
 }

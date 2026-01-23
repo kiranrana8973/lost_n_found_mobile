@@ -4,6 +4,7 @@
 // Adapter
 import 'package:hive/hive.dart';
 import 'package:lost_n_found/core/constants/hive_table_constant.dart';
+import 'package:lost_n_found/features/batch/data/models/batch_api_model.dart';
 import 'package:lost_n_found/features/batch/domain/entities/batch_entity.dart';
 import 'package:uuid/uuid.dart';
 
@@ -35,5 +36,19 @@ class BatchHiveModel extends HiveObject {
   // EntityList
   static List<BatchEntity> toEntityList(List<BatchHiveModel> models) {
     return models.map((model) => model.toEntity()).toList();
+  }
+
+  /// Convert from API model to Hive model for caching
+  factory BatchHiveModel.fromApiModel(BatchApiModel apiModel) {
+    return BatchHiveModel(
+      batchId: apiModel.id,
+      batchName: apiModel.batchName,
+      status: apiModel.status,
+    );
+  }
+
+  /// Convert list of API models to Hive models for caching
+  static List<BatchHiveModel> fromApiModelList(List<BatchApiModel> apiModels) {
+    return apiModels.map((model) => BatchHiveModel.fromApiModel(model)).toList();
   }
 }

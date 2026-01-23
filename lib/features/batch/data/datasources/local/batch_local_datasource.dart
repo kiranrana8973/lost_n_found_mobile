@@ -63,4 +63,9 @@ class BatchLocalDatasource implements IBatchLocalDataSource {
       return false;
     }
   }
+
+  /// Cache all batches from API response
+  Future<void> cacheAllBatches(List<BatchHiveModel> batches) async {
+    await _hiveService.cacheAllBatches(batches);
+  }
 }

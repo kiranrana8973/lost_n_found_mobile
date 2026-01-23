@@ -1,5 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:lost_n_found/core/constants/hive_table_constant.dart';
+import 'package:lost_n_found/features/category/data/models/category_api_model.dart';
 import 'package:lost_n_found/features/category/domain/entities/category_entity.dart';
 import 'package:uuid/uuid.dart';
 
@@ -47,5 +48,20 @@ class CategoryHiveModel extends HiveObject {
 
   static List<CategoryEntity> toEntityList(List<CategoryHiveModel> models) {
     return models.map((model) => model.toEntity()).toList();
+  }
+
+  /// Convert from API model to Hive model for caching
+  factory CategoryHiveModel.fromApiModel(CategoryApiModel apiModel) {
+    return CategoryHiveModel(
+      categoryId: apiModel.id,
+      name: apiModel.name,
+      description: apiModel.description,
+      status: apiModel.status,
+    );
+  }
+
+  /// Convert list of API models to Hive models for caching
+  static List<CategoryHiveModel> fromApiModelList(List<CategoryApiModel> apiModels) {
+    return apiModels.map((model) => CategoryHiveModel.fromApiModel(model)).toList();
   }
 }

@@ -24,12 +24,12 @@ final itemRepositoryProvider = Provider<IItemRepository>((ref) {
 });
 
 class ItemRepository implements IItemRepository {
-  final IItemLocalDataSource _localDataSource;
+  final ItemLocalDatasource _localDataSource;
   final IItemRemoteDataSource _remoteDataSource;
   final NetworkInfo _networkInfo;
 
   ItemRepository({
-    required IItemLocalDataSource localDatasource,
+    required ItemLocalDatasource localDatasource,
     required IItemRemoteDataSource remoteDatasource,
     required NetworkInfo networkInfo,
   }) : _localDataSource = localDatasource,
@@ -80,19 +80,28 @@ class ItemRepository implements IItemRepository {
     if (await _networkInfo.isConnected) {
       try {
         final models = await _remoteDataSource.getAllItems();
+        // Cache the data locally for offline access
+        final hiveModels = ItemHiveModel.fromApiModelList(models);
+        await _localDataSource.cacheAllItems(hiveModels);
         final entities = ItemApiModel.toEntityList(models);
         return Right(entities);
       } catch (e) {
-        return Left(ApiFailure(message: e.toString()));
+        // API failed, try to return cached data
+        return _getCachedItems();
       }
     } else {
-      try {
-        final models = await _localDataSource.getAllItems();
-        final entities = ItemHiveModel.toEntityList(models);
-        return Right(entities);
-      } catch (e) {
-        return Left(LocalDatabaseFailure(message: e.toString()));
-      }
+      return _getCachedItems();
+    }
+  }
+
+  /// Helper method to get cached items
+  Future<Either<Failure, List<ItemEntity>>> _getCachedItems() async {
+    try {
+      final models = await _localDataSource.getAllItems();
+      final entities = ItemHiveModel.toEntityList(models);
+      return Right(entities);
+    } catch (e) {
+      return Left(LocalDatabaseFailure(message: e.toString()));
     }
   }
 
