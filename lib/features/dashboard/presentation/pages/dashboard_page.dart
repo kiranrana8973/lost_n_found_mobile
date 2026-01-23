@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/theme_extensions.dart';
+import '../../../../core/localization/app_localizations.dart';
 import 'home_screen.dart';
 import 'profile_screen.dart';
 import '../../../item/presentation/pages/my_items_page.dart';
@@ -33,6 +34,8 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       body: _screens[_currentIndex],
       floatingActionButton: Container(
@@ -45,7 +48,7 @@ class _DashboardPageState extends State<DashboardPage> {
           onPressed: _onReportPressed,
           backgroundColor: Colors.transparent,
           elevation: 0,
-          child: Icon(
+          child: const Icon(
             Icons.add_rounded,
             color: Colors.white,
             size: 32,
@@ -67,29 +70,30 @@ class _DashboardPageState extends State<DashboardPage> {
               children: [
                 _NavItem(
                   icon: Icons.home_rounded,
-                  label: 'Home',
+                  label: l10n?.home ?? 'Home',
                   isSelected: _currentIndex == 0,
                   onTap: () => setState(() => _currentIndex = 0),
                 ),
                 _NavItem(
                   icon: Icons.inventory_2_rounded,
-                  label: 'My Items',
+                  label: l10n?.myItems ?? 'My Items',
                   isSelected: _currentIndex == 1,
                   onTap: () => setState(() => _currentIndex = 1),
                 ),
                 const SizedBox(width: 60), // Space for FAB
                 _NavItem(
                   icon: Icons.notifications_rounded,
-                  label: 'Alerts',
+                  label: l10n?.alerts ?? 'Alerts',
                   isSelected: false,
                   badge: 3,
+                  badgeText: l10n?.formatNumber(3),
                   onTap: () {
                     // Show notifications
                   },
                 ),
                 _NavItem(
                   icon: Icons.person_rounded,
-                  label: 'Profile',
+                  label: l10n?.profile ?? 'Profile',
                   isSelected: _currentIndex == 2,
                   onTap: () => setState(() => _currentIndex = 2),
                 ),
@@ -109,6 +113,7 @@ class _NavItem extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
   final int? badge;
+  final String? badgeText;
 
   const _NavItem({
     required this.icon,
@@ -116,6 +121,7 @@ class _NavItem extends StatelessWidget {
     required this.isSelected,
     required this.onTap,
     this.badge,
+    this.badgeText,
   });
 
   @override
@@ -158,8 +164,8 @@ class _NavItem extends StatelessWidget {
                         border: Border.all(color: Colors.white, width: 2),
                       ),
                       child: Text(
-                        '$badge',
-                        style: TextStyle(
+                        badgeText ?? '$badge',
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,

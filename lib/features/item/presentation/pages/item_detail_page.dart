@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/theme_extensions.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../widgets/info_chip.dart';
 import '../widgets/item_detail_header.dart';
@@ -214,9 +215,10 @@ class ItemDetailPage extends StatelessWidget {
   }
 
   void _showClaimDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
@@ -236,35 +238,41 @@ class ItemDetailPage extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            Text(
-              isLost ? 'Found This Item?' : 'Claim Item',
-              style: const TextStyle(fontWeight: FontWeight.bold),
+            Expanded(
+              child: Text(
+                isLost
+                    ? (l10n?.foundThisItem ?? 'Found This Item?')
+                    : (l10n?.claimItemTitle ?? 'Claim Item'),
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),
         content: Text(
           isLost
-              ? 'You will be connected with the owner to return the item. Continue?'
-              : 'Please provide proof of ownership to claim this item.',
+              ? (l10n?.foundItemDialogContent ?? 'You will be connected with the owner to return the item. Continue?')
+              : (l10n?.claimItemDialogContent ?? 'Please provide proof of ownership to claim this item.'),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text(
-              'Cancel',
+              l10n?.cancel ?? 'Cancel',
               style: TextStyle(color: context.textSecondary),
             ),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               SnackbarUtils.showSuccess(
                 context,
-                isLost ? 'Owner has been notified!' : 'Claim request sent!',
+                isLost
+                    ? (l10n?.ownerNotified ?? 'Owner has been notified!')
+                    : (l10n?.claimRequestSent ?? 'Claim request sent!'),
               );
             },
             child: Text(
-              'Continue',
+              l10n?.continueText ?? 'Continue',
               style: TextStyle(
                 color: isLost ? AppColors.foundColor : AppColors.primary,
                 fontWeight: FontWeight.bold,

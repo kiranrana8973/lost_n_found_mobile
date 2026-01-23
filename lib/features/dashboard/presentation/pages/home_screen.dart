@@ -4,6 +4,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/theme_extensions.dart';
 import '../../../../app/routes/app_routes.dart';
 import '../../../../core/api/api_endpoints.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/services/storage/user_session_service.dart';
 import '../../../item/presentation/pages/item_detail_page.dart';
 import '../../../item/domain/entities/item_entity.dart';
@@ -31,7 +32,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   String? _selectedCategoryId;
   String _searchQuery = '';
 
-  final List<String> _filters = ['All', 'Lost', 'Found'];
+  List<String> _getFilters(AppLocalizations? l10n) {
+    return [
+      l10n?.all ?? 'All',
+      l10n?.lost ?? 'Lost',
+      l10n?.found ?? 'Found',
+    ];
+  }
 
   @override
   void initState() {
@@ -84,6 +91,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final itemState = ref.watch(itemViewModelProvider);
     final categoryState = ref.watch(categoryViewModelProvider);
     final filteredItems = _getFilteredItems(itemState);
@@ -101,6 +109,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: SearchBarWidget(
+                  hintText: l10n?.searchItems ?? 'Search items...',
                   onChanged: (query) {
                     setState(() => _searchQuery = query);
                   },
@@ -112,7 +121,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: FilterTabs(
-                  filters: _filters,
+                  filters: _getFilters(l10n),
                   selectedIndex: _selectedFilter,
                   onFilterChanged: (index) {
                     setState(() => _selectedFilter = index);
@@ -139,8 +148,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     Expanded(
                       child: StatCard(
                         icon: Icons.search_off_rounded,
-                        title: 'Lost Items',
-                        value: '${itemState.lostItems.length}',
+                        title: l10n?.lostItems ?? 'Lost Items',
+                        value: l10n?.formatNumber(itemState.lostItems.length) ?? '${itemState.lostItems.length}',
                         gradient: AppColors.lostGradient,
                       ),
                     ),
@@ -148,8 +157,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     Expanded(
                       child: StatCard(
                         icon: Icons.check_circle_rounded,
-                        title: 'Found Items',
-                        value: '${itemState.foundItems.length}',
+                        title: l10n?.foundItems ?? 'Found Items',
+                        value: l10n?.formatNumber(itemState.foundItems.length) ?? '${itemState.foundItems.length}',
                         gradient: AppColors.foundGradient,
                       ),
                     ),
@@ -165,7 +174,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Recent Items',
+                      l10n?.recentItems ?? 'Recent Items',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -175,7 +184,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     TextButton(
                       onPressed: () {},
                       child: Text(
-                        'See All',
+                        l10n?.seeAll ?? 'See All',
                         style: TextStyle(
                           color: AppColors.primary,
                           fontWeight: FontWeight.w600,
@@ -187,7 +196,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 12)),
-            _buildItemsList(itemState, filteredItems, categoryState.categories),
+            _buildItemsList(itemState, filteredItems, categoryState.categories, l10n),
             const SliverToBoxAdapter(child: SizedBox(height: 100)),
           ],
         ),
@@ -199,6 +208,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     ItemState itemState,
     List<ItemEntity> filteredItems,
     List<CategoryEntity> categories,
+    AppLocalizations? l10n,
   ) {
     if (itemState.status == ItemStatus.loading) {
       return const SliverToBoxAdapter(
@@ -240,7 +250,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       location: item.location,
                       category: categoryName,
                       isLost: item.type == ItemType.lost,
-                      description: item.description ?? 'No description provided.',
+                      description: item.description ?? (l10n?.noDescription ?? 'No description provided.'),
                       reportedBy: item.reportedBy ?? 'Anonymous',
                       imageUrl: item.media != null
                           ? ApiEndpoints.itemPicture(item.media!)

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../../../app/theme/theme_extensions.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/services/storage/user_session_service.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../../../category/presentation/state/category_state.dart';
@@ -94,24 +95,25 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
   }
 
   void _showPermissionDeniedDialog() {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Permission Required"),
-        content: const Text(
-          "This feature requires permission to access your camera or gallery. Please enable it in your device settings.",
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n?.permissionRequired ?? "Permission Required"),
+        content: Text(
+          l10n?.permissionDeniedMessage ?? "This feature requires permission to access your camera or gallery. Please enable it in your device settings.",
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(l10n?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop();
+              Navigator.of(dialogContext).pop();
               openAppSettings();
             },
-            child: const Text('Open Settings'),
+            child: Text(l10n?.openSettings ?? 'Open Settings'),
           ),
         ],
       ),
@@ -159,9 +161,10 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
     } catch (e) {
       debugPrint('Gallery Error $e');
       if (mounted) {
+        final l10n = AppLocalizations.of(context);
         SnackbarUtils.showError(
           context,
-          'Unable to access gallery. Please try using the camera instead.',
+          l10n?.galleryError ?? 'Unable to access gallery. Please try using the camera instead.',
         );
       }
     }
@@ -206,6 +209,7 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final itemState = ref.watch(itemViewModelProvider);
     final categoryState = ref.watch(categoryViewModelProvider);
 
@@ -214,8 +218,8 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
         SnackbarUtils.showSuccess(
           context,
           _selectedType == ItemType.lost
-              ? 'Lost item reported successfully!'
-              : 'Found item reported successfully!',
+              ? (l10n?.lostItemSuccess ?? 'Lost item reported successfully!')
+              : (l10n?.foundItemSuccess ?? 'Found item reported successfully!'),
         );
         Navigator.pop(context);
       } else if (next.status == ItemStatus.error && next.errorMessage != null) {
@@ -233,7 +237,7 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(context),
+            _buildHeader(context, l10n),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -258,20 +262,20 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
                         },
                       ),
                       const SizedBox(height: 24),
-                      const FormSectionHeader(title: 'Item Name'),
+                      FormSectionHeader(title: l10n?.itemName ?? 'Item Name'),
                       const SizedBox(height: 12),
                       StyledTextField(
                         controller: _titleController,
-                        hintText: 'e.g., iPhone 14 Pro, Blue Wallet',
+                        hintText: l10n?.itemNameHint ?? 'e.g., iPhone 14 Pro, Blue Wallet',
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter item name';
+                            return l10n?.pleaseEnterItemName ?? 'Please enter item name';
                           }
                           return null;
                         },
                       ),
                       const SizedBox(height: 24),
-                      const FormSectionHeader(title: 'Category'),
+                      FormSectionHeader(title: l10n?.category ?? 'Category'),
                       const SizedBox(height: 12),
                       CategoryChipSelector(
                         categories: categoryState.categories,
@@ -282,27 +286,27 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
                         },
                       ),
                       const SizedBox(height: 24),
-                      const FormSectionHeader(title: 'Location'),
+                      FormSectionHeader(title: l10n?.location ?? 'Location'),
                       const SizedBox(height: 12),
                       StyledTextField(
                         controller: _locationController,
                         hintText: _selectedType == ItemType.lost
-                            ? 'Where did you lose it?'
-                            : 'Where did you find it?',
+                            ? (l10n?.whereLost ?? 'Where did you lose it?')
+                            : (l10n?.whereFound ?? 'Where did you find it?'),
                         prefixIcon: Icons.location_on_rounded,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter location';
+                            return l10n?.pleaseEnterLocation ?? 'Please enter location';
                           }
                           return null;
                         },
                       ),
                       const SizedBox(height: 24),
-                      const FormSectionHeader(title: 'Description'),
+                      FormSectionHeader(title: l10n?.description ?? 'Description'),
                       const SizedBox(height: 12),
                       StyledTextField(
                         controller: _descriptionController,
-                        hintText: 'Provide additional details about the item...',
+                        hintText: l10n?.provideDetails ?? 'Provide additional details about the item...',
                         maxLines: 4,
                       ),
                       const SizedBox(height: 32),
@@ -323,7 +327,7 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, AppLocalizations? l10n) {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Row(
@@ -347,7 +351,7 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
           const SizedBox(width: 16),
           Expanded(
             child: Text(
-              'Report Item',
+              l10n?.reportItem ?? 'Report Item',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,

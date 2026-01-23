@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/theme_extensions.dart';
+import '../../../../core/localization/app_localizations.dart';
+import '../../../../core/localization/language_provider.dart';
 
-class HomeHeader extends StatelessWidget {
+class HomeHeader extends ConsumerWidget {
   final String userName;
 
   const HomeHeader({
@@ -11,7 +14,11 @@ class HomeHeader extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final localeNotifier = ref.watch(localeProvider.notifier);
+    final isEnglish = ref.watch(localeProvider).languageCode == 'en';
+    final l10n = AppLocalizations.of(context);
+
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Row(
@@ -21,7 +28,7 @@ class HomeHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Welcome Back!',
+                l10n?.welcomeBack ?? 'Welcome Back!',
                 style: TextStyle(
                   fontSize: 16,
                   color: context.textSecondary,
@@ -39,8 +46,56 @@ class HomeHeader extends StatelessWidget {
               ),
             ],
           ),
-          _buildNotificationButton(),
+          Row(
+            children: [
+              _buildLanguageSwitch(context, ref, isEnglish, localeNotifier),
+              const SizedBox(width: 12),
+              _buildNotificationButton(),
+            ],
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLanguageSwitch(
+    BuildContext context,
+    WidgetRef ref,
+    bool isEnglish,
+    LocaleNotifier localeNotifier,
+  ) {
+    return GestureDetector(
+      onTap: () => localeNotifier.toggleLanguage(),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: context.surfaceColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppColors.primary.withValues(alpha: 0.3),
+            width: 1.5,
+          ),
+          boxShadow: context.softShadow,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              isEnglish ? 'EN' : 'NE',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Icon(
+              Icons.language_rounded,
+              size: 20,
+              color: AppColors.primary,
+            ),
+          ],
+        ),
       ),
     );
   }

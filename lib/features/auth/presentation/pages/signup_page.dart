@@ -5,6 +5,7 @@ import 'package:lost_n_found/features/auth/presentation/view_model/auth_viewmode
 import 'package:lost_n_found/features/batch/presentation/state/batch_state.dart';
 import 'package:lost_n_found/features/batch/presentation/view_model/batch_viewmodel.dart';
 import '../../../../app/theme/theme_extensions.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/widgets/gradient_button.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../widgets/auth_header.dart';
@@ -57,11 +58,11 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     super.dispose();
   }
 
-  Future<void> _handleSignup() async {
+  Future<void> _handleSignup(AppLocalizations? l10n) async {
     if (!_agreedToTerms) {
       SnackbarUtils.showError(
         context,
-        'Please agree to the Terms & Conditions',
+        l10n?.agreeTerms ?? 'Please agree to the Terms & Conditions',
       );
       return;
     }
@@ -84,6 +85,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final batchState = ref.watch(batchViewModelProvider);
     final authState = ref.watch(authViewModelProvider);
 
@@ -91,7 +93,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
       if (next.status == AuthStatus.registered) {
         SnackbarUtils.showSuccess(
           context,
-          'Registration successful! Please login.',
+          l10n?.registrationSuccess ?? 'Registration successful! Please login.',
         );
         Navigator.of(context).pop();
       } else if (next.status == AuthStatus.error && next.errorMessage != null) {
@@ -124,30 +126,30 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const AuthHeader(
+                  AuthHeader(
                     icon: Icons.person_add_rounded,
-                    title: 'Join Us Today',
-                    subtitle: 'Create your account to get started',
+                    title: l10n?.joinUsToday ?? 'Join Us Today',
+                    subtitle: l10n?.createAccountSubtitle ?? 'Create your account to get started',
                   ),
                   const SizedBox(height: 32),
-                  _buildNameField(),
+                  _buildNameField(l10n),
                   const SizedBox(height: 16),
-                  _buildEmailField(),
+                  _buildEmailField(l10n),
                   const SizedBox(height: 16),
-                  _buildPhoneRow(),
+                  _buildPhoneRow(l10n),
                   const SizedBox(height: 16),
-                  _buildBatchDropdown(batchState),
+                  _buildBatchDropdown(batchState, l10n),
                   const SizedBox(height: 16),
                   PasswordField(
                     controller: _passwordController,
-                    labelText: 'Password',
-                    hintText: 'Create a strong password',
+                    labelText: l10n?.password ?? 'Password',
+                    hintText: l10n?.createStrongPassword ?? 'Create a strong password',
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter a password';
+                        return l10n?.pleaseEnterPassword ?? 'Please enter a password';
                       }
                       if (value.length < 6) {
-                        return 'Password must be at least 6 characters';
+                        return l10n?.passwordMinLength ?? 'Password must be at least 6 characters';
                       }
                       return null;
                     },
@@ -155,14 +157,14 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                   const SizedBox(height: 16),
                   PasswordField(
                     controller: _confirmPasswordController,
-                    labelText: 'Confirm Password',
-                    hintText: 'Re-enter your password',
+                    labelText: l10n?.confirmPassword ?? 'Confirm Password',
+                    hintText: l10n?.reenterPassword ?? 'Re-enter your password',
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please confirm your password';
+                        return l10n?.pleaseConfirmPassword ?? 'Please confirm your password';
                       }
                       if (value != _passwordController.text) {
-                        return 'Passwords do not match';
+                        return l10n?.passwordsNotMatch ?? 'Passwords do not match';
                       }
                       return null;
                     },
@@ -175,14 +177,14 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                   ),
                   const SizedBox(height: 32),
                   GradientButton(
-                    text: 'Create Account',
-                    onPressed: _handleSignup,
+                    text: l10n?.createAccount ?? 'Create Account',
+                    onPressed: () => _handleSignup(l10n),
                     isLoading: authState.status == AuthStatus.loading,
                   ),
                   const SizedBox(height: 32),
                   AuthLinkText(
-                    text: 'Already have an account? ',
-                    linkText: 'Login',
+                    text: l10n?.alreadyHaveAccount ?? 'Already have an account? ',
+                    linkText: l10n?.login ?? 'Login',
                     onTap: _navigateToLogin,
                   ),
                   const SizedBox(height: 16),
@@ -195,44 +197,44 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     );
   }
 
-  Widget _buildNameField() {
+  Widget _buildNameField(AppLocalizations? l10n) {
     return TextFormField(
       controller: _nameController,
       keyboardType: TextInputType.name,
       textCapitalization: TextCapitalization.words,
-      decoration: const InputDecoration(
-        labelText: 'Full Name',
-        hintText: 'Enter your full name',
-        prefixIcon: Icon(Icons.person_outline_rounded),
+      decoration: InputDecoration(
+        labelText: l10n?.fullName ?? 'Full Name',
+        hintText: l10n?.enterFullName ?? 'Enter your full name',
+        prefixIcon: const Icon(Icons.person_outline_rounded),
       ),
       validator: (value) {
-        if (value == null || value.isEmpty) return 'Please enter your name';
-        if (value.length < 3) return 'Name must be at least 3 characters';
+        if (value == null || value.isEmpty) return l10n?.pleaseEnterName ?? 'Please enter your name';
+        if (value.length < 3) return l10n?.nameMinLength ?? 'Name must be at least 3 characters';
         return null;
       },
     );
   }
 
-  Widget _buildEmailField() {
+  Widget _buildEmailField(AppLocalizations? l10n) {
     return TextFormField(
       controller: _emailController,
       keyboardType: TextInputType.emailAddress,
-      decoration: const InputDecoration(
-        labelText: 'Email Address',
-        hintText: 'Enter your email',
-        prefixIcon: Icon(Icons.email_outlined),
+      decoration: InputDecoration(
+        labelText: l10n?.emailAddress ?? 'Email Address',
+        hintText: l10n?.enterYourEmail ?? 'Enter your email',
+        prefixIcon: const Icon(Icons.email_outlined),
       ),
       validator: (value) {
-        if (value == null || value.isEmpty) return 'Please enter your email';
+        if (value == null || value.isEmpty) return l10n?.pleaseEnterEmail ?? 'Please enter your email';
         if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-          return 'Please enter a valid email';
+          return l10n?.pleaseEnterValidEmail ?? 'Please enter a valid email';
         }
         return null;
       },
     );
   }
 
-  Widget _buildPhoneRow() {
+  Widget _buildPhoneRow(AppLocalizations? l10n) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -241,9 +243,9 @@ class _SignupPageState extends ConsumerState<SignupPage> {
           child: DropdownButtonFormField<String>(
             initialValue: _selectedCountryCode,
             isExpanded: true,
-            decoration: const InputDecoration(
-              labelText: 'Code',
-              contentPadding: EdgeInsets.symmetric(
+            decoration: InputDecoration(
+              labelText: l10n?.code ?? 'Code',
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
                 vertical: 16,
               ),
@@ -284,10 +286,10 @@ class _SignupPageState extends ConsumerState<SignupPage> {
             controller: _phoneController,
             keyboardType: TextInputType.number,
             maxLength: 10,
-            decoration: const InputDecoration(
-              labelText: 'Phone Number',
+            decoration: InputDecoration(
+              labelText: l10n?.phoneNumber ?? 'Phone Number',
               hintText: '9800000000',
-              prefixIcon: Icon(Icons.phone_outlined),
+              prefixIcon: const Icon(Icons.phone_outlined),
               counterText: '',
             ),
             validator: (value) {
@@ -306,14 +308,14 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     );
   }
 
-  Widget _buildBatchDropdown(BatchState batchState) {
+  Widget _buildBatchDropdown(BatchState batchState, AppLocalizations? l10n) {
     return DropdownButtonFormField<String>(
       initialValue: _selectedBatch,
       decoration: InputDecoration(
-        labelText: 'Select Batch',
+        labelText: l10n?.selectBatch ?? 'Select Batch',
         hintText: batchState.status == BatchStatus.loading
-            ? 'Loading batches...'
-            : 'Choose your batch',
+            ? (l10n?.loadingBatches ?? 'Loading batches...')
+            : (l10n?.chooseBatch ?? 'Choose your batch'),
         prefixIcon: const Icon(Icons.school_rounded),
       ),
       items: batchState.batches.map((batch) {
@@ -324,7 +326,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
       }).toList(),
       onChanged: (value) => _selectedBatch = value,
       validator: (value) {
-        if (value == null || value.isEmpty) return 'Please select your batch';
+        if (value == null || value.isEmpty) return l10n?.pleaseSelectBatch ?? 'Please select your batch';
         return null;
       },
     );

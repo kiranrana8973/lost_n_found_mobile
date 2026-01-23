@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lost_n_found/core/api/api_endpoints.dart';
+import 'package:lost_n_found/core/localization/app_localizations.dart';
 import 'package:lost_n_found/core/services/storage/user_session_service.dart';
 import 'package:lost_n_found/features/category/presentation/view_model/category_viewmodel.dart';
 import 'package:lost_n_found/features/item/domain/entities/item_entity.dart';
@@ -43,17 +44,18 @@ class _MyItemsPageState extends ConsumerState<MyItemsPage>
     super.dispose();
   }
 
-  String _getCategoryName(String? categoryId) {
-    if (categoryId == null) return 'Other';
+  String _getCategoryName(String? categoryId, AppLocalizations? l10n) {
+    if (categoryId == null) return l10n?.other ?? 'Other';
     final categoryState = ref.read(categoryViewModelProvider);
     final category = categoryState.categories.where(
       (c) => c.categoryId == categoryId,
     );
-    return category.isNotEmpty ? category.first.name : 'Other';
+    return category.isNotEmpty ? category.first.name : (l10n?.other ?? 'Other');
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final itemState = ref.watch(itemViewModelProvider);
     final myLostItems = itemState.myLostItems;
     final myFoundItems = itemState.myFoundItems;
@@ -62,8 +64,8 @@ class _MyItemsPageState extends ConsumerState<MyItemsPage>
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(context),
-            _buildTabBar(context, myLostItems.length, myFoundItems.length),
+            _buildHeader(context, l10n),
+            _buildTabBar(context, l10n, myLostItems.length, myFoundItems.length),
             const SizedBox(height: 20),
             Expanded(
               child: itemState.status == ItemStatus.loading
@@ -73,8 +75,8 @@ class _MyItemsPageState extends ConsumerState<MyItemsPage>
                   : TabBarView(
                       controller: _tabController,
                       children: [
-                        _buildItemsList(myLostItems, true),
-                        _buildItemsList(myFoundItems, false),
+                        _buildItemsList(myLostItems, true, l10n),
+                        _buildItemsList(myFoundItems, false, l10n),
                       ],
                     ),
             ),
@@ -84,7 +86,7 @@ class _MyItemsPageState extends ConsumerState<MyItemsPage>
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, AppLocalizations? l10n) {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Row(
@@ -94,7 +96,7 @@ class _MyItemsPageState extends ConsumerState<MyItemsPage>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'My Items',
+                  l10n?.myItems ?? 'My Items',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -103,7 +105,7 @@ class _MyItemsPageState extends ConsumerState<MyItemsPage>
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Track your reports',
+                  l10n?.trackYourReports ?? 'Track your reports',
                   style: TextStyle(
                     fontSize: 14,
                     color: context.textSecondary,
@@ -127,7 +129,7 @@ class _MyItemsPageState extends ConsumerState<MyItemsPage>
     );
   }
 
-  Widget _buildTabBar(BuildContext context, int lostCount, int foundCount) {
+  Widget _buildTabBar(BuildContext context, AppLocalizations? l10n, int lostCount, int foundCount) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(4),
@@ -148,14 +150,14 @@ class _MyItemsPageState extends ConsumerState<MyItemsPage>
         unselectedLabelColor: context.textSecondary,
         labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
         tabs: [
-          _buildTab(Icons.search_off_rounded, 'Lost', lostCount),
-          _buildTab(Icons.check_circle_rounded, 'Found', foundCount),
+          _buildTab(Icons.search_off_rounded, l10n?.lost ?? 'Lost', lostCount, l10n),
+          _buildTab(Icons.check_circle_rounded, l10n?.found ?? 'Found', foundCount, l10n),
         ],
       ),
     );
   }
 
-  Widget _buildTab(IconData icon, String label, int count) {
+  Widget _buildTab(IconData icon, String label, int count, AppLocalizations? l10n) {
     return Tab(
       child: FittedBox(
         fit: BoxFit.scaleDown,
@@ -172,7 +174,7 @@ class _MyItemsPageState extends ConsumerState<MyItemsPage>
                 color: Colors.white.withAlpha(51),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Text('$count', style: const TextStyle(fontSize: 12)),
+              child: Text(l10n?.formatNumber(count) ?? '$count', style: const TextStyle(fontSize: 12)),
             ),
           ],
         ),
@@ -180,7 +182,7 @@ class _MyItemsPageState extends ConsumerState<MyItemsPage>
     );
   }
 
-  Widget _buildItemsList(List<ItemEntity> items, bool isLost) {
+  Widget _buildItemsList(List<ItemEntity> items, bool isLost, AppLocalizations? l10n) {
     if (items.isEmpty) {
       return Center(
         child: Column(
@@ -193,7 +195,9 @@ class _MyItemsPageState extends ConsumerState<MyItemsPage>
             ),
             const SizedBox(height: 16),
             Text(
-              isLost ? 'No lost items reported' : 'No found items reported',
+              isLost
+                  ? (l10n?.noLostItems ?? 'No lost items reported')
+                  : (l10n?.noFoundItems ?? 'No found items reported'),
               style: TextStyle(
                 fontSize: 16,
                 color: context.textSecondary,
@@ -210,7 +214,7 @@ class _MyItemsPageState extends ConsumerState<MyItemsPage>
       itemCount: items.length,
       itemBuilder: (context, index) {
         final item = items[index];
-        final categoryName = _getCategoryName(item.category);
+        final categoryName = _getCategoryName(item.category, l10n);
         final status = item.status ?? (item.isClaimed ? 'claimed' : 'active');
 
         return Padding(
@@ -226,28 +230,28 @@ class _MyItemsPageState extends ConsumerState<MyItemsPage>
                 : null,
             onTap: () {},
             onEdit: () {},
-            onDelete: () => _showDeleteDialog(context, item),
+            onDelete: () => _showDeleteDialog(context, item, l10n),
           ),
         );
       },
     );
   }
 
-  void _showDeleteDialog(BuildContext context, ItemEntity item) {
+  void _showDeleteDialog(BuildContext context, ItemEntity item, AppLocalizations? l10n) {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          'Delete Item',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          l10n?.deleteItem ?? 'Delete Item',
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        content: Text('Are you sure you want to delete "${item.itemName}"?'),
+        content: Text('${l10n?.deleteConfirm ?? 'Are you sure you want to delete'} "${item.itemName}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
             child: Text(
-              'Cancel',
+              l10n?.cancel ?? 'Cancel',
               style: TextStyle(color: context.textSecondary),
             ),
           ),
@@ -266,7 +270,7 @@ class _MyItemsPageState extends ConsumerState<MyItemsPage>
               }
             },
             child: Text(
-              'Delete',
+              l10n?.delete ?? 'Delete',
               style: TextStyle(
                 color: AppColors.error,
                 fontWeight: FontWeight.bold,

@@ -6,6 +6,13 @@ class ProfileHeader extends StatelessWidget {
   final String userEmail;
   final int lostCount;
   final int foundCount;
+  final String? lostCountText;
+  final String? foundCountText;
+  final String? totalCountText;
+  final String? lostLabel;
+  final String? foundLabel;
+  final String? totalLabel;
+  final String? myProfileLabel;
 
   const ProfileHeader({
     super.key,
@@ -13,6 +20,13 @@ class ProfileHeader extends StatelessWidget {
     required this.userEmail,
     required this.lostCount,
     required this.foundCount,
+    this.lostCountText,
+    this.foundCountText,
+    this.totalCountText,
+    this.lostLabel,
+    this.foundLabel,
+    this.totalLabel,
+    this.myProfileLabel,
   });
 
   @override
@@ -29,9 +43,9 @@ class ProfileHeader extends StatelessWidget {
       child: Column(
         children: [
           const SizedBox(height: 20),
-          const Text(
-            'My Profile',
-            style: TextStyle(
+          Text(
+            myProfileLabel ?? 'My Profile',
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.white,
@@ -98,11 +112,11 @@ class ProfileHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _StatItem(title: 'Lost', value: '$lostCount'),
+          _StatItem(title: lostLabel ?? 'Lost', value: lostCountText ?? '$lostCount'),
           Container(width: 1, height: 40, color: AppColors.white30),
-          _StatItem(title: 'Found', value: '$foundCount'),
+          _StatItem(title: foundLabel ?? 'Found', value: foundCountText ?? '$foundCount'),
           Container(width: 1, height: 40, color: AppColors.white30),
-          _StatItem(title: 'Total', value: '${lostCount + foundCount}'),
+          _StatItem(title: totalLabel ?? 'Total', value: totalCountText ?? '${lostCount + foundCount}'),
         ],
       ),
     );
