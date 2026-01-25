@@ -28,8 +28,9 @@ void main() {
   group('UpdateBatchUsecase', () {
     test('should return true when batch is updated successfully', () async {
       // Arrange
-      when(() => mockRepository.updateBatch(any()))
-          .thenAnswer((_) async => const Right(true));
+      when(
+        () => mockRepository.updateBatch(any()),
+      ).thenAnswer((_) async => const Right(true));
 
       // Act
       final result = await usecase(
@@ -85,8 +86,9 @@ void main() {
     test('should return failure when repository call fails', () async {
       // Arrange
       const failure = ApiFailure(message: 'Failed to update batch');
-      when(() => mockRepository.updateBatch(any()))
-          .thenAnswer((_) async => const Left(failure));
+      when(
+        () => mockRepository.updateBatch(any()),
+      ).thenAnswer((_) async => const Left(failure));
 
       // Act
       final result = await usecase(
@@ -102,8 +104,9 @@ void main() {
     test('should return NetworkFailure when there is no internet', () async {
       // Arrange
       const failure = NetworkFailure();
-      when(() => mockRepository.updateBatch(any()))
-          .thenAnswer((_) async => const Left(failure));
+      when(
+        () => mockRepository.updateBatch(any()),
+      ).thenAnswer((_) async => const Left(failure));
 
       // Act
       final result = await usecase(

@@ -23,26 +23,30 @@ void main() {
   ];
 
   group('GetAllBatchUsecase', () {
-    test('should return list of batches when repository call is successful',
-        () async {
-      // Arrange
-      when(() => mockRepository.getAllBatches())
-          .thenAnswer((_) async => Right(tBatches));
+    test(
+      'should return list of batches when repository call is successful',
+      () async {
+        // Arrange
+        when(
+          () => mockRepository.getAllBatches(),
+        ).thenAnswer((_) async => Right(tBatches));
 
-      // Act
-      final result = await usecase();
+        // Act
+        final result = await usecase();
 
-      // Assert
-      expect(result, Right(tBatches));
-      verify(() => mockRepository.getAllBatches()).called(1);
-      verifyNoMoreInteractions(mockRepository);
-    });
+        // Assert
+        expect(result, Right(tBatches));
+        verify(() => mockRepository.getAllBatches()).called(1);
+        verifyNoMoreInteractions(mockRepository);
+      },
+    );
 
     test('should return failure when repository call fails', () async {
       // Arrange
       const failure = ApiFailure(message: 'Failed to fetch batches');
-      when(() => mockRepository.getAllBatches())
-          .thenAnswer((_) async => const Left(failure));
+      when(
+        () => mockRepository.getAllBatches(),
+      ).thenAnswer((_) async => const Left(failure));
 
       // Act
       final result = await usecase();
@@ -55,8 +59,9 @@ void main() {
 
     test('should return empty list when no batches exist', () async {
       // Arrange
-      when(() => mockRepository.getAllBatches())
-          .thenAnswer((_) async => const Right([]));
+      when(
+        () => mockRepository.getAllBatches(),
+      ).thenAnswer((_) async => const Right([]));
 
       // Act
       final result = await usecase();
@@ -69,8 +74,9 @@ void main() {
     test('should return NetworkFailure when there is no internet', () async {
       // Arrange
       const failure = NetworkFailure();
-      when(() => mockRepository.getAllBatches())
-          .thenAnswer((_) async => const Left(failure));
+      when(
+        () => mockRepository.getAllBatches(),
+      ).thenAnswer((_) async => const Left(failure));
 
       // Act
       final result = await usecase();

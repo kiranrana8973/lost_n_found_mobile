@@ -27,8 +27,9 @@ void main() {
   group('GetCurrentUserUsecase', () {
     test('should return AuthEntity when user is authenticated', () async {
       // Arrange
-      when(() => mockRepository.getCurrentUser())
-          .thenAnswer((_) async => const Right(tUser));
+      when(
+        () => mockRepository.getCurrentUser(),
+      ).thenAnswer((_) async => const Right(tUser));
 
       // Act
       final result = await usecase();
@@ -42,8 +43,9 @@ void main() {
     test('should return failure when user is not authenticated', () async {
       // Arrange
       const failure = ApiFailure(message: 'User not authenticated');
-      when(() => mockRepository.getCurrentUser())
-          .thenAnswer((_) async => const Left(failure));
+      when(
+        () => mockRepository.getCurrentUser(),
+      ).thenAnswer((_) async => const Left(failure));
 
       // Act
       final result = await usecase();
@@ -54,35 +56,43 @@ void main() {
       verifyNoMoreInteractions(mockRepository);
     });
 
-    test('should return LocalDatabaseFailure when local storage fails',
-        () async {
-      // Arrange
-      const failure = LocalDatabaseFailure(message: 'Failed to read user data');
-      when(() => mockRepository.getCurrentUser())
-          .thenAnswer((_) async => const Left(failure));
+    test(
+      'should return LocalDatabaseFailure when local storage fails',
+      () async {
+        // Arrange
+        const failure = LocalDatabaseFailure(
+          message: 'Failed to read user data',
+        );
+        when(
+          () => mockRepository.getCurrentUser(),
+        ).thenAnswer((_) async => const Left(failure));
 
-      // Act
-      final result = await usecase();
+        // Act
+        final result = await usecase();
 
-      // Assert
-      expect(result, const Left(failure));
-      verify(() => mockRepository.getCurrentUser()).called(1);
-    });
+        // Assert
+        expect(result, const Left(failure));
+        verify(() => mockRepository.getCurrentUser()).called(1);
+      },
+    );
 
-    test('should return NetworkFailure when fetching from remote fails',
-        () async {
-      // Arrange
-      const failure = NetworkFailure();
-      when(() => mockRepository.getCurrentUser())
-          .thenAnswer((_) async => const Left(failure));
+    test(
+      'should return NetworkFailure when fetching from remote fails',
+      () async {
+        // Arrange
+        const failure = NetworkFailure();
+        when(
+          () => mockRepository.getCurrentUser(),
+        ).thenAnswer((_) async => const Left(failure));
 
-      // Act
-      final result = await usecase();
+        // Act
+        final result = await usecase();
 
-      // Assert
-      expect(result, const Left(failure));
-      verify(() => mockRepository.getCurrentUser()).called(1);
-    });
+        // Assert
+        expect(result, const Left(failure));
+        verify(() => mockRepository.getCurrentUser()).called(1);
+      },
+    );
 
     test('should return user with all fields populated', () async {
       // Arrange
@@ -94,24 +104,22 @@ void main() {
         phoneNumber: '1234567890',
         profilePicture: 'https://example.com/pic.jpg',
       );
-      when(() => mockRepository.getCurrentUser())
-          .thenAnswer((_) async => const Right(userWithAllFields));
+      when(
+        () => mockRepository.getCurrentUser(),
+      ).thenAnswer((_) async => const Right(userWithAllFields));
 
       // Act
       final result = await usecase();
 
       // Assert
-      result.fold(
-        (failure) => fail('Should return user'),
-        (user) {
-          expect(user.authId, '1');
-          expect(user.fullName, 'Test User');
-          expect(user.email, 'test@example.com');
-          expect(user.username, 'testuser');
-          expect(user.phoneNumber, '1234567890');
-          expect(user.profilePicture, 'https://example.com/pic.jpg');
-        },
-      );
+      result.fold((failure) => fail('Should return user'), (user) {
+        expect(user.authId, '1');
+        expect(user.fullName, 'Test User');
+        expect(user.email, 'test@example.com');
+        expect(user.username, 'testuser');
+        expect(user.phoneNumber, '1234567890');
+        expect(user.profilePicture, 'https://example.com/pic.jpg');
+      });
     });
   });
 }

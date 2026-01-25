@@ -19,6 +19,7 @@ void main() {
 
   const tEmail = 'test@example.com';
   const tPassword = 'password123';
+
   const tUser = AuthEntity(
     authId: '1',
     fullName: 'Test User',
@@ -29,8 +30,9 @@ void main() {
   group('LoginUsecase', () {
     test('should return AuthEntity when login is successful', () async {
       // Arrange
-      when(() => mockRepository.login(tEmail, tPassword))
-          .thenAnswer((_) async => const Right(tUser));
+      when(
+        () => mockRepository.login(tEmail, tPassword),
+      ).thenAnswer((_) async => const Right(tUser));
 
       // Act
       final result = await usecase(
@@ -46,8 +48,9 @@ void main() {
     test('should return failure when login fails', () async {
       // Arrange
       const failure = ApiFailure(message: 'Invalid credentials');
-      when(() => mockRepository.login(tEmail, tPassword))
-          .thenAnswer((_) async => const Left(failure));
+      when(
+        () => mockRepository.login(tEmail, tPassword),
+      ).thenAnswer((_) async => const Left(failure));
 
       // Act
       final result = await usecase(
@@ -63,8 +66,9 @@ void main() {
     test('should return NetworkFailure when there is no internet', () async {
       // Arrange
       const failure = NetworkFailure();
-      when(() => mockRepository.login(tEmail, tPassword))
-          .thenAnswer((_) async => const Left(failure));
+      when(
+        () => mockRepository.login(tEmail, tPassword),
+      ).thenAnswer((_) async => const Left(failure));
 
       // Act
       final result = await usecase(
@@ -78,8 +82,9 @@ void main() {
 
     test('should pass correct email and password to repository', () async {
       // Arrange
-      when(() => mockRepository.login(any(), any()))
-          .thenAnswer((_) async => const Right(tUser));
+      when(
+        () => mockRepository.login(any(), any()),
+      ).thenAnswer((_) async => const Right(tUser));
 
       // Act
       await usecase(const LoginParams(email: tEmail, password: tPassword));
@@ -87,6 +92,49 @@ void main() {
       // Assert
       verify(() => mockRepository.login(tEmail, tPassword)).called(1);
     });
+
+    test(
+      'should succeed with correct credentials and fail with wrong credentials',
+      () async {
+        // Arrange
+        const wrongEmail = 'wrong@example.com';
+        const wrongPassword = 'wrongpassword';
+        const failure = ApiFailure(message: 'Invalid credentials');
+
+        // Mock: check credentials using if condition
+        when(() => mockRepository.login(any(), any())).thenAnswer((
+          invocation,
+        ) async {
+          final email = invocation.positionalArguments[0] as String;
+          final password = invocation.positionalArguments[1] as String;
+
+          // If email and password are correct, return success
+          if (email == tEmail && password == tPassword) {
+            return const Right(tUser);
+          }
+          // Otherwise return failure
+          return const Left(failure);
+        });
+
+        // Act & Assert - Correct credentials should succeed
+        final successResult = await usecase(
+          const LoginParams(email: tEmail, password: tPassword),
+        );
+        expect(successResult, const Right(tUser));
+
+        // Act & Assert - Wrong email should fail
+        final wrongEmailResult = await usecase(
+          const LoginParams(email: wrongEmail, password: tPassword),
+        );
+        expect(wrongEmailResult, const Left(failure));
+
+        // Act & Assert - Wrong password should fail
+        final wrongPasswordResult = await usecase(
+          const LoginParams(email: tEmail, password: wrongPassword),
+        );
+        expect(wrongPasswordResult, const Left(failure));
+      },
+    );
   });
 
   group('LoginParams', () {
@@ -110,7 +158,10 @@ void main() {
     test('two params with different values should not be equal', () {
       // Arrange
       const params1 = LoginParams(email: tEmail, password: tPassword);
-      const params2 = LoginParams(email: 'other@email.com', password: tPassword);
+      const params2 = LoginParams(
+        email: 'other@email.com',
+        password: tPassword,
+      );
 
       // Assert
       expect(params1, isNot(params2));
