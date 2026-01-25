@@ -1,6 +1,11 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:lost_n_found/features/category/domain/entities/category_entity.dart';
 
+part 'category_api_model.g.dart';
+
+@JsonSerializable()
 class CategoryApiModel {
+  @JsonKey(name: '_id')
   final String? id;
   final String name;
   final String? description;
@@ -13,18 +18,10 @@ class CategoryApiModel {
     this.status,
   });
 
-  Map<String, dynamic> toJson() {
-    return {'name': name, if (description != null) 'description': description};
-  }
+  Map<String, dynamic> toJson() => _$CategoryApiModelToJson(this);
 
-  factory CategoryApiModel.fromJson(Map<String, dynamic> json) {
-    return CategoryApiModel(
-      id: json['_id'] as String?,
-      name: json['name'] as String,
-      description: json['description'] as String?,
-      status: json['status'] as String?,
-    );
-  }
+  factory CategoryApiModel.fromJson(Map<String, dynamic> json) =>
+      _$CategoryApiModelFromJson(json);
 
   CategoryEntity toEntity() {
     return CategoryEntity(

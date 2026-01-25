@@ -1,8 +1,14 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:lost_n_found/features/auth/domain/entities/auth_entity.dart';
 import 'package:lost_n_found/features/batch/data/models/batch_api_model.dart';
 
+part 'auth_api_model.g.dart';
+
+@JsonSerializable()
 class AuthApiModel {
+  @JsonKey(name: '_id')
   final String? id;
+  @JsonKey(name: 'name')
   final String fullName;
   final String email;
   final String? phoneNumber;
@@ -24,34 +30,10 @@ class AuthApiModel {
     this.batch,
   });
 
-  // toJSON
-  Map<String, dynamic> toJson() {
-    return {
-      "name": fullName,
-      "email": email,
-      "phoneNumber": phoneNumber,
-      "username": username,
-      "password": password,
-      "batchId": batchId,
-      "profilePicture": profilePicture,
-    };
-  }
+  Map<String, dynamic> toJson() => _$AuthApiModelToJson(this);
 
-  // fromJson
-  factory AuthApiModel.fromJson(Map<String, dynamic> json) {
-    return AuthApiModel(
-      id: json['_id'] as String,
-      fullName: json['name'] as String,
-      email: json['email'] as String,
-      phoneNumber: json['phoneNumber'] as String?,
-      username: json['username'] as String,
-      batchId: json['batchId'] as String?,
-      profilePicture: json['profilePicture'] as String?,
-      batch: json['batch'] != null
-          ? BatchApiModel.fromJson(json['batch'] as Map<String, dynamic>)
-          : null,
-    );
-  }
+  factory AuthApiModel.fromJson(Map<String, dynamic> json) =>
+      _$AuthApiModelFromJson(json);
 
   // toEntity
   AuthEntity toEntity() {

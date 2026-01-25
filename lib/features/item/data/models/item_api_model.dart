@@ -1,9 +1,24 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:lost_n_found/features/item/domain/entities/item_entity.dart';
 
+part 'item_api_model.g.dart';
+
+/// Helper to extract ID from nested object or string
+String? _extractId(dynamic value) {
+  if (value == null) return null;
+  if (value is Map) return value['_id'] as String?;
+  return value as String?;
+}
+
+@JsonSerializable()
 class ItemApiModel {
+  @JsonKey(name: '_id')
   final String? id;
+  @JsonKey(fromJson: _extractId)
   final String? reportedBy;
+  @JsonKey(fromJson: _extractId)
   final String? claimedBy;
+  @JsonKey(fromJson: _extractId)
   final String? category;
   final String itemName;
   final String? description;
@@ -11,12 +26,12 @@ class ItemApiModel {
   final String location;
   final String? media;
   final String? mediaType;
+  @JsonKey(defaultValue: false)
   final bool isClaimed;
   final String? status;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
-  // Constructor
   ItemApiModel({
     this.id,
     this.reportedBy,
@@ -34,48 +49,10 @@ class ItemApiModel {
     this.updatedAt,
   });
 
-  Map<String, dynamic> toJson() {
-    return {
-      'itemName': itemName,
-      'type': type,
-      'location': location,
-      if (reportedBy != null) 'reportedBy': reportedBy,
-      if (category != null) 'category': category,
-      if (description != null) 'description': description,
-      if (media != null) 'media': media,
-      if (mediaType != null) 'mediaType': mediaType,
-    };
-  }
+  Map<String, dynamic> toJson() => _$ItemApiModelToJson(this);
 
-  factory ItemApiModel.fromJson(Map<String, dynamic> json) {
-    // Handle nested objects - server returns category and reportedBy as objects
-    String? extractId(dynamic value) {
-      if (value == null) return null;
-      if (value is Map) return value['_id'] as String?;
-      return value as String?;
-    }
-
-    return ItemApiModel(
-      id: json['_id'] as String?,
-      reportedBy: extractId(json['reportedBy']),
-      claimedBy: extractId(json['claimedBy']),
-      category: extractId(json['category']),
-      itemName: json['itemName'] as String,
-      description: json['description'] as String?,
-      type: json['type'] as String,
-      location: json['location'] as String,
-      media: json['media'] as String?,
-      mediaType: json['mediaType'] as String?,
-      isClaimed: json['isClaimed'] as bool? ?? false,
-      status: json['status'] as String?,
-      createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'] as String)
-          : null,
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'] as String)
-          : null,
-    );
-  }
+  factory ItemApiModel.fromJson(Map<String, dynamic> json) =>
+      _$ItemApiModelFromJson(json);
 
   ItemEntity toEntity() {
     return ItemEntity(
