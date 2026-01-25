@@ -123,10 +123,10 @@ class BatchViewModel extends Notifier<BatchState> {
   }
 
   void clearError() {
-    state = state.copyWith(errorMessage: null);
+    state = state.copyWith(clearErrorMessage: true);
   }
 
   void clearSelectedBatch() {
-    state = state.copyWith(selectedBatch: null);
+    state = state.copyWith(clearSelectedBatch: true);
   }
 }

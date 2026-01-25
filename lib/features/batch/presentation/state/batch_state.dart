@@ -20,13 +20,19 @@ class BatchState extends Equatable {
     BatchStatus? status,
     List<BatchEntity>? batches,
     BatchEntity? selectedBatch,
+    bool clearSelectedBatch = false,
     String? errorMessage,
+    bool clearErrorMessage = false,
   }) {
     return BatchState(
       status: status ?? this.status,
       batches: batches ?? this.batches,
-      selectedBatch: selectedBatch ?? this.selectedBatch,
-      errorMessage: errorMessage ?? this.errorMessage,
+      selectedBatch: clearSelectedBatch
+          ? null
+          : (selectedBatch ?? this.selectedBatch),
+      errorMessage: clearErrorMessage
+          ? null
+          : (errorMessage ?? this.errorMessage),
     );
   }
 
