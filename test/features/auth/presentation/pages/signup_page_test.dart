@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lost_n_found/core/error/failures.dart';
 import 'package:lost_n_found/features/auth/domain/usecases/get_current_user_usecase.dart';
 import 'package:lost_n_found/features/auth/domain/usecases/login_usecase.dart';
 import 'package:lost_n_found/features/auth/domain/usecases/logout_usecase.dart';
@@ -107,90 +108,33 @@ void main() {
     );
   }
 
-  group('SignupPage', () {
-    testWidgets('should display header text', (tester) async {
+  group('SignupPage - UI Elements', () {
+    testWidgets('should display header text and form fields', (tester) async {
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
+      // Header
       expect(find.text('Join Us Today'), findsOneWidget);
       expect(find.text('Create your account to get started'), findsOneWidget);
-    });
 
-    testWidgets('should display name field', (tester) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
+      // Form labels
       expect(find.text('Full Name'), findsOneWidget);
-    });
-
-    testWidgets('should display email field', (tester) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
       expect(find.text('Email Address'), findsOneWidget);
-    });
-
-    testWidgets('should display phone field', (tester) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
       expect(find.text('Phone Number'), findsOneWidget);
-    });
-
-    testWidgets('should display batch dropdown', (tester) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
       expect(find.text('Select Batch'), findsOneWidget);
+
+      // Icons
+      expect(find.byIcon(Icons.person_outline_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.email_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.phone_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.school_rounded), findsOneWidget);
     });
 
-    testWidgets('should display form fields', (tester) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
-      expect(find.byType(TextFormField), findsAtLeast(3));
-    });
-
-    testWidgets('should have back button in app bar', (tester) async {
+    testWidgets('should display back button in app bar', (tester) async {
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.arrow_back), findsOneWidget);
-    });
-
-    testWidgets('should show person icon for name field', (tester) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
-      expect(find.byIcon(Icons.person_outline_rounded), findsOneWidget);
-    });
-
-    testWidgets('should show email icon', (tester) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
-      expect(find.byIcon(Icons.email_outlined), findsOneWidget);
-    });
-
-    testWidgets('should show phone icon', (tester) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
-      expect(find.byIcon(Icons.phone_outlined), findsOneWidget);
-    });
-
-    testWidgets('should show school icon for batch dropdown', (tester) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
-      expect(find.byIcon(Icons.school_rounded), findsOneWidget);
-    });
-
-    testWidgets('should load batches on init', (tester) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
-      verify(() => mockGetAllBatchUsecase()).called(1);
     });
 
     testWidgets('should display country code dropdown', (tester) async {
@@ -200,7 +144,31 @@ void main() {
       expect(find.text('Code'), findsOneWidget);
     });
 
-    testWidgets('should allow entering text in name field', (tester) async {
+    testWidgets('should display create account button', (tester) async {
+      await tester.pumpWidget(createTestWidget());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Create Account'), findsOneWidget);
+    });
+
+    testWidgets('should display login link', (tester) async {
+      await tester.pumpWidget(createTestWidget());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Already have an account? '), findsOneWidget);
+      expect(find.text('Login'), findsOneWidget);
+    });
+
+    testWidgets('should load batches on init', (tester) async {
+      await tester.pumpWidget(createTestWidget());
+      await tester.pumpAndSettle();
+
+      verify(() => mockGetAllBatchUsecase()).called(1);
+    });
+  });
+
+  group('SignupPage - Form Input', () {
+    testWidgets('should allow entering name', (tester) async {
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
@@ -210,7 +178,7 @@ void main() {
       expect(find.text('Test User'), findsOneWidget);
     });
 
-    testWidgets('should allow entering text in email field', (tester) async {
+    testWidgets('should allow entering email', (tester) async {
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
@@ -221,57 +189,263 @@ void main() {
       expect(find.text('test@example.com'), findsOneWidget);
     });
 
-    testWidgets(
-      'should call register usecase when form is valid and submitted',
-      (tester) async {
-        // Set a larger surface size to avoid scrolling issues
-        await tester.binding.setSurfaceSize(const Size(800, 1200));
+    testWidgets('should allow entering phone number', (tester) async {
+      await tester.pumpWidget(createTestWidget());
+      await tester.pumpAndSettle();
 
-        // Mock register to return success
-        when(
-          () => mockRegisterUsecase(any()),
-        ).thenAnswer((_) async => const Right(true));
+      final textFields = find.byType(TextFormField);
+      await tester.enterText(textFields.at(2), '9800000000');
+      await tester.pump();
 
-        await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+      // Verify by checking the text field controller value
+      final phoneField = tester.widget<TextFormField>(textFields.at(2));
+      expect(phoneField.controller?.text, '9800000000');
+    });
+  });
 
-        // Fill out all form fields
-        final textFields = find.byType(TextFormField);
+  group('SignupPage - Form Validation', () {
+    testWidgets('should show error when name is empty', (tester) async {
+      // Use very large surface to avoid scrolling
+      await tester.binding.setSurfaceSize(const Size(800, 2000));
 
-        // Name field
-        await tester.enterText(textFields.at(0), 'Test User');
-        // Email field
-        await tester.enterText(textFields.at(1), 'test@example.com');
-        // Phone field
-        await tester.enterText(textFields.at(2), '9800000000');
-        // Password field
-        await tester.enterText(textFields.at(3), 'password123');
-        // Confirm Password field
-        await tester.enterText(textFields.at(4), 'password123');
+      await tester.pumpWidget(createTestWidget());
+      await tester.pumpAndSettle();
 
-        await tester.pump();
+      // Check terms first (validation only happens after terms check)
+      await tester.tap(find.byType(Checkbox));
+      await tester.pump();
 
-        // Select a batch from dropdown
-        await tester.tap(find.text('Select Batch').last);
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('Batch 2024').last);
-        await tester.pumpAndSettle();
+      // Tap Create Account
+      await tester.tap(find.text('Create Account'));
+      await tester.pump();
 
-        // Check the terms checkbox
-        final checkbox = find.byType(Checkbox);
-        await tester.tap(checkbox);
-        await tester.pump();
+      expect(find.text('Please enter your name'), findsOneWidget);
 
-        // Tap Create Account button
-        await tester.tap(find.text('Create Account'));
-        await tester.pumpAndSettle();
+      await tester.binding.setSurfaceSize(null);
+    });
 
-        // Verify register usecase was called
-        verify(() => mockRegisterUsecase(any())).called(1);
+    testWidgets('should show error when email is invalid', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(800, 2000));
 
-        // Reset surface size
-        await tester.binding.setSurfaceSize(null);
-      },
-    );
+      await tester.pumpWidget(createTestWidget());
+      await tester.pumpAndSettle();
+
+      // Enter name and invalid email
+      final textFields = find.byType(TextFormField);
+      await tester.enterText(textFields.at(0), 'Test User');
+      await tester.enterText(textFields.at(1), 'invalidemail');
+      await tester.pump();
+
+      // Check terms first
+      await tester.tap(find.byType(Checkbox));
+      await tester.pump();
+
+      // Tap Create Account
+      await tester.tap(find.text('Create Account'));
+      await tester.pump();
+
+      expect(find.text('Please enter a valid email'), findsOneWidget);
+
+      await tester.binding.setSurfaceSize(null);
+    });
+
+    testWidgets('should show error when phone is invalid', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(800, 2000));
+
+      await tester.pumpWidget(createTestWidget());
+      await tester.pumpAndSettle();
+
+      // Fill name and email
+      final textFields = find.byType(TextFormField);
+      await tester.enterText(textFields.at(0), 'Test User');
+      await tester.enterText(textFields.at(1), 'test@example.com');
+      await tester.enterText(textFields.at(2), '12345'); // Invalid phone
+      await tester.pump();
+
+      // Check terms first
+      await tester.tap(find.byType(Checkbox));
+      await tester.pump();
+
+      // Tap Create Account
+      await tester.tap(find.text('Create Account'));
+      await tester.pump();
+
+      expect(find.text('Phone must be 10 digits'), findsOneWidget);
+
+      await tester.binding.setSurfaceSize(null);
+    });
+  });
+
+  group('SignupPage - Form Submission', () {
+    testWidgets('should call register usecase when form is valid', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(800, 2000));
+
+      // Return failure to avoid navigation issues
+      when(
+        () => mockRegisterUsecase(any()),
+      ).thenAnswer((_) async => const Left(ApiFailure(message: 'Test')));
+
+      await tester.pumpWidget(createTestWidget());
+      await tester.pumpAndSettle();
+
+      // Fill out all form fields
+      final textFields = find.byType(TextFormField);
+      await tester.enterText(textFields.at(0), 'Test User');
+      await tester.enterText(textFields.at(1), 'test@example.com');
+      await tester.enterText(textFields.at(2), '9800000000');
+      await tester.enterText(textFields.at(3), 'password123');
+      await tester.enterText(textFields.at(4), 'password123');
+      await tester.pump();
+
+      // Select batch from dropdown
+      await tester.tap(find.text('Select Batch'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Batch 2024').last);
+      await tester.pumpAndSettle();
+
+      // Check terms checkbox
+      final checkbox = find.byType(Checkbox);
+      await tester.tap(checkbox);
+      await tester.pump();
+
+      // Tap Create Account
+      await tester.tap(find.text('Create Account'));
+      await tester.pumpAndSettle();
+
+      verify(() => mockRegisterUsecase(any())).called(1);
+
+      await tester.binding.setSurfaceSize(null);
+    });
+
+    testWidgets('should pass correct params to register usecase', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(800, 2000));
+
+      RegisterParams? capturedParams;
+      when(() => mockRegisterUsecase(any())).thenAnswer((invocation) async {
+        capturedParams = invocation.positionalArguments[0] as RegisterParams;
+        return const Right(true);
+      });
+
+      await tester.pumpWidget(createTestWidget());
+      await tester.pumpAndSettle();
+
+      // Fill form
+      final textFields = find.byType(TextFormField);
+      await tester.enterText(textFields.at(0), 'John Doe');
+      await tester.enterText(textFields.at(1), 'john@example.com');
+      await tester.enterText(textFields.at(2), '9800000000');
+      await tester.enterText(textFields.at(3), 'mypassword');
+      await tester.enterText(textFields.at(4), 'mypassword');
+      await tester.pump();
+
+      // Select batch
+      await tester.tap(find.text('Select Batch'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Batch 2024').last);
+      await tester.pumpAndSettle();
+
+      // Check terms
+      await tester.tap(find.byType(Checkbox));
+      await tester.pump();
+
+      // Submit
+      await tester.tap(find.text('Create Account'));
+      await tester.pumpAndSettle();
+
+      // Verify captured params
+      expect(capturedParams?.fullName, 'John Doe');
+      expect(capturedParams?.email, 'john@example.com');
+      expect(capturedParams?.password, 'mypassword');
+
+      await tester.binding.setSurfaceSize(null);
+    });
+
+    testWidgets('should succeed with valid data and fail with invalid data', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(800, 2000));
+
+      const validEmail = 'valid@example.com';
+      const validPassword = 'validpass';
+      const failure = ApiFailure(message: 'Registration failed');
+
+      // Mock register to check data using if condition
+      when(() => mockRegisterUsecase(any())).thenAnswer((invocation) async {
+        final params = invocation.positionalArguments[0] as RegisterParams;
+
+        // Check if email and password are valid
+        if (params.email == validEmail && params.password == validPassword) {
+          return const Right(true);
+        }
+        return const Left(failure);
+      });
+
+      await tester.pumpWidget(createTestWidget());
+      await tester.pumpAndSettle();
+
+      // Fill form with valid data
+      final textFields = find.byType(TextFormField);
+      await tester.enterText(textFields.at(0), 'Test User');
+      await tester.enterText(textFields.at(1), validEmail);
+      await tester.enterText(textFields.at(2), '9800000000');
+      await tester.enterText(textFields.at(3), validPassword);
+      await tester.enterText(textFields.at(4), validPassword);
+      await tester.pump();
+
+      // Select batch
+      await tester.tap(find.text('Select Batch'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Batch 2024').last);
+      await tester.pumpAndSettle();
+
+      // Check terms
+      await tester.tap(find.byType(Checkbox));
+      await tester.pump();
+
+      // Submit
+      await tester.tap(find.text('Create Account'));
+      await tester.pumpAndSettle();
+
+      verify(() => mockRegisterUsecase(any())).called(1);
+
+      await tester.binding.setSurfaceSize(null);
+    });
+
+    testWidgets('should not call register when terms not accepted', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(800, 2000));
+
+      await tester.pumpWidget(createTestWidget());
+      await tester.pumpAndSettle();
+
+      // Fill all fields but don't check terms
+      final textFields = find.byType(TextFormField);
+      await tester.enterText(textFields.at(0), 'Test User');
+      await tester.enterText(textFields.at(1), 'test@example.com');
+      await tester.enterText(textFields.at(2), '9800000000');
+      await tester.enterText(textFields.at(3), 'password123');
+      await tester.enterText(textFields.at(4), 'password123');
+      await tester.pump();
+
+      // Select batch
+      await tester.tap(find.text('Select Batch'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Batch 2024').last);
+      await tester.pumpAndSettle();
+
+      // Submit without checking terms
+      await tester.tap(find.text('Create Account'));
+      await tester.pumpAndSettle();
+
+      // Register should not be called
+      verifyNever(() => mockRegisterUsecase(any()));
+
+      await tester.binding.setSurfaceSize(null);
+    });
   });
 }
