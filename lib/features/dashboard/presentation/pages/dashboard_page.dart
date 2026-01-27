@@ -25,9 +25,7 @@ class _DashboardPageState extends State<DashboardPage> {
   void _onReportPressed() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const ReportItemPage(),
-      ),
+      MaterialPageRoute(builder: (context) => const ReportItemPage()),
     );
   }
 
@@ -45,59 +43,55 @@ class _DashboardPageState extends State<DashboardPage> {
           onPressed: _onReportPressed,
           backgroundColor: Colors.transparent,
           elevation: 0,
-          child: Icon(
-            Icons.add_rounded,
-            color: Colors.white,
-            size: 32,
-          ),
+          child: Icon(Icons.add_rounded, color: Colors.white, size: 32),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: Builder(
         builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: context.surfaceColor,
-          boxShadow: context.softShadow,
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _NavItem(
-                  icon: Icons.home_rounded,
-                  label: 'Home',
-                  isSelected: _currentIndex == 0,
-                  onTap: () => setState(() => _currentIndex = 0),
-                ),
-                _NavItem(
-                  icon: Icons.inventory_2_rounded,
-                  label: 'My Items',
-                  isSelected: _currentIndex == 1,
-                  onTap: () => setState(() => _currentIndex = 1),
-                ),
-                const SizedBox(width: 60), // Space for FAB
-                _NavItem(
-                  icon: Icons.notifications_rounded,
-                  label: 'Alerts',
-                  isSelected: false,
-                  badge: 3,
-                  onTap: () {
-                    // Show notifications
-                  },
-                ),
-                _NavItem(
-                  icon: Icons.person_rounded,
-                  label: 'Profile',
-                  isSelected: _currentIndex == 2,
-                  onTap: () => setState(() => _currentIndex = 2),
-                ),
-              ],
+          decoration: BoxDecoration(
+            color: context.surfaceColor,
+            boxShadow: context.softShadow,
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _NavItem(
+                    icon: Icons.home_rounded,
+                    label: 'Home',
+                    isSelected: _currentIndex == 0,
+                    onTap: () => setState(() => _currentIndex = 0),
+                  ),
+                  _NavItem(
+                    icon: Icons.inventory_2_rounded,
+                    label: 'My Items',
+                    isSelected: _currentIndex == 1,
+                    onTap: () => setState(() => _currentIndex = 1),
+                  ),
+                  const SizedBox(width: 60), // Space for FAB
+                  _NavItem(
+                    icon: Icons.notifications_rounded,
+                    label: 'Alerts',
+                    isSelected: false,
+                    badge: 3,
+                    onTap: () {
+                      // Show notifications
+                    },
+                  ),
+                  _NavItem(
+                    icon: Icons.person_rounded,
+                    label: 'Profile',
+                    isSelected: _currentIndex == 2,
+                    onTap: () => setState(() => _currentIndex = 2),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -130,7 +124,10 @@ class _NavItem extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 8),
+        padding: EdgeInsets.symmetric(
+          horizontal: horizontalPadding,
+          vertical: 8,
+        ),
         decoration: BoxDecoration(
           gradient: isSelected ? AppColors.primaryGradient : null,
           borderRadius: BorderRadius.circular(16),

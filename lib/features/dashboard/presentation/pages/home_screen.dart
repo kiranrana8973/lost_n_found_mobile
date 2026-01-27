@@ -50,7 +50,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       final query = _searchQuery.toLowerCase();
       items = items.where((item) {
         final nameMatch = item.itemName.toLowerCase().contains(query);
-        final descriptionMatch = item.description?.toLowerCase().contains(query) ?? false;
+        final descriptionMatch =
+            item.description?.toLowerCase().contains(query) ?? false;
         final locationMatch = item.location.toLowerCase().contains(query);
         return nameMatch || descriptionMatch || locationMatch;
       }).toList();
@@ -73,7 +74,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return items;
   }
 
-  String _getCategoryNameById(String? categoryId, List<CategoryEntity> categories) {
+  String _getCategoryNameById(
+    String? categoryId,
+    List<CategoryEntity> categories,
+  ) {
     if (categoryId == null) return 'Other';
     try {
       return categories.firstWhere((c) => c.categoryId == categoryId).name;
@@ -94,9 +98,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            SliverToBoxAdapter(
-              child: HomeHeader(userName: userName),
-            ),
+            SliverToBoxAdapter(child: HomeHeader(userName: userName)),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -218,41 +220,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       sliver: SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final item = filteredItems[index];
-            final categoryName = _getCategoryNameById(item.category, categories);
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: ItemCard(
-                title: item.itemName,
-                location: item.location,
-                category: categoryName,
-                isLost: item.type == ItemType.lost,
-                imageUrl: item.media != null
-                    ? ApiEndpoints.itemPicture(item.media!)
-                    : null,
-                onTap: () {
-                  AppRoutes.push(
-                    context,
-                    ItemDetailPage(
-                      title: item.itemName,
-                      location: item.location,
-                      category: categoryName,
-                      isLost: item.type == ItemType.lost,
-                      description: item.description ?? 'No description provided.',
-                      reportedBy: item.reportedBy ?? 'Anonymous',
-                      imageUrl: item.media != null
-                          ? ApiEndpoints.itemPicture(item.media!)
-                          : null,
-                    ),
-                  );
-                },
-              ),
-            );
-          },
-          childCount: filteredItems.length,
-        ),
+        delegate: SliverChildBuilderDelegate((context, index) {
+          final item = filteredItems[index];
+          final categoryName = _getCategoryNameById(item.category, categories);
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: ItemCard(
+              title: item.itemName,
+              location: item.location,
+              category: categoryName,
+              isLost: item.type == ItemType.lost,
+              imageUrl: item.media != null
+                  ? ApiEndpoints.itemPicture(item.media!)
+                  : null,
+              onTap: () {
+                AppRoutes.push(
+                  context,
+                  ItemDetailPage(
+                    title: item.itemName,
+                    location: item.location,
+                    category: categoryName,
+                    isLost: item.type == ItemType.lost,
+                    description: item.description ?? 'No description provided.',
+                    reportedBy: item.reportedBy ?? 'Anonymous',
+                    imageUrl: item.media != null
+                        ? ApiEndpoints.itemPicture(item.media!)
+                        : null,
+                  ),
+                );
+              },
+            ),
+          );
+        }, childCount: filteredItems.length),
       ),
     );
   }
