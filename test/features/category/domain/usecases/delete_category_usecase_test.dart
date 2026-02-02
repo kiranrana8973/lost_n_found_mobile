@@ -64,38 +64,35 @@ void main() {
       expect(result, const Left(failure));
     });
 
-    test(
-      'should succeed with valid id and fail with invalid id',
-      () async {
-        // Arrange
-        const validId = '123';
-        const invalidId = '';
-        const failure = ApiFailure(message: 'Invalid category id');
+    test('should succeed with valid id and fail with invalid id', () async {
+      // Arrange
+      const validId = '123';
+      const invalidId = '';
+      const failure = ApiFailure(message: 'Invalid category id');
 
-        when(() => mockRepository.deleteCategory(any())).thenAnswer((
-          invocation,
-        ) async {
-          final categoryId = invocation.positionalArguments[0] as String;
+      when(() => mockRepository.deleteCategory(any())).thenAnswer((
+        invocation,
+      ) async {
+        final categoryId = invocation.positionalArguments[0] as String;
 
-          if (categoryId.isNotEmpty) {
-            return const Right(true);
-          }
-          return const Left(failure);
-        });
+        if (categoryId.isNotEmpty) {
+          return const Right(true);
+        }
+        return const Left(failure);
+      });
 
-        // Act & Assert - Valid id should succeed
-        final successResult = await usecase(
-          const DeleteCategoryParams(categoryId: validId),
-        );
-        expect(successResult, const Right(true));
+      // Act & Assert - Valid id should succeed
+      final successResult = await usecase(
+        const DeleteCategoryParams(categoryId: validId),
+      );
+      expect(successResult, const Right(true));
 
-        // Act & Assert - Invalid id should fail
-        final failResult = await usecase(
-          const DeleteCategoryParams(categoryId: invalidId),
-        );
-        expect(failResult, const Left(failure));
-      },
-    );
+      // Act & Assert - Invalid id should fail
+      final failResult = await usecase(
+        const DeleteCategoryParams(categoryId: invalidId),
+      );
+      expect(failResult, const Left(failure));
+    });
   });
 
   group('DeleteCategoryParams', () {
