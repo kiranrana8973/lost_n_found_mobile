@@ -19,8 +19,8 @@ dependencies:
   cupertino_icons: ^1.0.8
 
   # State Management
-  flutter_riverpod: ^3.0.3
-  riverpod_annotation: ^3.0.3
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
 
   # Local Database (Offline Storage)
   hive: ^2.2.3
@@ -51,7 +51,7 @@ dependencies:
   flutter_svg: ^2.0.10+1
 
   # Real-time Features
-  web_socket_channel: ^3.0.3
+  web_socket_channel: ^2.2.0
 
   # Utilities
   freezed_annotation: ^3.1.0

@@ -78,7 +78,7 @@ class BatchRepository implements IBatchRepository {
         await _batchLocalDataSource.cacheAllBatches(hiveModels);
         final result = BatchApiModel.toEntityList(apiModels);
         return Right(result);
-      } on DioException catch (e) {
+      } on DioException {
         // API failed, try to return cached data
         return _getCachedBatches();
       } catch (e) {
