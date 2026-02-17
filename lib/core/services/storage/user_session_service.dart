@@ -1,16 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-// SharedPreferences instance provider
-final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
-  throw UnimplementedError('SharedPreferences must be overridden in main.dart');
-});
-
-// UserSessionService provider
-final userSessionServiceProvider = Provider<UserSessionService>((ref) {
-  final prefs = ref.read(sharedPreferencesProvider);
-  return UserSessionService(prefs: prefs);
-});
 
 class UserSessionService {
   final SharedPreferences _prefs;

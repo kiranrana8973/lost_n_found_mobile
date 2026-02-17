@@ -1,15 +1,8 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lost_n_found/core/api/api_client.dart';
 import 'package:lost_n_found/core/api/api_endpoints.dart';
 import 'package:lost_n_found/features/batch/data/datasources/batch_datasource.dart';
 import 'package:lost_n_found/features/batch/data/models/batch_api_model.dart';
 import 'package:lost_n_found/features/batch/data/models/batch_hive_model.dart';
-
-// provider
-
-final batchRemoteProvider = Provider<IBatchRemoteDataSource>((ref) {
-  return BatchRemoteDatasource(apiClient: ref.read(apiClientProvider));
-});
 
 class BatchRemoteDatasource implements IBatchRemoteDataSource {
   final ApiClient _apiClient;

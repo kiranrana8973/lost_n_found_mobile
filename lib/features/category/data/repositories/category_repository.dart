@@ -1,25 +1,12 @@
 import 'package:dartz/dartz.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lost_n_found/core/error/failures.dart';
 import 'package:lost_n_found/core/services/connectivity/network_info.dart';
 import 'package:lost_n_found/features/category/data/datasources/category_datasource.dart';
 import 'package:lost_n_found/features/category/data/datasources/local/category_local_datasource.dart';
-import 'package:lost_n_found/features/category/data/datasources/remote/category_remote_datasource.dart';
 import 'package:lost_n_found/features/category/data/models/category_api_model.dart';
 import 'package:lost_n_found/features/category/data/models/category_hive_model.dart';
 import 'package:lost_n_found/features/category/domain/entities/category_entity.dart';
 import 'package:lost_n_found/features/category/domain/repositories/category_repository.dart';
-
-final categoryRepositoryProvider = Provider<ICategoryRepository>((ref) {
-  final categoryLocalDatasource = ref.read(categoryLocalDatasourceProvider);
-  final categoryRemoteDatasource = ref.read(categoryRemoteDatasourceProvider);
-  final networkInfo = ref.read(networkInfoProvider);
-  return CategoryRepository(
-    categoryLocalDatasource: categoryLocalDatasource,
-    categoryRemoteDatasource: categoryRemoteDatasource,
-    networkInfo: networkInfo,
-  );
-});
 
 class CategoryRepository implements ICategoryRepository {
   final CategoryLocalDatasource _categoryLocalDataSource;

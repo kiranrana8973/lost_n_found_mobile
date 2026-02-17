@@ -1,19 +1,11 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lost_n_found/core/api/api_client.dart';
 import 'package:lost_n_found/core/api/api_endpoints.dart';
 import 'package:lost_n_found/core/services/storage/token_service.dart';
 import 'package:lost_n_found/features/item/data/datasources/item_datasource.dart';
 import 'package:lost_n_found/features/item/data/models/item_api_model.dart';
-
-final itemRemoteDatasourceProvider = Provider<IItemRemoteDataSource>((ref) {
-  return ItemRemoteDatasource(
-    apiClient: ref.read(apiClientProvider),
-    tokenService: ref.read(tokenServiceProvider),
-  );
-});
 
 class ItemRemoteDatasource implements IItemRemoteDataSource {
   final ApiClient _apiClient;

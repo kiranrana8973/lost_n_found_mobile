@@ -1,11 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lost_n_found/core/services/storage/user_session_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-// provider
-final tokenServiceProvider = Provider<TokenService>((ref) {
-  return TokenService(prefs: ref.read(sharedPreferencesProvider));
-});
 
 class TokenService {
   static const String _tokenKey = 'auth_token';

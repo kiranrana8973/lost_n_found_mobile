@@ -1,23 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lost_n_found/core/api/api_endpoints.dart';
-import 'package:lost_n_found/core/services/storage/user_session_service.dart';
-import 'package:lost_n_found/features/category/presentation/view_model/category_viewmodel.dart';
 import 'package:lost_n_found/features/item/domain/entities/item_entity.dart';
-import 'package:lost_n_found/features/item/presentation/state/item_state.dart';
-import 'package:lost_n_found/features/item/presentation/view_model/item_viewmodel.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/theme_extensions.dart';
+import '../../../../core/di/service_locator.dart';
+import '../../../../core/services/storage/user_session_service.dart';
+import '../../../category/presentation/bloc/category_bloc.dart';
+import '../../../category/presentation/bloc/category_event.dart';
+import '../bloc/item_bloc.dart';
+import '../bloc/item_event.dart';
+import '../state/item_state.dart';
 import '../widgets/my_item_card.dart';
 
-class MyItemsPage extends ConsumerStatefulWidget {
+class MyItemsPage extends StatefulWidget {
   const MyItemsPage({super.key});
 
   @override
-  ConsumerState<MyItemsPage> createState() => _MyItemsPageState();
+  State<MyItemsPage> createState() => _MyItemsPageState();
 }
 
-class _MyItemsPageState extends ConsumerState<MyItemsPage>
+class _MyItemsPageState extends State<MyItemsPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
@@ -29,12 +32,12 @@ class _MyItemsPageState extends ConsumerState<MyItemsPage>
   }
 
   void _loadData() {
-    final userSessionService = ref.read(userSessionServiceProvider);
+    final userSessionService = serviceLocator<UserSessionService>();
     final userId = userSessionService.getCurrentUserId();
     if (userId != null) {
-      ref.read(itemViewModelProvider.notifier).getMyItems(userId);
+      context.read<ItemBloc>().add(ItemGetMyItemsEvent(userId: userId));
     }
-    ref.read(categoryViewModelProvider.notifier).getAllCategories();
+    context.read<CategoryBloc>().add(const CategoryGetAllEvent());
   }
 
   @override
@@ -45,7 +48,7 @@ class _MyItemsPageState extends ConsumerState<MyItemsPage>
 
   String _getCategoryName(String? categoryId) {
     if (categoryId == null) return 'Other';
-    final categoryState = ref.read(categoryViewModelProvider);
+    final categoryState = context.read<CategoryBloc>().state;
     final category = categoryState.categories.where(
       (c) => c.categoryId == categoryId,
     );
@@ -54,31 +57,36 @@ class _MyItemsPageState extends ConsumerState<MyItemsPage>
 
   @override
   Widget build(BuildContext context) {
-    final itemState = ref.watch(itemViewModelProvider);
-    final myLostItems = itemState.myLostItems;
-    final myFoundItems = itemState.myFoundItems;
-
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(context),
-            _buildTabBar(context, myLostItems.length, myFoundItems.length),
-            const SizedBox(height: 20),
-            Expanded(
-              child: itemState.status == ItemStatus.loading
-                  ? Center(
-                      child: CircularProgressIndicator(color: AppColors.primary),
-                    )
-                  : TabBarView(
-                      controller: _tabController,
-                      children: [
-                        _buildItemsList(myLostItems, true),
-                        _buildItemsList(myFoundItems, false),
-                      ],
-                    ),
-            ),
-          ],
+        child: BlocBuilder<ItemBloc, ItemState>(
+          builder: (context, itemState) {
+            final myLostItems = itemState.myLostItems;
+            final myFoundItems = itemState.myFoundItems;
+
+            return Column(
+              children: [
+                _buildHeader(context),
+                _buildTabBar(
+                    context, myLostItems.length, myFoundItems.length),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: itemState.status == ItemStatus.loading
+                      ? Center(
+                          child: CircularProgressIndicator(
+                              color: AppColors.primary),
+                        )
+                      : TabBarView(
+                          controller: _tabController,
+                          children: [
+                            _buildItemsList(myLostItems, true),
+                            _buildItemsList(myFoundItems, false),
+                          ],
+                        ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -146,7 +154,8 @@ class _MyItemsPageState extends ConsumerState<MyItemsPage>
         dividerColor: Colors.transparent,
         labelColor: Colors.white,
         unselectedLabelColor: context.textSecondary,
-        labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+        labelStyle:
+            const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
         tabs: [
           _buildTab(Icons.search_off_rounded, 'Lost', lostCount),
           _buildTab(Icons.check_circle_rounded, 'Found', foundCount),
@@ -167,12 +176,14 @@ class _MyItemsPageState extends ConsumerState<MyItemsPage>
             Text(label),
             const SizedBox(width: 6),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
                 color: Colors.white.withAlpha(51),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Text('$count', style: const TextStyle(fontSize: 12)),
+              child:
+                  Text('$count', style: const TextStyle(fontSize: 12)),
             ),
           ],
         ),
@@ -211,7 +222,8 @@ class _MyItemsPageState extends ConsumerState<MyItemsPage>
       itemBuilder: (context, index) {
         final item = items[index];
         final categoryName = _getCategoryName(item.category);
-        final status = item.status ?? (item.isClaimed ? 'claimed' : 'active');
+        final status =
+            item.status ?? (item.isClaimed ? 'claimed' : 'active');
 
         return Padding(
           padding: const EdgeInsets.only(bottom: 16),
@@ -237,12 +249,14 @@ class _MyItemsPageState extends ConsumerState<MyItemsPage>
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20)),
         title: const Text(
           'Delete Item',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        content: Text('Are you sure you want to delete "${item.itemName}"?'),
+        content:
+            Text('Are you sure you want to delete "${item.itemName}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -255,12 +269,18 @@ class _MyItemsPageState extends ConsumerState<MyItemsPage>
             onPressed: () {
               Navigator.pop(dialogContext);
               if (item.itemId != null) {
-                ref.read(itemViewModelProvider.notifier).deleteItem(item.itemId!);
-                final userSessionService = ref.read(userSessionServiceProvider);
+                context
+                    .read<ItemBloc>()
+                    .add(ItemDeleteEvent(itemId: item.itemId!));
+                final userSessionService =
+                    serviceLocator<UserSessionService>();
                 final userId = userSessionService.getCurrentUserId();
                 if (userId != null) {
                   Future.delayed(const Duration(milliseconds: 300), () {
-                    ref.read(itemViewModelProvider.notifier).getMyItems(userId);
+                    if (mounted) {
+                      context.read<ItemBloc>().add(
+                          ItemGetMyItemsEvent(userId: userId));
+                    }
                   });
                 }
               }

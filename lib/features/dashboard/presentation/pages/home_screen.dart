@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/theme_extensions.dart';
 import '../../../../app/routes/app_routes.dart';
 import '../../../../core/api/api_endpoints.dart';
+import '../../../../core/di/service_locator.dart';
 import '../../../../core/services/storage/user_session_service.dart';
 import '../../../item/presentation/pages/item_detail_page.dart';
 import '../../../item/domain/entities/item_entity.dart';
-import '../../../item/presentation/view_model/item_viewmodel.dart';
+import '../../../item/presentation/bloc/item_bloc.dart';
+import '../../../item/presentation/bloc/item_event.dart';
 import '../../../item/presentation/state/item_state.dart';
 import '../../../category/domain/entities/category_entity.dart';
-import '../../../category/presentation/view_model/category_viewmodel.dart';
+import '../../../category/presentation/bloc/category_bloc.dart';
+import '../../../category/presentation/bloc/category_event.dart';
+import '../../../category/presentation/state/category_state.dart';
 import '../widgets/stat_card.dart';
 import '../widgets/item_card.dart';
 import '../widgets/filter_tabs.dart';
@@ -19,14 +23,14 @@ import '../widgets/empty_items_view.dart';
 import '../widgets/home_header.dart';
 import '../widgets/search_bar_widget.dart';
 
-class HomeScreen extends ConsumerStatefulWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> {
   int _selectedFilter = 0;
   String? _selectedCategoryId;
   String _searchQuery = '';
@@ -37,33 +41,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      ref.read(itemViewModelProvider.notifier).getAllItems();
-      ref.read(categoryViewModelProvider.notifier).getAllCategories();
+      context.read<ItemBloc>().add(const ItemGetAllEvent());
+      context.read<CategoryBloc>().add(const CategoryGetAllEvent());
     });
   }
 
   List<ItemEntity> _getFilteredItems(ItemState itemState) {
     List<ItemEntity> items = itemState.items;
 
-    // Filter by search query
     if (_searchQuery.isNotEmpty) {
       final query = _searchQuery.toLowerCase();
       items = items.where((item) {
         final nameMatch = item.itemName.toLowerCase().contains(query);
-        final descriptionMatch = item.description?.toLowerCase().contains(query) ?? false;
+        final descriptionMatch =
+            item.description?.toLowerCase().contains(query) ?? false;
         final locationMatch = item.location.toLowerCase().contains(query);
         return nameMatch || descriptionMatch || locationMatch;
       }).toList();
     }
 
-    // Filter by type (lost/found)
     if (_selectedFilter == 1) {
       items = items.where((item) => item.type == ItemType.lost).toList();
     } else if (_selectedFilter == 2) {
       items = items.where((item) => item.type == ItemType.found).toList();
     }
 
-    // Filter by category
     if (_selectedCategoryId != null) {
       items = items
           .where((item) => item.category == _selectedCategoryId)
@@ -73,7 +75,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return items;
   }
 
-  String _getCategoryNameById(String? categoryId, List<CategoryEntity> categories) {
+  String _getCategoryNameById(
+      String? categoryId, List<CategoryEntity> categories) {
     if (categoryId == null) return 'Other';
     try {
       return categories.firstWhere((c) => c.categoryId == categoryId).name;
@@ -84,112 +87,119 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final itemState = ref.watch(itemViewModelProvider);
-    final categoryState = ref.watch(categoryViewModelProvider);
-    final filteredItems = _getFilteredItems(itemState);
-    final userSessionService = ref.watch(userSessionServiceProvider);
+    final userSessionService = serviceLocator<UserSessionService>();
     final userName = userSessionService.getCurrentUserFullName() ?? 'User';
 
     return Scaffold(
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: HomeHeader(userName: userName),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: SearchBarWidget(
-                  onChanged: (query) {
-                    setState(() => _searchQuery = query);
-                  },
-                ),
-              ),
-            ),
-            const SliverToBoxAdapter(child: SizedBox(height: 20)),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: FilterTabs(
-                  filters: _filters,
-                  selectedIndex: _selectedFilter,
-                  onFilterChanged: (index) {
-                    setState(() => _selectedFilter = index);
-                  },
-                ),
-              ),
-            ),
-            const SliverToBoxAdapter(child: SizedBox(height: 20)),
-            SliverToBoxAdapter(
-              child: CategoryChipList(
-                categories: categoryState.categories,
-                selectedCategoryId: _selectedCategoryId,
-                onCategorySelected: (id) {
-                  setState(() => _selectedCategoryId = id);
-                },
-              ),
-            ),
-            const SliverToBoxAdapter(child: SizedBox(height: 24)),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: StatCard(
-                        icon: Icons.search_off_rounded,
-                        title: 'Lost Items',
-                        value: '${itemState.lostItems.length}',
-                        gradient: AppColors.lostGradient,
-                      ),
+        child: BlocBuilder<ItemBloc, ItemState>(
+          builder: (context, itemState) {
+            return BlocBuilder<CategoryBloc, CategoryState>(
+              builder: (context, categoryState) {
+                final filteredItems = _getFilteredItems(itemState);
+                return CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: HomeHeader(userName: userName),
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: StatCard(
-                        icon: Icons.check_circle_rounded,
-                        title: 'Found Items',
-                        value: '${itemState.foundItems.length}',
-                        gradient: AppColors.foundGradient,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SliverToBoxAdapter(child: SizedBox(height: 24)),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Recent Items',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: context.textPrimary,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        'See All',
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: SearchBarWidget(
+                          onChanged: (query) {
+                            setState(() => _searchQuery = query);
+                          },
                         ),
                       ),
                     ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 20)),
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: FilterTabs(
+                          filters: _filters,
+                          selectedIndex: _selectedFilter,
+                          onFilterChanged: (index) {
+                            setState(() => _selectedFilter = index);
+                          },
+                        ),
+                      ),
+                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 20)),
+                    SliverToBoxAdapter(
+                      child: CategoryChipList(
+                        categories: categoryState.categories,
+                        selectedCategoryId: _selectedCategoryId,
+                        onCategorySelected: (id) {
+                          setState(() => _selectedCategoryId = id);
+                        },
+                      ),
+                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: StatCard(
+                                icon: Icons.search_off_rounded,
+                                title: 'Lost Items',
+                                value: '${itemState.lostItems.length}',
+                                gradient: AppColors.lostGradient,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: StatCard(
+                                icon: Icons.check_circle_rounded,
+                                title: 'Found Items',
+                                value: '${itemState.foundItems.length}',
+                                gradient: AppColors.foundGradient,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Recent Items',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: context.textPrimary,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {},
+                              child: Text(
+                                'See All',
+                                style: TextStyle(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 12)),
+                    _buildItemsList(
+                        itemState, filteredItems, categoryState.categories),
+                    const SliverToBoxAdapter(child: SizedBox(height: 100)),
                   ],
-                ),
-              ),
-            ),
-            const SliverToBoxAdapter(child: SizedBox(height: 12)),
-            _buildItemsList(itemState, filteredItems, categoryState.categories),
-            const SliverToBoxAdapter(child: SizedBox(height: 100)),
-          ],
+                );
+              },
+            );
+          },
         ),
       ),
     );
@@ -221,7 +231,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         delegate: SliverChildBuilderDelegate(
           (context, index) {
             final item = filteredItems[index];
-            final categoryName = _getCategoryNameById(item.category, categories);
+            final categoryName =
+                _getCategoryNameById(item.category, categories);
             return Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
               child: ItemCard(
@@ -240,7 +251,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       location: item.location,
                       category: categoryName,
                       isLost: item.type == ItemType.lost,
-                      description: item.description ?? 'No description provided.',
+                      description:
+                          item.description ?? 'No description provided.',
                       reportedBy: item.reportedBy ?? 'Anonymous',
                       imageUrl: item.media != null
                           ? ApiEndpoints.itemPicture(item.media!)

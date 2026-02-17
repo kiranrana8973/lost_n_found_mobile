@@ -1,15 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:lost_n_found/core/api/api_endpoints.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
-
-// Provider for ApiClient
-final apiClientProvider = Provider<ApiClient>((ref) {
-  return ApiClient();
-});
 
 class ApiClient {
   late final Dio _dio;

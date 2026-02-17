@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lost_n_found/core/services/storage/user_session_service.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-// Theme mode provider
-final themeModeProvider = NotifierProvider<ThemeModeNotifier, ThemeMode>(
-  ThemeModeNotifier.new,
-);
-
-class ThemeModeNotifier extends Notifier<ThemeMode> {
+class ThemeCubit extends Cubit<ThemeMode> {
+  final SharedPreferences _prefs;
   static const String _themeKey = 'theme_mode';
 
-  @override
-  ThemeMode build() {
-    // Load saved theme from SharedPreferences synchronously
-    final prefs = ref.read(sharedPreferencesProvider);
+  ThemeCubit({required SharedPreferences prefs})
+    : _prefs = prefs,
+      super(_loadTheme(prefs));
+
+  static ThemeMode _loadTheme(SharedPreferences prefs) {
     final themeValue = prefs.getString(_themeKey);
     if (themeValue != null) {
       return _themeModeFromString(themeValue);
@@ -22,9 +19,8 @@ class ThemeModeNotifier extends Notifier<ThemeMode> {
   }
 
   Future<void> setThemeMode(ThemeMode mode) async {
-    final prefs = ref.read(sharedPreferencesProvider);
-    state = mode;
-    await prefs.setString(_themeKey, _themeModeToString(mode));
+    emit(mode);
+    await _prefs.setString(_themeKey, _themeModeToString(mode));
   }
 
   Future<void> toggleTheme() async {
@@ -37,7 +33,7 @@ class ThemeModeNotifier extends Notifier<ThemeMode> {
 
   bool get isDarkMode => state == ThemeMode.dark;
 
-  ThemeMode _themeModeFromString(String value) {
+  static ThemeMode _themeModeFromString(String value) {
     switch (value) {
       case 'dark':
         return ThemeMode.dark;
@@ -48,7 +44,7 @@ class ThemeModeNotifier extends Notifier<ThemeMode> {
     }
   }
 
-  String _themeModeToString(ThemeMode mode) {
+  static String _themeModeToString(ThemeMode mode) {
     switch (mode) {
       case ThemeMode.dark:
         return 'dark';

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/onboarding_item.dart';
 import '../widgets/onboarding_content.dart';
 import '../widgets/page_indicator.dart';
@@ -9,14 +8,14 @@ import '../../../../app/theme/theme_extensions.dart';
 import '../../../../app/routes/app_routes.dart';
 import '../../../auth/presentation/pages/login_page.dart';
 
-class OnboardingPage extends ConsumerStatefulWidget {
+class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
 
   @override
-  ConsumerState<OnboardingPage> createState() => _OnboardingPageState();
+  State<OnboardingPage> createState() => _OnboardingPageState();
 }
 
-class _OnboardingPageState extends ConsumerState<OnboardingPage>
+class _OnboardingPageState extends State<OnboardingPage>
     with SingleTickerProviderStateMixin {
   final PageController _pageController = PageController();
   int _currentPage = 0;

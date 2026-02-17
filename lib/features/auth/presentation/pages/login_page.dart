@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../app/routes/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../../../dashboard/presentation/pages/dashboard_page.dart';
+import '../bloc/auth_bloc.dart';
+import '../bloc/auth_event.dart';
 import '../state/auth_state.dart';
-import '../view_model/auth_viewmodel.dart';
 import '../widgets/social_login_buttons.dart';
 import '../widgets/auth_link_text.dart';
 import 'signup_page.dart';
 
-class LoginPage extends ConsumerStatefulWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  ConsumerState<LoginPage> createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends ConsumerState<LoginPage> {
+class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -33,12 +34,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
-      await ref
-          .read(authViewModelProvider.notifier)
-          .login(
-            email: _emailController.text.trim(),
-            password: _passwordController.text,
-          );
+      context.read<AuthBloc>().add(
+        AuthLoginEvent(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        ),
+      );
     }
   }
 
@@ -52,56 +53,61 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authViewModelProvider);
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final textColor =
         Theme.of(context).textTheme.bodyLarge?.color ?? AppColors.textDark;
     final secondaryTextColor =
         Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textMuted;
 
-    ref.listen<AuthState>(authViewModelProvider, (previous, next) {
-      if (next.status == AuthStatus.authenticated) {
-        AppRoutes.pushReplacement(context, const DashboardPage());
-      } else if (next.status == AuthStatus.error && next.errorMessage != null) {
-        SnackbarUtils.showError(context, next.errorMessage!);
-      }
-    });
-
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 40),
-                _buildLogo(isDarkMode),
-                const SizedBox(height: 32),
-                _buildTitle(textColor, secondaryTextColor),
-                const SizedBox(height: 40),
-                _buildEmailField(textColor),
-                const SizedBox(height: 16),
-                _buildPasswordField(textColor),
-                const SizedBox(height: 8),
-                _buildForgotPassword(),
-                const SizedBox(height: 24),
-                _buildLoginButton(authState),
-                const SizedBox(height: 24),
-                _buildDivider(secondaryTextColor),
-                const SizedBox(height: 24),
-                SocialLoginButtons(
-                  onGoogleTap: _handleGoogleSignIn,
-                  onAppleTap: _handleAppleSignIn,
-                ),
-                const SizedBox(height: 24),
-                AuthLinkText(
-                  text: "Don't have an account? ",
-                  linkText: 'Sign Up',
-                  onTap: _navigateToSignup,
-                ),
-              ],
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state.status == AuthStatus.authenticated) {
+          AppRoutes.pushReplacement(context, const DashboardPage());
+        } else if (state.status == AuthStatus.error &&
+            state.errorMessage != null) {
+          SnackbarUtils.showError(context, state.errorMessage!);
+        }
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 40),
+                  _buildLogo(isDarkMode),
+                  const SizedBox(height: 32),
+                  _buildTitle(textColor, secondaryTextColor),
+                  const SizedBox(height: 40),
+                  _buildEmailField(textColor),
+                  const SizedBox(height: 16),
+                  _buildPasswordField(textColor),
+                  const SizedBox(height: 8),
+                  _buildForgotPassword(),
+                  const SizedBox(height: 24),
+                  BlocBuilder<AuthBloc, AuthState>(
+                    builder: (context, authState) {
+                      return _buildLoginButton(authState);
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  _buildDivider(secondaryTextColor),
+                  const SizedBox(height: 24),
+                  SocialLoginButtons(
+                    onGoogleTap: _handleGoogleSignIn,
+                    onAppleTap: _handleAppleSignIn,
+                  ),
+                  const SizedBox(height: 24),
+                  AuthLinkText(
+                    text: "Don't have an account? ",
+                    linkText: 'Sign Up',
+                    onTap: _navigateToSignup,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

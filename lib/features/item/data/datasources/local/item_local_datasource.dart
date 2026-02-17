@@ -1,12 +1,6 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lost_n_found/core/services/hive/hive_service.dart';
 import 'package:lost_n_found/features/item/data/datasources/item_datasource.dart';
 import 'package:lost_n_found/features/item/data/models/item_hive_model.dart';
-
-final itemLocalDatasourceProvider = Provider<ItemLocalDatasource>((ref) {
-  final hiveService = ref.read(hiveServiceProvider);
-  return ItemLocalDatasource(hiveService: hiveService);
-});
 
 class ItemLocalDatasource implements IItemLocalDataSource {
   final HiveService _hiveService;

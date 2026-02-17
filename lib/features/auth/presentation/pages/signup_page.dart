@@ -1,25 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lost_n_found/features/auth/presentation/state/auth_state.dart';
-import 'package:lost_n_found/features/auth/presentation/view_model/auth_viewmodel.dart';
-import 'package:lost_n_found/features/batch/presentation/state/batch_state.dart';
-import 'package:lost_n_found/features/batch/presentation/view_model/batch_viewmodel.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../batch/presentation/bloc/batch_bloc.dart';
+import '../../../batch/presentation/bloc/batch_event.dart';
+import '../../../batch/presentation/state/batch_state.dart';
 import '../../../../app/theme/theme_extensions.dart';
 import '../../../../core/widgets/gradient_button.dart';
 import '../../../../core/utils/snackbar_utils.dart';
+import '../bloc/auth_bloc.dart';
+import '../bloc/auth_event.dart';
+import '../state/auth_state.dart';
 import '../widgets/auth_header.dart';
 import '../widgets/password_field.dart';
 import '../widgets/terms_checkbox.dart';
 import '../widgets/auth_link_text.dart';
 
-class SignupPage extends ConsumerStatefulWidget {
+class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
 
   @override
-  ConsumerState<SignupPage> createState() => _SignupPageState();
+  State<SignupPage> createState() => _SignupPageState();
 }
 
-class _SignupPageState extends ConsumerState<SignupPage> {
+class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -43,7 +45,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      ref.read(batchViewModelProvider.notifier).getAllBatches();
+      context.read<BatchBloc>().add(const BatchGetAllEvent());
     });
   }
 
@@ -67,15 +69,15 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     }
 
     if (_formKey.currentState!.validate()) {
-      await ref
-          .read(authViewModelProvider.notifier)
-          .register(
-            fullName: _nameController.text.trim(),
-            email: _emailController.text.trim(),
-            username: _emailController.text.trim().split('@').first,
-            password: _passwordController.text,
-            phoneNumber: '$_selectedCountryCode${_phoneController.text.trim()}',
-            batchId: _selectedBatch,
+      context.read<AuthBloc>().add(
+            AuthRegisterEvent(
+              fullName: _nameController.text.trim(),
+              email: _emailController.text.trim(),
+              username: _emailController.text.trim().split('@').first,
+              password: _passwordController.text,
+              phoneNumber: '$_selectedCountryCode${_phoneController.text.trim()}',
+              batchId: _selectedBatch,
+            ),
           );
     }
   }
@@ -84,109 +86,116 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
-    final batchState = ref.watch(batchViewModelProvider);
-    final authState = ref.watch(authViewModelProvider);
-
-    ref.listen<AuthState>(authViewModelProvider, (previous, next) {
-      if (next.status == AuthStatus.registered) {
-        SnackbarUtils.showSuccess(
-          context,
-          'Registration successful! Please login.',
-        );
-        Navigator.of(context).pop();
-      } else if (next.status == AuthStatus.error && next.errorMessage != null) {
-        SnackbarUtils.showError(context, next.errorMessage!);
-      }
-    });
-
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: context.surfaceColor,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: context.softShadow,
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state.status == AuthStatus.registered) {
+          SnackbarUtils.showSuccess(
+            context,
+            'Registration successful! Please login.',
+          );
+          Navigator.of(context).pop();
+        } else if (state.status == AuthStatus.error &&
+            state.errorMessage != null) {
+          SnackbarUtils.showError(context, state.errorMessage!);
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: context.surfaceColor,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: context.softShadow,
+              ),
+              child: Icon(Icons.arrow_back, color: context.textPrimary, size: 20),
             ),
-            child: Icon(Icons.arrow_back, color: context.textPrimary, size: 20),
+            onPressed: _navigateToLogin,
           ),
-          onPressed: _navigateToLogin,
         ),
-      ),
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const AuthHeader(
-                    icon: Icons.person_add_rounded,
-                    title: 'Join Us Today',
-                    subtitle: 'Create your account to get started',
-                  ),
-                  const SizedBox(height: 32),
-                  _buildNameField(),
-                  const SizedBox(height: 16),
-                  _buildEmailField(),
-                  const SizedBox(height: 16),
-                  _buildPhoneRow(),
-                  const SizedBox(height: 16),
-                  _buildBatchDropdown(batchState),
-                  const SizedBox(height: 16),
-                  PasswordField(
-                    controller: _passwordController,
-                    labelText: 'Password',
-                    hintText: 'Create a strong password',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a password';
-                      }
-                      if (value.length < 6) {
-                        return 'Password must be at least 6 characters';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  PasswordField(
-                    controller: _confirmPasswordController,
-                    labelText: 'Confirm Password',
-                    hintText: 'Re-enter your password',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please confirm your password';
-                      }
-                      if (value != _passwordController.text) {
-                        return 'Passwords do not match';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  TermsCheckbox(
-                    value: _agreedToTerms,
-                    onChanged: (value) =>
-                        setState(() => _agreedToTerms = value),
-                  ),
-                  const SizedBox(height: 32),
-                  GradientButton(
-                    text: 'Create Account',
-                    onPressed: _handleSignup,
-                    isLoading: authState.status == AuthStatus.loading,
-                  ),
-                  const SizedBox(height: 32),
-                  AuthLinkText(
-                    text: 'Already have an account? ',
-                    linkText: 'Login',
-                    onTap: _navigateToLogin,
-                  ),
-                  const SizedBox(height: 16),
-                ],
+        body: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const AuthHeader(
+                      icon: Icons.person_add_rounded,
+                      title: 'Join Us Today',
+                      subtitle: 'Create your account to get started',
+                    ),
+                    const SizedBox(height: 32),
+                    _buildNameField(),
+                    const SizedBox(height: 16),
+                    _buildEmailField(),
+                    const SizedBox(height: 16),
+                    _buildPhoneRow(),
+                    const SizedBox(height: 16),
+                    BlocBuilder<BatchBloc, BatchState>(
+                      builder: (context, batchState) {
+                        return _buildBatchDropdown(batchState);
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    PasswordField(
+                      controller: _passwordController,
+                      labelText: 'Password',
+                      hintText: 'Create a strong password',
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a password';
+                        }
+                        if (value.length < 6) {
+                          return 'Password must be at least 6 characters';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    PasswordField(
+                      controller: _confirmPasswordController,
+                      labelText: 'Confirm Password',
+                      hintText: 'Re-enter your password',
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please confirm your password';
+                        }
+                        if (value != _passwordController.text) {
+                          return 'Passwords do not match';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    TermsCheckbox(
+                      value: _agreedToTerms,
+                      onChanged: (value) =>
+                          setState(() => _agreedToTerms = value),
+                    ),
+                    const SizedBox(height: 32),
+                    BlocBuilder<AuthBloc, AuthState>(
+                      builder: (context, authState) {
+                        return GradientButton(
+                          text: 'Create Account',
+                          onPressed: _handleSignup,
+                          isLoading: authState.status == AuthStatus.loading,
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 32),
+                    AuthLinkText(
+                      text: 'Already have an account? ',
+                      linkText: 'Login',
+                      onTap: _navigateToLogin,
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
               ),
             ),
           ),

@@ -1,27 +1,14 @@
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lost_n_found/core/error/failures.dart';
 import 'package:lost_n_found/core/services/connectivity/network_info.dart';
 import 'package:lost_n_found/features/item/data/datasources/item_datasource.dart';
 import 'package:lost_n_found/features/item/data/datasources/local/item_local_datasource.dart';
-import 'package:lost_n_found/features/item/data/datasources/remote/item_remote_datasource.dart';
 import 'package:lost_n_found/features/item/data/models/item_api_model.dart';
 import 'package:lost_n_found/features/item/data/models/item_hive_model.dart';
 import 'package:lost_n_found/features/item/domain/entities/item_entity.dart';
 import 'package:lost_n_found/features/item/domain/repositories/item_repository.dart';
-
-final itemRepositoryProvider = Provider<IItemRepository>((ref) {
-  final localDatasource = ref.read(itemLocalDatasourceProvider);
-  final remoteDatasource = ref.read(itemRemoteDatasourceProvider);
-  final networkInfo = ref.read(networkInfoProvider);
-  return ItemRepository(
-    localDatasource: localDatasource,
-    remoteDatasource: remoteDatasource,
-    networkInfo: networkInfo,
-  );
-});
 
 class ItemRepository implements IItemRepository {
   final ItemLocalDatasource _localDataSource;

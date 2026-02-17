@@ -1,27 +1,13 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lost_n_found/core/error/failures.dart';
 import 'package:lost_n_found/core/services/connectivity/network_info.dart';
 import 'package:lost_n_found/features/batch/data/datasources/batch_datasource.dart';
 import 'package:lost_n_found/features/batch/data/datasources/local/batch_local_datasource.dart';
-import 'package:lost_n_found/features/batch/data/datasources/remote/batch_remote_datasource.dart';
 import 'package:lost_n_found/features/batch/data/models/batch_api_model.dart';
 import 'package:lost_n_found/features/batch/data/models/batch_hive_model.dart';
 import 'package:lost_n_found/features/batch/domain/entities/batch_entity.dart';
 import 'package:lost_n_found/features/batch/domain/repositories/batch_repository.dart';
-
-// Create provider
-final batchRepositoryProvider = Provider<IBatchRepository>((ref) {
-  final batchLocalDatasource = ref.read(batchLocalDatasourceProvider);
-  final batchRemoteDataSource = ref.read(batchRemoteProvider);
-  final networkInfo = ref.read(networkInfoProvider);
-  return BatchRepository(
-    batchDatasource: batchLocalDatasource,
-    batchRemoteDataSource: batchRemoteDataSource,
-    networkInfo: networkInfo,
-  );
-});
 
 class BatchRepository implements IBatchRepository {
   final BatchLocalDatasource _batchLocalDataSource;

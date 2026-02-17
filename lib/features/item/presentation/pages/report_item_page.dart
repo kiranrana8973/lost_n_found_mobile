@@ -1,17 +1,20 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../../../app/theme/theme_extensions.dart';
+import '../../../../core/di/service_locator.dart';
 import '../../../../core/services/storage/user_session_service.dart';
 import '../../../../core/utils/snackbar_utils.dart';
+import '../../../category/presentation/bloc/category_bloc.dart';
+import '../../../category/presentation/bloc/category_event.dart';
 import '../../../category/presentation/state/category_state.dart';
-import '../../../category/presentation/view_model/category_viewmodel.dart';
 import '../../domain/entities/item_entity.dart';
+import '../bloc/item_bloc.dart';
+import '../bloc/item_event.dart';
 import '../state/item_state.dart';
-import '../view_model/item_viewmodel.dart';
 import '../widgets/item_type_toggle.dart';
 import '../widgets/media_upload_section.dart';
 import '../widgets/category_chip_selector.dart';
@@ -20,14 +23,14 @@ import '../widgets/form_section_header.dart';
 import '../widgets/styled_text_field.dart';
 import '../widgets/gradient_submit_button.dart';
 
-class ReportItemPage extends ConsumerStatefulWidget {
+class ReportItemPage extends StatefulWidget {
   const ReportItemPage({super.key});
 
   @override
-  ConsumerState<ReportItemPage> createState() => _ReportItemPageState();
+  State<ReportItemPage> createState() => _ReportItemPageState();
 }
 
-class _ReportItemPageState extends ConsumerState<ReportItemPage> {
+class _ReportItemPageState extends State<ReportItemPage> {
   ItemType _selectedType = ItemType.lost;
   String? _selectedCategoryId;
   final _formKey = GlobalKey<FormState>();
@@ -43,7 +46,7 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(categoryViewModelProvider.notifier).getAllCategories();
+      context.read<CategoryBloc>().add(const CategoryGetAllEvent());
     });
   }
 
@@ -57,21 +60,24 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
 
   Future<void> _handleSubmit() async {
     if (_formKey.currentState!.validate()) {
-      final userSessionService = ref.read(userSessionServiceProvider);
+      final userSessionService = serviceLocator<UserSessionService>();
       final userId = userSessionService.getCurrentUserId();
-      final uploadedPhotoUrl = ref.read(itemViewModelProvider).uploadedPhotoUrl;
+      final uploadedPhotoUrl =
+          context.read<ItemBloc>().state.uploadedPhotoUrl;
 
-      await ref.read(itemViewModelProvider.notifier).createItem(
-            itemName: _titleController.text.trim(),
-            description: _descriptionController.text.trim().isEmpty
-                ? null
-                : _descriptionController.text.trim(),
-            category: _selectedCategoryId,
-            location: _locationController.text.trim(),
-            type: _selectedType,
-            reportedBy: userId,
-            media: uploadedPhotoUrl,
-            mediaType: uploadedPhotoUrl != null ? _selectedMediaType : null,
+      context.read<ItemBloc>().add(
+            ItemCreateEvent(
+              itemName: _titleController.text.trim(),
+              description: _descriptionController.text.trim().isEmpty
+                  ? null
+                  : _descriptionController.text.trim(),
+              category: _selectedCategoryId,
+              location: _locationController.text.trim(),
+              type: _selectedType,
+              reportedBy: userId,
+              media: uploadedPhotoUrl,
+              mediaType: uploadedPhotoUrl != null ? _selectedMediaType : null,
+            ),
           );
     }
   }
@@ -133,9 +139,11 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
         _selectedMedia.add(File(photo.path));
         _selectedMediaType = 'photo';
       });
-      await ref
-          .read(itemViewModelProvider.notifier)
-          .uploadPhoto(File(photo.path));
+      if (mounted) {
+        context
+            .read<ItemBloc>()
+            .add(ItemUploadPhotoEvent(photo: File(photo.path)));
+      }
     }
   }
 
@@ -152,9 +160,11 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
           _selectedMedia.add(File(image.path));
           _selectedMediaType = 'photo';
         });
-        await ref
-            .read(itemViewModelProvider.notifier)
-            .uploadPhoto(File(image.path));
+        if (mounted) {
+          context
+              .read<ItemBloc>()
+              .add(ItemUploadPhotoEvent(photo: File(image.path)));
+        }
       }
     } catch (e) {
       debugPrint('Gallery Error $e');
@@ -186,9 +196,11 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
           _selectedMedia.add(File(video.path));
           _selectedMediaType = 'video';
         });
-        await ref
-            .read(itemViewModelProvider.notifier)
-            .uploadVideo(File(video.path));
+        if (mounted) {
+          context
+              .read<ItemBloc>()
+              .add(ItemUploadVideoEvent(video: File(video.path)));
+        }
       }
     } catch (e) {
       _showPermissionDeniedDialog();
@@ -206,118 +218,132 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
 
   @override
   Widget build(BuildContext context) {
-    final itemState = ref.watch(itemViewModelProvider);
-    final categoryState = ref.watch(categoryViewModelProvider);
+    return BlocListener<ItemBloc, ItemState>(
+      listener: (context, state) {
+        if (state.status == ItemStatus.created) {
+          SnackbarUtils.showSuccess(
+            context,
+            _selectedType == ItemType.lost
+                ? 'Lost item reported successfully!'
+                : 'Found item reported successfully!',
+          );
+          Navigator.pop(context);
+        } else if (state.status == ItemStatus.error &&
+            state.errorMessage != null) {
+          SnackbarUtils.showError(context, state.errorMessage!);
+        }
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: Column(
+            children: [
+              _buildHeader(context),
+              Expanded(
+                child: BlocBuilder<ItemBloc, ItemState>(
+                  builder: (context, itemState) {
+                    return BlocBuilder<CategoryBloc, CategoryState>(
+                      builder: (context, categoryState) {
+                        if (categoryState.status == CategoryStatus.loaded &&
+                            _selectedCategoryId == null &&
+                            categoryState.categories.isNotEmpty) {
+                          _selectedCategoryId =
+                              categoryState.categories.first.categoryId;
+                        }
 
-    ref.listen<ItemState>(itemViewModelProvider, (previous, next) {
-      if (next.status == ItemStatus.created) {
-        SnackbarUtils.showSuccess(
-          context,
-          _selectedType == ItemType.lost
-              ? 'Lost item reported successfully!'
-              : 'Found item reported successfully!',
-        );
-        Navigator.pop(context);
-      } else if (next.status == ItemStatus.error && next.errorMessage != null) {
-        SnackbarUtils.showError(context, next.errorMessage!);
-      }
-    });
-
-    if (categoryState.status == CategoryStatus.loaded &&
-        _selectedCategoryId == null &&
-        categoryState.categories.isNotEmpty) {
-      _selectedCategoryId = categoryState.categories.first.categoryId;
-    }
-
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(context),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ItemTypeToggle(
-                        selectedType: _selectedType,
-                        onTypeChanged: (type) {
-                          setState(() => _selectedType = type);
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                      MediaUploadSection(
-                        selectedMedia: _selectedMedia,
-                        itemType: _selectedType,
-                        onAddMedia: _showMediaPicker,
-                        onRemoveMedia: () {
-                          setState(() => _selectedMedia.clear());
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                      const FormSectionHeader(title: 'Item Name'),
-                      const SizedBox(height: 12),
-                      StyledTextField(
-                        controller: _titleController,
-                        hintText: 'e.g., iPhone 14 Pro, Blue Wallet',
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter item name';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                      const FormSectionHeader(title: 'Category'),
-                      const SizedBox(height: 12),
-                      CategoryChipSelector(
-                        categories: categoryState.categories,
-                        selectedCategoryId: _selectedCategoryId,
-                        itemType: _selectedType,
-                        onCategorySelected: (id) {
-                          setState(() => _selectedCategoryId = id);
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                      const FormSectionHeader(title: 'Location'),
-                      const SizedBox(height: 12),
-                      StyledTextField(
-                        controller: _locationController,
-                        hintText: _selectedType == ItemType.lost
-                            ? 'Where did you lose it?'
-                            : 'Where did you find it?',
-                        prefixIcon: Icons.location_on_rounded,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter location';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                      const FormSectionHeader(title: 'Description'),
-                      const SizedBox(height: 12),
-                      StyledTextField(
-                        controller: _descriptionController,
-                        hintText: 'Provide additional details about the item...',
-                        maxLines: 4,
-                      ),
-                      const SizedBox(height: 32),
-                      GradientSubmitButton(
-                        itemType: _selectedType,
-                        isLoading: itemState.status == ItemStatus.loading,
-                        onTap: _handleSubmit,
-                      ),
-                      const SizedBox(height: 32),
-                    ],
-                  ),
+                        return SingleChildScrollView(
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 20.0),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ItemTypeToggle(
+                                  selectedType: _selectedType,
+                                  onTypeChanged: (type) {
+                                    setState(() => _selectedType = type);
+                                  },
+                                ),
+                                const SizedBox(height: 24),
+                                MediaUploadSection(
+                                  selectedMedia: _selectedMedia,
+                                  itemType: _selectedType,
+                                  onAddMedia: _showMediaPicker,
+                                  onRemoveMedia: () {
+                                    setState(() => _selectedMedia.clear());
+                                  },
+                                ),
+                                const SizedBox(height: 24),
+                                const FormSectionHeader(title: 'Item Name'),
+                                const SizedBox(height: 12),
+                                StyledTextField(
+                                  controller: _titleController,
+                                  hintText:
+                                      'e.g., iPhone 14 Pro, Blue Wallet',
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter item name';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 24),
+                                const FormSectionHeader(title: 'Category'),
+                                const SizedBox(height: 12),
+                                CategoryChipSelector(
+                                  categories: categoryState.categories,
+                                  selectedCategoryId: _selectedCategoryId,
+                                  itemType: _selectedType,
+                                  onCategorySelected: (id) {
+                                    setState(
+                                        () => _selectedCategoryId = id);
+                                  },
+                                ),
+                                const SizedBox(height: 24),
+                                const FormSectionHeader(title: 'Location'),
+                                const SizedBox(height: 12),
+                                StyledTextField(
+                                  controller: _locationController,
+                                  hintText: _selectedType == ItemType.lost
+                                      ? 'Where did you lose it?'
+                                      : 'Where did you find it?',
+                                  prefixIcon: Icons.location_on_rounded,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter location';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 24),
+                                const FormSectionHeader(
+                                    title: 'Description'),
+                                const SizedBox(height: 12),
+                                StyledTextField(
+                                  controller: _descriptionController,
+                                  hintText:
+                                      'Provide additional details about the item...',
+                                  maxLines: 4,
+                                ),
+                                const SizedBox(height: 32),
+                                GradientSubmitButton(
+                                  itemType: _selectedType,
+                                  isLoading: itemState.status ==
+                                      ItemStatus.loading,
+                                  onTap: _handleSubmit,
+                                ),
+                                const SizedBox(height: 32),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
