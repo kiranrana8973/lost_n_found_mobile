@@ -78,11 +78,14 @@ class BatchRepository implements IBatchRepository {
         await _batchLocalDataSource.cacheAllBatches(hiveModels);
         final result = BatchApiModel.toEntityList(apiModels);
         return Right(result);
-      } on DioException {
-        // API failed, try to return cached data
+      } on DioException catch (e) {
+        if (e.response == null) {
+          return _getCachedBatches(
+            serverError: ApiFailure.fromDioException(e, fallback: 'Failed to load batches'),
+          );
+        }
         return _getCachedBatches();
       } catch (e) {
-        // API failed, try to return cached data
         return _getCachedBatches();
       }
     } else {
@@ -90,13 +93,20 @@ class BatchRepository implements IBatchRepository {
     }
   }
 
-  /// Helper method to get cached batches
-  Future<Either<Failure, List<BatchEntity>>> _getCachedBatches() async {
+  /// Helper method to get cached batches.
+  /// If [serverError] is provided and cache is empty, returns that error.
+  Future<Either<Failure, List<BatchEntity>>> _getCachedBatches({
+    ApiFailure? serverError,
+  }) async {
     try {
       final models = await _batchLocalDataSource.getAllBatches();
       final entities = BatchHiveModel.toEntityList(models);
+      if (entities.isEmpty && serverError != null) {
+        return Left(serverError);
+      }
       return Right(entities);
     } catch (e) {
+      if (serverError != null) return Left(serverError);
       return Left(LocalDatabaseFailure(message: e.toString()));
     }
   }

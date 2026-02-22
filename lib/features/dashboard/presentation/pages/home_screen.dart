@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../app/routes/router_extensions.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/theme_extensions.dart';
-import '../../../../app/routes/app_routes.dart';
 import '../../../../core/api/api_endpoints.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/services/storage/user_session_service.dart';
-import '../../../item/presentation/pages/item_detail_page.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../../../item/domain/entities/item_entity.dart';
 import '../../../item/presentation/view_model/item_viewmodel.dart';
 import '../../../item/presentation/state/item_state.dart';
@@ -50,43 +50,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   List<ItemEntity> _getFilteredItems(ItemState itemState) {
-    List<ItemEntity> items = itemState.items;
+    final items = itemState.items;
+    final hasSearch = _searchQuery.isNotEmpty;
+    final query = hasSearch ? _searchQuery.toLowerCase() : '';
+    final filterType = _selectedFilter;
+    final categoryId = _selectedCategoryId;
 
-    // Filter by search query
-    if (_searchQuery.isNotEmpty) {
-      final query = _searchQuery.toLowerCase();
-      items = items.where((item) {
-        final nameMatch = item.itemName.toLowerCase().contains(query);
-        final descriptionMatch = item.description?.toLowerCase().contains(query) ?? false;
-        final locationMatch = item.location.toLowerCase().contains(query);
-        return nameMatch || descriptionMatch || locationMatch;
-      }).toList();
-    }
-
-    // Filter by type (lost/found)
-    if (_selectedFilter == 1) {
-      items = items.where((item) => item.type == ItemType.lost).toList();
-    } else if (_selectedFilter == 2) {
-      items = items.where((item) => item.type == ItemType.found).toList();
-    }
-
-    // Filter by category
-    if (_selectedCategoryId != null) {
-      items = items
-          .where((item) => item.category == _selectedCategoryId)
-          .toList();
-    }
-
-    return items;
+    // Single-pass filtering instead of chained .where().toList()
+    return items.where((item) {
+      if (filterType == 1 && item.type != ItemType.lost) return false;
+      if (filterType == 2 && item.type != ItemType.found) return false;
+      if (categoryId != null && item.category != categoryId) return false;
+      if (hasSearch) {
+        return item.itemName.toLowerCase().contains(query) ||
+            item.location.toLowerCase().contains(query) ||
+            (item.description?.toLowerCase().contains(query) ?? false);
+      }
+      return true;
+    }).toList();
   }
 
-  String _getCategoryNameById(String? categoryId, List<CategoryEntity> categories) {
-    if (categoryId == null) return 'Other';
-    try {
-      return categories.firstWhere((c) => c.categoryId == categoryId).name;
-    } catch (e) {
-      return 'Other';
-    }
+  /// Build a category ID -> name map for O(1) lookups instead of O(n) firstWhere
+  Map<String, String> _buildCategoryMap(List<CategoryEntity> categories) {
+    return {
+      for (final c in categories)
+        if (c.categoryId != null) c.categoryId!: c.name,
+    };
   }
 
   @override
@@ -97,6 +86,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final filteredItems = _getFilteredItems(itemState);
     final userSessionService = ref.watch(userSessionServiceProvider);
     final userName = userSessionService.getCurrentUserFullName() ?? 'User';
+
+    ref.listen<ItemState>(itemViewModelProvider, (previous, next) {
+      if (next.status == ItemStatus.error && next.errorMessage != null) {
+        SnackbarUtils.showError(context, next.errorMessage!);
+      }
+    });
 
     return Scaffold(
       body: SafeArea(
@@ -196,7 +191,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 12)),
-            _buildItemsList(itemState, filteredItems, categoryState.categories, l10n),
+            _buildItemsList(itemState, filteredItems, _buildCategoryMap(categoryState.categories), l10n),
             const SliverToBoxAdapter(child: SizedBox(height: 100)),
           ],
         ),
@@ -207,7 +202,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildItemsList(
     ItemState itemState,
     List<ItemEntity> filteredItems,
-    List<CategoryEntity> categories,
+    Map<String, String> categoryMap,
     AppLocalizations? l10n,
   ) {
     if (itemState.status == ItemStatus.loading) {
@@ -216,6 +211,45 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Padding(
             padding: EdgeInsets.all(40.0),
             child: CircularProgressIndicator(),
+          ),
+        ),
+      );
+    }
+
+    if (itemState.status == ItemStatus.error && filteredItems.isEmpty) {
+      return SliverToBoxAdapter(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(40.0),
+            child: Column(
+              children: [
+                Icon(Icons.cloud_off_rounded, size: 48, color: Colors.grey[400]),
+                const SizedBox(height: 12),
+                Text(
+                  itemState.errorMessage ?? 'Something went wrong',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    ref.read(itemViewModelProvider.notifier).getAllItems();
+                  },
+                  icon: const Icon(Icons.refresh_rounded, size: 18),
+                  label: Text(l10n?.retry ?? 'Retry'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );
@@ -231,7 +265,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         delegate: SliverChildBuilderDelegate(
           (context, index) {
             final item = filteredItems[index];
-            final categoryName = _getCategoryNameById(item.category, categories);
+            final categoryName = (item.category != null ? categoryMap[item.category] : null) ?? 'Other';
+            final isVideo = item.isVideo;
             return Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
               child: ItemCard(
@@ -239,23 +274,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 location: item.location,
                 category: categoryName,
                 isLost: item.type == ItemType.lost,
-                imageUrl: item.media != null
+                imageUrl: item.media != null && !isVideo
                     ? ApiEndpoints.itemPicture(item.media!)
                     : null,
                 onTap: () {
-                  AppRoutes.push(
-                    context,
-                    ItemDetailPage(
-                      title: item.itemName,
-                      location: item.location,
-                      category: categoryName,
-                      isLost: item.type == ItemType.lost,
-                      description: item.description ?? (l10n?.noDescription ?? 'No description provided.'),
-                      reportedBy: item.reportedBy ?? 'Anonymous',
-                      imageUrl: item.media != null
-                          ? ApiEndpoints.itemPicture(item.media!)
-                          : null,
-                    ),
+                  context.goToItemDetail(
+                    id: item.itemId ?? '',
+                    title: item.itemName,
+                    location: item.location,
+                    category: categoryName,
+                    isLost: item.type == ItemType.lost,
+                    description: item.description ?? (l10n?.noDescription ?? 'No description provided.'),
+                    reportedBy: item.reportedBy ?? 'Anonymous',
+                    imageUrl: item.media != null && !isVideo
+                        ? ApiEndpoints.itemPicture(item.media!)
+                        : null,
+                    videoUrl: item.media != null && isVideo
+                        ? ApiEndpoints.itemVideo(item.media!)
+                        : null,
                   );
                 },
               ),

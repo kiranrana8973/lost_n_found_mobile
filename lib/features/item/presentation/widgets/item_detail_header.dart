@@ -7,6 +7,7 @@ class ItemDetailHeader extends StatelessWidget {
   final String category;
   final bool isLost;
   final IconData categoryIcon;
+  final VoidCallback? onImageTap;
 
   const ItemDetailHeader({
     super.key,
@@ -14,6 +15,7 @@ class ItemDetailHeader extends StatelessWidget {
     required this.category,
     required this.isLost,
     required this.categoryIcon,
+    this.onImageTap,
   });
 
   @override
@@ -25,52 +27,57 @@ class ItemDetailHeader extends StatelessWidget {
   }
 
   Widget _buildImageHeader(BuildContext context) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        CachedNetworkImage(
-          imageUrl: imageUrl!,
-          fit: BoxFit.cover,
-          placeholder: (context, url) => Container(
-            decoration: BoxDecoration(
-              gradient: isLost ? AppColors.lostGradient : AppColors.foundGradient,
+    return GestureDetector(
+      onTap: onImageTap,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          CachedNetworkImage(
+            imageUrl: imageUrl!,
+            fit: BoxFit.cover,
+            memCacheHeight: 600,
+            memCacheWidth: 600,
+            placeholder: (context, url) => Container(
+              decoration: BoxDecoration(
+                gradient: isLost ? AppColors.lostGradient : AppColors.foundGradient,
+              ),
+              child: const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 3,
+                ),
+              ),
             ),
-            child: const Center(
-              child: CircularProgressIndicator(
-                color: Colors.white,
-                strokeWidth: 3,
+            errorWidget: (context, url, error) => Container(
+              decoration: BoxDecoration(
+                gradient: isLost ? AppColors.lostGradient : AppColors.foundGradient,
+              ),
+              child: Center(
+                child: Icon(categoryIcon, size: 50, color: Colors.white),
               ),
             ),
           ),
-          errorWidget: (context, url, error) => Container(
+          Container(
             decoration: BoxDecoration(
-              gradient: isLost ? AppColors.lostGradient : AppColors.foundGradient,
-            ),
-            child: Center(
-              child: Icon(categoryIcon, size: 50, color: Colors.white),
-            ),
-          ),
-        ),
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.black.withAlpha(77),
-                Colors.transparent,
-                Colors.black.withAlpha(128),
-              ],
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withAlpha(77),
+                  Colors.transparent,
+                  Colors.black.withAlpha(128),
+                ],
+              ),
             ),
           ),
-        ),
-        Positioned(
-          bottom: 40,
-          left: 0,
-          right: 0,
-          child: Center(child: _buildBadge()),
-        ),
-      ],
+          Positioned(
+            bottom: 40,
+            left: 0,
+            right: 0,
+            child: Center(child: _buildBadge()),
+          ),
+        ],
+      ),
     );
   }
 

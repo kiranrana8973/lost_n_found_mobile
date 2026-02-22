@@ -24,6 +24,7 @@ class UserSessionService {
   static const String _keyUserPhoneNumber = 'user_phone_number';
   static const String _keyUserBatchId = 'user_batch_id';
   static const String _keyUserProfilePicture = 'user_profile_picture';
+  static const String _keyHasSeenOnboarding = 'has_seen_onboarding';
 
   UserSessionService({required SharedPreferences prefs}) : _prefs = prefs;
 
@@ -93,7 +94,17 @@ class UserSessionService {
     return _prefs.getString(_keyUserProfilePicture);
   }
 
-  // Clear user session (logout)
+  // Check if user has completed onboarding
+  bool hasSeenOnboarding() {
+    return _prefs.getBool(_keyHasSeenOnboarding) ?? false;
+  }
+
+  // Mark onboarding as completed (persists across logout)
+  Future<void> setOnboardingSeen() async {
+    await _prefs.setBool(_keyHasSeenOnboarding, true);
+  }
+
+  // Clear user session (logout) — does NOT clear onboarding flag
   Future<void> clearSession() async {
     await _prefs.remove(_keyIsLoggedIn);
     await _prefs.remove(_keyUserId);

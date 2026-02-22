@@ -94,8 +94,13 @@ class ItemCard extends StatelessWidget {
           ? CachedNetworkImage(
               imageUrl: imageUrl!,
               fit: BoxFit.cover,
-              placeholder: (context, url) => const Center(
-                child: CircularProgressIndicator(strokeWidth: 2),
+              memCacheHeight: 128,
+              memCacheWidth: 128,
+              placeholder: (context, url) => Container(
+                decoration: BoxDecoration(
+                  gradient:
+                      isLost ? AppColors.lostGradient : AppColors.foundGradient,
+                ),
               ),
               errorWidget: (context, url, error) => Container(
                 decoration: BoxDecoration(

@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../../app/routes/app_routes.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../app/routes/route_constants.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/snackbar_utils.dart';
-import '../../../dashboard/presentation/pages/dashboard_page.dart';
 import '../state/auth_state.dart';
 import '../view_model/auth_viewmodel.dart';
 import '../widgets/social_login_buttons.dart';
 import '../widgets/auth_link_text.dart';
-import 'signup_page.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -43,7 +42,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     }
   }
 
-  void _navigateToSignup() => AppRoutes.push(context, const SignupPage());
+  void _navigateToSignup() => context.push(RouteConstants.signup);
   void _handleForgotPassword() =>
       SnackbarUtils.showInfo(context, 'Forgot password feature coming soon');
   void _handleGoogleSignIn() =>
@@ -63,7 +62,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
     ref.listen<AuthState>(authViewModelProvider, (previous, next) {
       if (next.status == AuthStatus.authenticated) {
-        AppRoutes.pushReplacement(context, const DashboardPage());
+        context.go(RouteConstants.dashboard);
       } else if (next.status == AuthStatus.error && next.errorMessage != null) {
         SnackbarUtils.showError(context, next.errorMessage!);
       }
@@ -125,7 +124,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
   }
 
-  Widget _buildTitle(Color textColor, Color secondaryTextColor, AppLocalizations? l10n) {
+  Widget _buildTitle(
+    Color textColor,
+    Color secondaryTextColor,
+    AppLocalizations? l10n,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -157,8 +160,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         prefixIcon: const Icon(Icons.email_outlined),
       ),
       validator: (value) {
-        if (value == null || value.isEmpty) return l10n?.pleaseEnterEmail ?? 'Please enter your email';
-        if (!value.contains('@')) return l10n?.pleaseEnterValidEmail ?? 'Please enter a valid email';
+        if (value == null || value.isEmpty) {
+          return l10n?.pleaseEnterEmail ?? 'Please enter your email';
+        }
+        if (!value.contains('@')) {
+          return l10n?.pleaseEnterValidEmail ?? 'Please enter a valid email';
+        }
         return null;
       },
     );
@@ -183,8 +190,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         ),
       ),
       validator: (value) {
-        if (value == null || value.isEmpty) return l10n?.pleaseEnterPassword ?? 'Please enter your password';
-        if (value.length < 6) return l10n?.passwordMinLength ?? 'Password must be at least 6 characters';
+        if (value == null || value.isEmpty) {
+          return l10n?.pleaseEnterPassword ?? 'Please enter your password';
+        }
+        if (value.length < 6) {
+          return l10n?.passwordMinLength ??
+              'Password must be at least 6 characters';
+        }
         return null;
       },
     );
@@ -230,7 +242,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               )
             : Text(
                 l10n?.login ?? 'Login',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
       ),
     );

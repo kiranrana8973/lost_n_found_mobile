@@ -34,10 +34,7 @@ class TermsCheckbox extends StatelessWidget {
             child: Text.rich(
               TextSpan(
                 text: 'I agree to the ',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: context.textSecondary,
-                ),
+                style: TextStyle(fontSize: 14, color: context.textSecondary),
                 children: [
                   TextSpan(
                     text: 'Terms & Conditions',

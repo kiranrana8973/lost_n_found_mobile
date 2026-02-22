@@ -5,12 +5,14 @@ class MediaPickerBottomSheet extends StatelessWidget {
   final VoidCallback onCameraTap;
   final VoidCallback onGalleryTap;
   final VoidCallback onVideoTap;
+  final VoidCallback? onVideoGalleryTap;
 
   const MediaPickerBottomSheet({
     super.key,
     required this.onCameraTap,
     required this.onGalleryTap,
     required this.onVideoTap,
+    this.onVideoGalleryTap,
   });
 
   static Future<void> show(
@@ -18,6 +20,7 @@ class MediaPickerBottomSheet extends StatelessWidget {
     required VoidCallback onCameraTap,
     required VoidCallback onGalleryTap,
     required VoidCallback onVideoTap,
+    VoidCallback? onVideoGalleryTap,
   }) {
     return showModalBottomSheet(
       context: context,
@@ -38,6 +41,12 @@ class MediaPickerBottomSheet extends StatelessWidget {
           Navigator.pop(context);
           onVideoTap();
         },
+        onVideoGalleryTap: onVideoGalleryTap != null
+            ? () {
+                Navigator.pop(context);
+                onVideoGalleryTap();
+              }
+            : null,
       ),
     );
   }
@@ -51,20 +60,26 @@ class MediaPickerBottomSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.camera),
-              title: const Text('Open Camera'),
+              leading: const Icon(Icons.camera_alt_rounded),
+              title: const Text('Take Photo'),
               onTap: onCameraTap,
             ),
             ListTile(
-              leading: const Icon(Icons.browse_gallery),
-              title: const Text('Open Gallery'),
+              leading: const Icon(Icons.photo_library_rounded),
+              title: const Text('Choose Photo'),
               onTap: onGalleryTap,
             ),
             ListTile(
-              leading: const Icon(Icons.video_call),
+              leading: const Icon(Icons.videocam_rounded),
               title: const Text('Record Video'),
               onTap: onVideoTap,
             ),
+            if (onVideoGalleryTap != null)
+              ListTile(
+                leading: const Icon(Icons.video_library_rounded),
+                title: const Text('Choose Video'),
+                onTap: onVideoGalleryTap,
+              ),
           ],
         ),
       ),

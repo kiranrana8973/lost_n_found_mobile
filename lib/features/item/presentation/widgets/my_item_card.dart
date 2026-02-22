@@ -145,20 +145,12 @@ class MyItemCard extends StatelessWidget {
               fit: BoxFit.cover,
               width: 56,
               height: 56,
+              memCacheHeight: 112,
+              memCacheWidth: 112,
               placeholder: (context, url) => Container(
                 decoration: BoxDecoration(
                   gradient:
                       isLost ? AppColors.lostGradient : AppColors.foundGradient,
-                ),
-                child: const Center(
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  ),
                 ),
               ),
               errorWidget: (context, url, error) => Container(

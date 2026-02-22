@@ -198,12 +198,56 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
     }
   }
 
+  Future<void> _pickVideoFromGallery() async {
+    try {
+      final XFile? video = await _imagePicker.pickVideo(
+        source: ImageSource.gallery,
+        maxDuration: const Duration(minutes: 5),
+      );
+
+      if (video != null) {
+        final file = File(video.path);
+        final fileSize = await file.length();
+
+        // Check file size (limit to 50MB)
+        if (fileSize > 50 * 1024 * 1024) {
+          if (mounted) {
+            SnackbarUtils.showError(
+              context,
+              'Video is too large. Please select a video under 50MB.',
+            );
+          }
+          return;
+        }
+
+        setState(() {
+          _selectedMedia.clear();
+          _selectedMedia.add(file);
+          _selectedMediaType = 'video';
+        });
+
+        await ref
+            .read(itemViewModelProvider.notifier)
+            .uploadVideo(file);
+      }
+    } catch (e) {
+      debugPrint('Video Gallery Error: $e');
+      if (mounted) {
+        SnackbarUtils.showError(
+          context,
+          'Unable to access video gallery. Please try again.',
+        );
+      }
+    }
+  }
+
   void _showMediaPicker() {
     MediaPickerBottomSheet.show(
       context,
       onCameraTap: _pickFromCamera,
       onGalleryTap: _pickFromGallery,
       onVideoTap: _pickFromVideo,
+      onVideoGalleryTap: _pickVideoFromGallery,
     );
   }
 

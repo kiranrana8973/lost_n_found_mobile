@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class Failure extends Equatable {
@@ -19,6 +20,38 @@ class ApiFailure extends Failure {
 
   const ApiFailure({String message = "API Failure", this.statusCode})
     : super(message);
+
+  /// Convert a DioException into a user-friendly ApiFailure.
+  factory ApiFailure.fromDioException(DioException e, {String fallback = 'Something went wrong'}) {
+    // Server responded — use its error message if available
+    if (e.response != null) {
+      final data = e.response?.data;
+      String? serverMessage;
+      if (data is Map<String, dynamic>) {
+        serverMessage = data['message'] as String?;
+      }
+      return ApiFailure(
+        message: serverMessage ?? fallback,
+        statusCode: e.response?.statusCode,
+      );
+    }
+
+    // No response — server unreachable, timeout, etc.
+    switch (e.type) {
+      case DioExceptionType.connectionTimeout:
+        return const ApiFailure(message: 'Connection timed out. Is the server running?');
+      case DioExceptionType.sendTimeout:
+        return const ApiFailure(message: 'Request timed out. Please try again.');
+      case DioExceptionType.receiveTimeout:
+        return const ApiFailure(message: 'Server took too long to respond. Please try again.');
+      case DioExceptionType.connectionError:
+        return const ApiFailure(message: 'Cannot connect to server. Please make sure the backend is running.');
+      case DioExceptionType.cancel:
+        return const ApiFailure(message: 'Request was cancelled.');
+      default:
+        return ApiFailure(message: fallback);
+    }
+  }
 }
 
 class NetworkFailure extends Failure {

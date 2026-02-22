@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/theme_extensions.dart';
@@ -6,6 +7,7 @@ import '../../../../core/utils/snackbar_utils.dart';
 import '../widgets/info_chip.dart';
 import '../widgets/item_detail_header.dart';
 import '../widgets/item_action_bar.dart';
+import '../widgets/item_video_player.dart';
 import '../widgets/reporter_info_card.dart';
 import '../widgets/description_card.dart';
 
@@ -17,6 +19,7 @@ class ItemDetailPage extends StatelessWidget {
   final String? description;
   final String reportedBy;
   final String? imageUrl;
+  final String? videoUrl;
 
   const ItemDetailPage({
     super.key,
@@ -27,7 +30,10 @@ class ItemDetailPage extends StatelessWidget {
     this.description,
     required this.reportedBy,
     this.imageUrl,
+    this.videoUrl,
   });
+
+  bool get _hasVideo => videoUrl != null;
 
   IconData _getCategoryIcon(String category) {
     switch (category) {
@@ -50,11 +56,12 @@ class ItemDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            expandedHeight: 280,
+            expandedHeight: _hasVideo ? 200 : screenWidth * 0.85,
             pinned: true,
             backgroundColor: Colors.transparent,
             elevation: 0,
@@ -62,10 +69,13 @@ class ItemDetailPage extends StatelessWidget {
             actions: _buildActions(context),
             flexibleSpace: FlexibleSpaceBar(
               background: ItemDetailHeader(
-                imageUrl: imageUrl,
+                imageUrl: _hasVideo ? null : imageUrl,
                 category: category,
                 isLost: isLost,
                 categoryIcon: _getCategoryIcon(category),
+                onImageTap: imageUrl != null && !_hasVideo
+                    ? () => _openFullscreenImage(context)
+                    : null,
               ),
             ),
           ),
@@ -82,6 +92,10 @@ class ItemDetailPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      if (_hasVideo) ...[
+                        _buildVideoSection(),
+                        const SizedBox(height: 20),
+                      ],
                       _buildTitleCard(context),
                       const SizedBox(height: 20),
                       DescriptionCard(description: description),
@@ -162,6 +176,32 @@ class ItemDetailPage extends StatelessWidget {
         ),
       ),
     ];
+  }
+
+  Widget _buildVideoSection() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: AspectRatio(
+        aspectRatio: 16 / 9,
+        child: ItemVideoPlayer(
+          videoUrl: videoUrl!,
+          isLost: isLost,
+        ),
+      ),
+    );
+  }
+
+  void _openFullscreenImage(BuildContext context) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return FadeTransition(
+            opacity: animation,
+            child: _FullscreenImageView(imageUrl: imageUrl!),
+          );
+        },
+      ),
+    );
   }
 
   Widget _buildTitleCard(BuildContext context) {
@@ -280,6 +320,49 @@ class ItemDetailPage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _FullscreenImageView extends StatelessWidget {
+  final String imageUrl;
+
+  const _FullscreenImageView({required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.close, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      extendBodyBehindAppBar: true,
+      body: GestureDetector(
+        onTap: () => Navigator.pop(context),
+        child: Center(
+          child: InteractiveViewer(
+            minScale: 0.5,
+            maxScale: 4.0,
+            child: CachedNetworkImage(
+              imageUrl: imageUrl,
+              fit: BoxFit.contain,
+              placeholder: (context, url) => const Center(
+                child: CircularProgressIndicator(color: Colors.white),
+              ),
+              errorWidget: (context, url, error) => const Icon(
+                Icons.broken_image_rounded,
+                color: Colors.white54,
+                size: 64,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

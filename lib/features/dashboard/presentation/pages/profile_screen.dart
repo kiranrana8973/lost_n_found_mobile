@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../app/routes/route_constants.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/theme_extensions.dart';
-import '../../../../app/routes/app_routes.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/services/storage/user_session_service.dart';
-import '../../../auth/presentation/pages/login_page.dart';
 import '../../../auth/presentation/view_model/auth_viewmodel.dart';
 import '../../../item/presentation/view_model/item_viewmodel.dart';
 import '../widgets/profile_header.dart';
@@ -158,7 +158,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               Navigator.pop(dialogContext);
               await ref.read(authViewModelProvider.notifier).logout();
               if (context.mounted) {
-                AppRoutes.pushAndRemoveUntil(context, const LoginPage());
+                context.go(RouteConstants.login);
               }
             },
             child: Text(

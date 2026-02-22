@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../domain/entities/onboarding_item.dart';
 import '../widgets/onboarding_content.dart';
 import '../widgets/page_indicator.dart';
@@ -8,8 +9,8 @@ import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/localization/language_provider.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/theme_extensions.dart';
-import '../../../../app/routes/app_routes.dart';
-import '../../../auth/presentation/pages/login_page.dart';
+import '../../../../app/routes/route_constants.dart';
+import '../../../../core/services/storage/user_session_service.dart';
 
 class OnboardingPage extends ConsumerStatefulWidget {
   const OnboardingPage({super.key});
@@ -87,7 +88,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
   }
 
   void _navigateToLogin() {
-    AppRoutes.pushReplacement(context, const LoginPage());
+    // Mark onboarding as completed so it never shows again (even after logout)
+    ref.read(userSessionServiceProvider).setOnboardingSeen();
+    context.go(RouteConstants.login);
   }
 
   @override

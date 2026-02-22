@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lost_n_found/core/error/failures.dart';
 import 'package:lost_n_found/core/services/connectivity/network_info.dart';
@@ -43,6 +44,8 @@ class ItemRepository implements IItemRepository {
         final itemApiModel = ItemApiModel.fromEntity(item);
         await _remoteDataSource.createItem(itemApiModel);
         return const Right(true);
+      } on DioException catch (e) {
+        return Left(ApiFailure.fromDioException(e, fallback: 'Failed to report item'));
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }
@@ -57,6 +60,8 @@ class ItemRepository implements IItemRepository {
       try {
         await _remoteDataSource.deleteItem(itemId);
         return const Right(true);
+      } on DioException catch (e) {
+        return Left(ApiFailure.fromDioException(e, fallback: 'Failed to delete item'));
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }
@@ -85,8 +90,16 @@ class ItemRepository implements IItemRepository {
         await _localDataSource.cacheAllItems(hiveModels);
         final entities = ItemApiModel.toEntityList(models);
         return Right(entities);
+      } on DioException catch (e) {
+        // Connection error — try cache but also report the error
+        if (e.response == null) {
+          return _getCachedItems(
+            serverError: ApiFailure.fromDioException(e, fallback: 'Failed to load items'),
+          );
+        }
+        return _getCachedItems();
       } catch (e) {
-        // API failed, try to return cached data
+        // Non-Dio error, try to return cached data
         return _getCachedItems();
       }
     } else {
@@ -94,13 +107,21 @@ class ItemRepository implements IItemRepository {
     }
   }
 
-  /// Helper method to get cached items
-  Future<Either<Failure, List<ItemEntity>>> _getCachedItems() async {
+  /// Helper method to get cached items.
+  /// If [serverError] is provided and cache is empty, returns that error
+  /// so the user knows the server was unreachable.
+  Future<Either<Failure, List<ItemEntity>>> _getCachedItems({
+    ApiFailure? serverError,
+  }) async {
     try {
       final models = await _localDataSource.getAllItems();
       final entities = ItemHiveModel.toEntityList(models);
+      if (entities.isEmpty && serverError != null) {
+        return Left(serverError);
+      }
       return Right(entities);
     } catch (e) {
+      if (serverError != null) return Left(serverError);
       return Left(LocalDatabaseFailure(message: e.toString()));
     }
   }
@@ -111,6 +132,8 @@ class ItemRepository implements IItemRepository {
       try {
         final model = await _remoteDataSource.getItemById(itemId);
         return Right(model.toEntity());
+      } on DioException catch (e) {
+        return Left(ApiFailure.fromDioException(e, fallback: 'Failed to load item'));
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }
@@ -136,6 +159,8 @@ class ItemRepository implements IItemRepository {
         final models = await _remoteDataSource.getItemsByUser(userId);
         final entities = ItemApiModel.toEntityList(models);
         return Right(entities);
+      } on DioException catch (e) {
+        return Left(ApiFailure.fromDioException(e, fallback: 'Failed to load your items'));
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }
@@ -157,6 +182,8 @@ class ItemRepository implements IItemRepository {
         final models = await _remoteDataSource.getLostItems();
         final entities = ItemApiModel.toEntityList(models);
         return Right(entities);
+      } on DioException catch (e) {
+        return Left(ApiFailure.fromDioException(e, fallback: 'Failed to load lost items'));
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }
@@ -178,6 +205,8 @@ class ItemRepository implements IItemRepository {
         final models = await _remoteDataSource.getFoundItems();
         final entities = ItemApiModel.toEntityList(models);
         return Right(entities);
+      } on DioException catch (e) {
+        return Left(ApiFailure.fromDioException(e, fallback: 'Failed to load found items'));
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }
@@ -201,6 +230,8 @@ class ItemRepository implements IItemRepository {
         final models = await _remoteDataSource.getItemsByCategory(categoryId);
         final entities = ItemApiModel.toEntityList(models);
         return Right(entities);
+      } on DioException catch (e) {
+        return Left(ApiFailure.fromDioException(e, fallback: 'Failed to load items'));
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }
@@ -222,6 +253,8 @@ class ItemRepository implements IItemRepository {
         final itemApiModel = ItemApiModel.fromEntity(item);
         await _remoteDataSource.updateItem(itemApiModel);
         return const Right(true);
+      } on DioException catch (e) {
+        return Left(ApiFailure.fromDioException(e, fallback: 'Failed to update item'));
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }
@@ -247,6 +280,8 @@ class ItemRepository implements IItemRepository {
       try {
         final url = await _remoteDataSource.uploadPhoto(photo);
         return Right(url);
+      } on DioException catch (e) {
+        return Left(ApiFailure.fromDioException(e, fallback: 'Failed to upload photo'));
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }
@@ -261,6 +296,8 @@ class ItemRepository implements IItemRepository {
       try {
         final url = await _remoteDataSource.uploadVideo(video);
         return Right(url);
+      } on DioException catch (e) {
+        return Left(ApiFailure.fromDioException(e, fallback: 'Failed to upload video'));
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }

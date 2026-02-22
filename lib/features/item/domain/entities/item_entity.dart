@@ -35,6 +35,15 @@ class ItemEntity extends Equatable {
     this.updatedAt,
   });
 
+  /// Whether this item's media is a video.
+  /// Checks mediaType first, falls back to file extension.
+  bool get isVideo {
+    if (mediaType == 'video') return true;
+    if (media == null) return false;
+    final ext = media!.split('.').last.toLowerCase();
+    return const {'mp4', 'mov', 'avi', 'mkv', 'webm'}.contains(ext);
+  }
+
   @override
   List<Object?> get props => [
         itemId,

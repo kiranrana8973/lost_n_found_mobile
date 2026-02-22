@@ -45,12 +45,7 @@ class AuthRepository implements IAuthRepository {
         await _authRemoteDataSource.register(apiModel);
         return const Right(true);
       } on DioException catch (e) {
-        return Left(
-          ApiFailure(
-            message: e.response?.data['message'] ?? 'Registration failed',
-            statusCode: e.response?.statusCode,
-          ),
-        );
+        return Left(ApiFailure.fromDioException(e, fallback: 'Registration failed'));
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }
@@ -91,16 +86,14 @@ class AuthRepository implements IAuthRepository {
         final apiModel = await _authRemoteDataSource.login(email, password);
         if (apiModel != null) {
           final entity = apiModel.toEntity();
+          // Save to Hive so getCurrentUser() finds the user on next app start
+          final hiveModel = AuthHiveModel.fromEntity(entity);
+          await _authDataSource.register(hiveModel);
           return Right(entity);
         }
         return const Left(ApiFailure(message: "Invalid credentials"));
       } on DioException catch (e) {
-        return Left(
-          ApiFailure(
-            message: e.response?.data['message'] ?? 'Login failed',
-            statusCode: e.response?.statusCode,
-          ),
-        );
+        return Left(ApiFailure.fromDioException(e, fallback: 'Login failed'));
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }

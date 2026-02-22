@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lost_n_found/core/error/failures.dart';
 import 'package:lost_n_found/core/services/connectivity/network_info.dart';
@@ -77,8 +78,14 @@ class CategoryRepository implements ICategoryRepository {
         await _categoryLocalDataSource.cacheAllCategories(hiveModels);
         final entities = CategoryApiModel.toEntityList(models);
         return Right(entities);
+      } on DioException catch (e) {
+        if (e.response == null) {
+          return _getCachedCategories(
+            serverError: ApiFailure.fromDioException(e, fallback: 'Failed to load categories'),
+          );
+        }
+        return _getCachedCategories();
       } catch (e) {
-        // API failed, try to return cached data
         return _getCachedCategories();
       }
     } else {
@@ -86,13 +93,20 @@ class CategoryRepository implements ICategoryRepository {
     }
   }
 
-  /// Helper method to get cached categories
-  Future<Either<Failure, List<CategoryEntity>>> _getCachedCategories() async {
+  /// Helper method to get cached categories.
+  /// If [serverError] is provided and cache is empty, returns that error.
+  Future<Either<Failure, List<CategoryEntity>>> _getCachedCategories({
+    ApiFailure? serverError,
+  }) async {
     try {
       final models = await _categoryLocalDataSource.getAllCategories();
       final entities = CategoryHiveModel.toEntityList(models);
+      if (entities.isEmpty && serverError != null) {
+        return Left(serverError);
+      }
       return Right(entities);
     } catch (e) {
+      if (serverError != null) return Left(serverError);
       return Left(LocalDatabaseFailure(message: e.toString()));
     }
   }

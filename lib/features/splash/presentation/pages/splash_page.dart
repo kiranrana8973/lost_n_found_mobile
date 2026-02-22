@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../../app/routes/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/theme_extensions.dart';
-import '../../../../core/services/storage/user_session_service.dart';
-import '../../../dashboard/presentation/pages/dashboard_page.dart';
-import '../../../onboarding/presentation/pages/onboarding_page.dart';
 
-class SplashPage extends ConsumerStatefulWidget {
+/// Splash page is PURE UI — no navigation logic.
+///
+/// The GoRouter redirect in [app_router.dart] is the single authority
+/// that decides when to leave splash and where to go next.
+/// This page just shows the branding animation while auth state hydrates.
+class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
 
   @override
-  ConsumerState<SplashPage> createState() => _SplashPageState();
+  State<SplashPage> createState() => _SplashPageState();
 }
 
-class _SplashPageState extends ConsumerState<SplashPage>
+class _SplashPageState extends State<SplashPage>
     with TickerProviderStateMixin {
   late AnimationController _fadeController;
   late AnimationController _slideController;
@@ -31,23 +31,19 @@ class _SplashPageState extends ConsumerState<SplashPage>
     super.initState();
     _setupAnimations();
     _startAnimations();
-    _navigateToNext();
   }
 
   void _setupAnimations() {
-    // Fade controller for overall content
     _fadeController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
 
-    // Slide controller for text elements
     _slideController = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
 
-    // Scale controller for logo
     _scaleController = AnimationController(
       duration: const Duration(milliseconds: 1200),
       vsync: this,
@@ -78,25 +74,9 @@ class _SplashPageState extends ConsumerState<SplashPage>
   void _startAnimations() async {
     _scaleController.forward();
     await Future.delayed(const Duration(milliseconds: 300));
+    if (!mounted) return;
     _fadeController.forward();
     _slideController.forward();
-  }
-
-  Future<void> _navigateToNext() async {
-    await Future.delayed(const Duration(seconds: 3));
-    if (!mounted) return;
-
-    // Check if user is already logged in
-    final userSessionService = ref.read(userSessionServiceProvider);
-    final isLoggedIn = userSessionService.isLoggedIn();
-
-    if (isLoggedIn) {
-      // Navigate to Dashboard if user is logged in
-      AppRoutes.pushReplacement(context, const DashboardPage());
-    } else {
-      // Navigate to Onboarding if user is not logged in
-      AppRoutes.pushReplacement(context, const OnboardingPage());
-    }
   }
 
   @override
@@ -112,7 +92,6 @@ class _SplashPageState extends ConsumerState<SplashPage>
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // Responsive sizes
     final logoSize = screenWidth < 360 ? 100.0 : 120.0;
     final logoIconSize = screenWidth < 360 ? 48.0 : 56.0;
     final titleFontSize = screenWidth < 360 ? 26.0 : 32.0;
@@ -209,19 +188,15 @@ class _SplashPageState extends ConsumerState<SplashPage>
               // Loading indicator
               FadeTransition(
                 opacity: _fadeAnimation,
-                child: Column(
-                  children: [
-                    SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColors.primary.withAlpha(180),
-                        ),
-                      ),
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppColors.primary.withAlpha(180),
                     ),
-                  ],
+                  ),
                 ),
               ),
               const Spacer(flex: 1),
@@ -230,18 +205,14 @@ class _SplashPageState extends ConsumerState<SplashPage>
                 opacity: _fadeAnimation,
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 24),
-                  child: Column(
-                    children: [
-                      SvgPicture.asset(
-                        'assets/svg/softwarica_logo.svg',
-                        width: bottomLogoWidth,
-                        height: bottomLogoHeight,
-                        colorFilter: ColorFilter.mode(
-                          context.textSecondary.withAlpha(150),
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ],
+                  child: SvgPicture.asset(
+                    'assets/svg/softwarica_logo.svg',
+                    width: bottomLogoWidth,
+                    height: bottomLogoHeight,
+                    colorFilter: ColorFilter.mode(
+                      context.textSecondary.withAlpha(150),
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
               ),

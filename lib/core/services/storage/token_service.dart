@@ -28,4 +28,3 @@ class TokenService {
     await _prefs.remove(_tokenKey);
   }
 }
-

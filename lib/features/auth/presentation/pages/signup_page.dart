@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lost_n_found/features/auth/presentation/state/auth_state.dart';
 import 'package:lost_n_found/features/auth/presentation/view_model/auth_viewmodel.dart';
 import 'package:lost_n_found/features/batch/presentation/state/batch_state.dart';
@@ -81,7 +82,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     }
   }
 
-  void _navigateToLogin() => Navigator.of(context).pop();
+  void _navigateToLogin() => context.pop();
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +96,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
           context,
           l10n?.registrationSuccess ?? 'Registration successful! Please login.',
         );
-        Navigator.of(context).pop();
+        context.pop();
       } else if (next.status == AuthStatus.error && next.errorMessage != null) {
         SnackbarUtils.showError(context, next.errorMessage!);
       }
@@ -129,7 +130,9 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                   AuthHeader(
                     icon: Icons.person_add_rounded,
                     title: l10n?.joinUsToday ?? 'Join Us Today',
-                    subtitle: l10n?.createAccountSubtitle ?? 'Create your account to get started',
+                    subtitle:
+                        l10n?.createAccountSubtitle ??
+                        'Create your account to get started',
                   ),
                   const SizedBox(height: 32),
                   _buildNameField(l10n),
@@ -143,13 +146,17 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                   PasswordField(
                     controller: _passwordController,
                     labelText: l10n?.password ?? 'Password',
-                    hintText: l10n?.createStrongPassword ?? 'Create a strong password',
+                    hintText:
+                        l10n?.createStrongPassword ??
+                        'Create a strong password',
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return l10n?.pleaseEnterPassword ?? 'Please enter a password';
+                        return l10n?.pleaseEnterPassword ??
+                            'Please enter a password';
                       }
                       if (value.length < 6) {
-                        return l10n?.passwordMinLength ?? 'Password must be at least 6 characters';
+                        return l10n?.passwordMinLength ??
+                            'Password must be at least 6 characters';
                       }
                       return null;
                     },
@@ -161,10 +168,12 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                     hintText: l10n?.reenterPassword ?? 'Re-enter your password',
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return l10n?.pleaseConfirmPassword ?? 'Please confirm your password';
+                        return l10n?.pleaseConfirmPassword ??
+                            'Please confirm your password';
                       }
                       if (value != _passwordController.text) {
-                        return l10n?.passwordsNotMatch ?? 'Passwords do not match';
+                        return l10n?.passwordsNotMatch ??
+                            'Passwords do not match';
                       }
                       return null;
                     },
@@ -183,7 +192,8 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                   ),
                   const SizedBox(height: 32),
                   AuthLinkText(
-                    text: l10n?.alreadyHaveAccount ?? 'Already have an account? ',
+                    text:
+                        l10n?.alreadyHaveAccount ?? 'Already have an account? ',
                     linkText: l10n?.login ?? 'Login',
                     onTap: _navigateToLogin,
                   ),
@@ -208,8 +218,12 @@ class _SignupPageState extends ConsumerState<SignupPage> {
         prefixIcon: const Icon(Icons.person_outline_rounded),
       ),
       validator: (value) {
-        if (value == null || value.isEmpty) return l10n?.pleaseEnterName ?? 'Please enter your name';
-        if (value.length < 3) return l10n?.nameMinLength ?? 'Name must be at least 3 characters';
+        if (value == null || value.isEmpty) {
+          return l10n?.pleaseEnterName ?? 'Please enter your name';
+        }
+        if (value.length < 3) {
+          return l10n?.nameMinLength ?? 'Name must be at least 3 characters';
+        }
         return null;
       },
     );
@@ -225,7 +239,9 @@ class _SignupPageState extends ConsumerState<SignupPage> {
         prefixIcon: const Icon(Icons.email_outlined),
       ),
       validator: (value) {
-        if (value == null || value.isEmpty) return l10n?.pleaseEnterEmail ?? 'Please enter your email';
+        if (value == null || value.isEmpty) {
+          return l10n?.pleaseEnterEmail ?? 'Please enter your email';
+        }
         if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
           return l10n?.pleaseEnterValidEmail ?? 'Please enter a valid email';
         }
@@ -326,7 +342,9 @@ class _SignupPageState extends ConsumerState<SignupPage> {
       }).toList(),
       onChanged: (value) => _selectedBatch = value,
       validator: (value) {
-        if (value == null || value.isEmpty) return l10n?.pleaseSelectBatch ?? 'Please select your batch';
+        if (value == null || value.isEmpty) {
+          return l10n?.pleaseSelectBatch ?? 'Please select your batch';
+        }
         return null;
       },
     );

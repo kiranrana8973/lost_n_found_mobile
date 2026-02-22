@@ -94,10 +94,14 @@ class ItemViewModel extends Notifier<ItemState> {
         errorMessage: failure.message,
       ),
       (items) {
-        final myLostItems = items
+        // Filter by current user in case the backend returns all items
+        final myItems = items
+            .where((item) => item.reportedBy == userId)
+            .toList();
+        final myLostItems = myItems
             .where((item) => item.type == ItemType.lost)
             .toList();
-        final myFoundItems = items
+        final myFoundItems = myItems
             .where((item) => item.type == ItemType.found)
             .toList();
         state = state.copyWith(
