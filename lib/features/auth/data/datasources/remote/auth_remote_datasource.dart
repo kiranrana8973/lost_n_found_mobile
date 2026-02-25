@@ -5,7 +5,6 @@ import 'package:lost_n_found/core/services/storage/user_session_service.dart';
 import 'package:lost_n_found/features/auth/data/datasources/auth_datasource.dart';
 import 'package:lost_n_found/features/auth/data/models/auth_api_model.dart';
 
-// Create provider
 final authRemoteDatasourceProvider = Provider<IAuthRemoteDataSource>((ref) {
   return AuthRemoteDatasource(
     apiClient: ref.read(apiClientProvider),
@@ -23,11 +22,6 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
   }) : _apiClient = apiClient,
        _userSessionService = userSessionService;
 
-  // Token is auto-managed by _AuthInterceptor:
-  // - Saved to FlutterSecureStorage on login response
-  // - Added as Bearer header on non-public requests
-  // - Refreshed on 401
-
   @override
   Future<AuthApiModel?> getCurrentUser() async {
     final response = await _apiClient.get(ApiEndpoints.studentMe);
@@ -36,7 +30,6 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
       final data = response.data['data'] as Map<String, dynamic>;
       final user = AuthApiModel.fromJson(data);
 
-      // Update session with latest data from server
       await _userSessionService.saveUserSession(
         userId: user.id!,
         email: user.email,
@@ -54,7 +47,6 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
 
   @override
   Future<AuthApiModel?> getUserById(String authId) {
-    // TODO: implement getUserById
     throw UnimplementedError();
   }
 
@@ -69,7 +61,6 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
       final data = response.data['data'] as Map<String, dynamic>;
       final user = AuthApiModel.fromJson(data);
 
-      // Save user session to SharedPreferences
       await _userSessionService.saveUserSession(
         userId: user.id!,
         email: user.email,
@@ -77,7 +68,6 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
         username: user.username,
       );
 
-      // Token is saved by _AuthInterceptor.onResponse automatically
       return user;
     }
 

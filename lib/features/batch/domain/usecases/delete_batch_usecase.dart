@@ -15,7 +15,6 @@ class DeleteBatchParams extends Equatable {
   List<Object?> get props => [batchId];
 }
 
-// Create Provider
 final deleteBatchUsecaseProvider = Provider<DeleteBatchUsecase>((ref) {
   final batchRepository = ref.read(batchRepositoryProvider);
   return DeleteBatchUsecase(batchRepository: batchRepository);

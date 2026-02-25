@@ -99,7 +99,6 @@ class ItemHiveModel extends HiveObject {
     return models.map((model) => model.toEntity()).toList();
   }
 
-  /// Convert from API model to Hive model for caching
   factory ItemHiveModel.fromApiModel(ItemApiModel apiModel) {
     return ItemHiveModel(
       itemId: apiModel.id,
@@ -117,7 +116,6 @@ class ItemHiveModel extends HiveObject {
     );
   }
 
-  /// Convert list of API models to Hive models for caching
   static List<ItemHiveModel> fromApiModelList(List<ItemApiModel> apiModels) {
     return apiModels.map((model) => ItemHiveModel.fromApiModel(model)).toList();
   }

@@ -6,11 +6,7 @@ void main() {
   group('SearchBarWidget', () {
     testWidgets('renders with default hint text', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SearchBarWidget(),
-          ),
-        ),
+        MaterialApp(home: Scaffold(body: SearchBarWidget())),
       );
 
       expect(find.text('Search items...'), findsOneWidget);
@@ -19,9 +15,7 @@ void main() {
     testWidgets('renders with custom hint text', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: SearchBarWidget(hintText: 'Find something'),
-          ),
+          home: Scaffold(body: SearchBarWidget(hintText: 'Find something')),
         ),
       );
 
@@ -30,11 +24,7 @@ void main() {
 
     testWidgets('renders search icon', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SearchBarWidget(),
-          ),
-        ),
+        MaterialApp(home: Scaffold(body: SearchBarWidget())),
       );
 
       expect(find.byIcon(Icons.search_rounded), findsOneWidget);
@@ -42,11 +32,7 @@ void main() {
 
     testWidgets('renders filter icon', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SearchBarWidget(),
-          ),
-        ),
+        MaterialApp(home: Scaffold(body: SearchBarWidget())),
       );
 
       expect(find.byIcon(Icons.tune_rounded), findsOneWidget);
@@ -58,9 +44,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SearchBarWidget(
-              onChanged: (value) => changedText = value,
-            ),
+            body: SearchBarWidget(onChanged: (value) => changedText = value),
           ),
         ),
       );

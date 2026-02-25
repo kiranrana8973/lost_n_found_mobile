@@ -132,8 +132,8 @@ class MyItemCard extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: imageUrl == null
             ? (isResolved
-                ? null
-                : (isLost ? AppColors.lostGradient : AppColors.foundGradient))
+                  ? null
+                  : (isLost ? AppColors.lostGradient : AppColors.foundGradient))
             : null,
         color: isResolved && imageUrl == null ? AppColors.claimedColor : null,
         borderRadius: BorderRadius.circular(14),
@@ -149,14 +149,16 @@ class MyItemCard extends StatelessWidget {
               memCacheWidth: 112,
               placeholder: (context, url) => Container(
                 decoration: BoxDecoration(
-                  gradient:
-                      isLost ? AppColors.lostGradient : AppColors.foundGradient,
+                  gradient: isLost
+                      ? AppColors.lostGradient
+                      : AppColors.foundGradient,
                 ),
               ),
               errorWidget: (context, url, error) => Container(
                 decoration: BoxDecoration(
-                  gradient:
-                      isLost ? AppColors.lostGradient : AppColors.foundGradient,
+                  gradient: isLost
+                      ? AppColors.lostGradient
+                      : AppColors.foundGradient,
                 ),
                 child: Icon(
                   _getCategoryIcon(category),
@@ -165,11 +167,7 @@ class MyItemCard extends StatelessWidget {
                 ),
               ),
             )
-          : Icon(
-              _getCategoryIcon(category),
-              color: Colors.white,
-              size: 26,
-            ),
+          : Icon(_getCategoryIcon(category), color: Colors.white, size: 26),
     );
   }
 
@@ -208,19 +206,12 @@ class MyItemCard extends StatelessWidget {
   Widget _buildLocationRow(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          Icons.location_on_rounded,
-          size: 14,
-          color: context.textSecondary,
-        ),
+        Icon(Icons.location_on_rounded, size: 14, color: context.textSecondary),
         const SizedBox(width: 4),
         Expanded(
           child: Text(
             location,
-            style: TextStyle(
-              fontSize: 13,
-              color: context.textSecondary,
-            ),
+            style: TextStyle(fontSize: 13, color: context.textSecondary),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

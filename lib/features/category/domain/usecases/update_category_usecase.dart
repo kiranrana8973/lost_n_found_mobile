@@ -34,7 +34,7 @@ class UpdateCategoryUsecase
   final ICategoryRepository _categoryRepository;
 
   UpdateCategoryUsecase({required ICategoryRepository categoryRepository})
-      : _categoryRepository = categoryRepository;
+    : _categoryRepository = categoryRepository;
 
   @override
   Future<Either<Failure, bool>> call(UpdateCategoryParams params) {

@@ -161,16 +161,18 @@ void main() {
         expect(entity.isVideo, true);
       });
 
-      test('should return false when media is null and mediaType is not video',
-          () {
-        const entity = ItemEntity(
-          itemName: 'Test Item',
-          type: ItemType.lost,
-          location: 'Lab',
-        );
+      test(
+        'should return false when media is null and mediaType is not video',
+        () {
+          const entity = ItemEntity(
+            itemName: 'Test Item',
+            type: ItemType.lost,
+            location: 'Lab',
+          );
 
-        expect(entity.isVideo, false);
-      });
+          expect(entity.isVideo, false);
+        },
+      );
 
       test('should return false when media has image extension', () {
         const entity = ItemEntity(

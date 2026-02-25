@@ -94,12 +94,17 @@ class _FoundScreenState extends State<FoundScreen> {
               onTap: () => setState(() => _selectedCategory = category),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   gradient: isSelected ? AppColors.primaryGradient : null,
                   color: isSelected ? null : Colors.white,
                   borderRadius: BorderRadius.circular(14),
-                  boxShadow: isSelected ? AppColors.buttonShadow : AppColors.softShadow,
+                  boxShadow: isSelected
+                      ? AppColors.buttonShadow
+                      : AppColors.softShadow,
                 ),
                 child: Center(
                   child: Text(
@@ -107,7 +112,9 @@ class _FoundScreenState extends State<FoundScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: isSelected ? Colors.white : AppColors.textSecondary,
+                      color: isSelected
+                          ? Colors.white
+                          : AppColors.textSecondary,
                     ),
                   ),
                 ),
@@ -121,14 +128,54 @@ class _FoundScreenState extends State<FoundScreen> {
 
   Widget _buildItemsGrid() {
     final items = [
-      {'title': 'Phone', 'foundBy': 'John Doe', 'location': 'Block A', 'time': '1h ago'},
-      {'title': 'Wallet', 'foundBy': 'John Doe', 'location': 'Block B', 'time': '2h ago'},
-      {'title': 'Keys', 'foundBy': 'John Doe', 'location': 'Block C', 'time': '3h ago'},
-      {'title': 'Laptop', 'foundBy': 'John Doe', 'location': 'Block D', 'time': '4h ago'},
-      {'title': 'Bag', 'foundBy': 'John Doe', 'location': 'Block A', 'time': '5h ago'},
-      {'title': 'Watch', 'foundBy': 'John Doe', 'location': 'Block B', 'time': '6h ago'},
-      {'title': 'Glasses', 'foundBy': 'John Doe', 'location': 'Block C', 'time': '7h ago'},
-      {'title': 'Book', 'foundBy': 'John Doe', 'location': 'Block D', 'time': '8h ago'},
+      {
+        'title': 'Phone',
+        'foundBy': 'John Doe',
+        'location': 'Block A',
+        'time': '1h ago',
+      },
+      {
+        'title': 'Wallet',
+        'foundBy': 'John Doe',
+        'location': 'Block B',
+        'time': '2h ago',
+      },
+      {
+        'title': 'Keys',
+        'foundBy': 'John Doe',
+        'location': 'Block C',
+        'time': '3h ago',
+      },
+      {
+        'title': 'Laptop',
+        'foundBy': 'John Doe',
+        'location': 'Block D',
+        'time': '4h ago',
+      },
+      {
+        'title': 'Bag',
+        'foundBy': 'John Doe',
+        'location': 'Block A',
+        'time': '5h ago',
+      },
+      {
+        'title': 'Watch',
+        'foundBy': 'John Doe',
+        'location': 'Block B',
+        'time': '6h ago',
+      },
+      {
+        'title': 'Glasses',
+        'foundBy': 'John Doe',
+        'location': 'Block C',
+        'time': '7h ago',
+      },
+      {
+        'title': 'Book',
+        'foundBy': 'John Doe',
+        'location': 'Block D',
+        'time': '8h ago',
+      },
     ];
 
     return Expanded(

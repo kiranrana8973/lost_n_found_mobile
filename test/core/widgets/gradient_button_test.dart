@@ -8,10 +8,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: GradientButton(
-              text: 'Submit',
-              onPressed: () {},
-            ),
+            body: GradientButton(text: 'Submit', onPressed: () {}),
           ),
         ),
       );
@@ -37,8 +34,9 @@ void main() {
       expect(pressed, isTrue);
     });
 
-    testWidgets('shows loading indicator when isLoading is true',
-        (tester) async {
+    testWidgets('shows loading indicator when isLoading is true', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(

@@ -33,29 +33,25 @@ void main() {
 
   group('GetAllItemsUsecase', () {
     test('should return list of items on success', () async {
-      // Arrange
-      when(() => mockItemRepository.getAllItems())
-          .thenAnswer((_) async => Right(tItemList));
+      when(
+        () => mockItemRepository.getAllItems(),
+      ).thenAnswer((_) async => Right(tItemList));
 
-      // Act
       final result = await usecase();
 
-      // Assert
       expect(result, Right(tItemList));
       verify(() => mockItemRepository.getAllItems()).called(1);
       verifyNoMoreInteractions(mockItemRepository);
     });
 
     test('should return Failure when repository fails', () async {
-      // Arrange
       const tFailure = ApiFailure(message: 'Failed to fetch items');
-      when(() => mockItemRepository.getAllItems())
-          .thenAnswer((_) async => const Left(tFailure));
+      when(
+        () => mockItemRepository.getAllItems(),
+      ).thenAnswer((_) async => const Left(tFailure));
 
-      // Act
       final result = await usecase();
 
-      // Assert
       expect(result, const Left(tFailure));
       verify(() => mockItemRepository.getAllItems()).called(1);
       verifyNoMoreInteractions(mockItemRepository);

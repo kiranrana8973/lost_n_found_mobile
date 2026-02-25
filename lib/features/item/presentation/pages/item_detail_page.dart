@@ -83,7 +83,9 @@ class ItemDetailPage extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 color: context.backgroundColor,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(32),
+                ),
               ),
               child: Transform.translate(
                 offset: const Offset(0, -24),
@@ -100,10 +102,7 @@ class ItemDetailPage extends StatelessWidget {
                       const SizedBox(height: 20),
                       DescriptionCard(description: description),
                       const SizedBox(height: 20),
-                      ReporterInfoCard(
-                        reportedBy: reportedBy,
-                        isLost: isLost,
-                      ),
+                      ReporterInfoCard(reportedBy: reportedBy, isLost: isLost),
                       const SizedBox(height: 100),
                     ],
                   ),
@@ -132,10 +131,7 @@ class ItemDetailPage extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             boxShadow: context.softShadow,
           ),
-          child: Icon(
-            Icons.arrow_back_rounded,
-            color: context.textPrimary,
-          ),
+          child: Icon(Icons.arrow_back_rounded, color: context.textPrimary),
         ),
       ),
     );
@@ -183,10 +179,7 @@ class ItemDetailPage extends StatelessWidget {
       borderRadius: BorderRadius.circular(20),
       child: AspectRatio(
         aspectRatio: 16 / 9,
-        child: ItemVideoPlayer(
-          videoUrl: videoUrl!,
-          isLost: isLost,
-        ),
+        child: ItemVideoPlayer(videoUrl: videoUrl!, isLost: isLost),
       ),
     );
   }
@@ -228,7 +221,10 @@ class ItemDetailPage extends StatelessWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withAlpha(26),
                   borderRadius: BorderRadius.circular(10),
@@ -245,10 +241,7 @@ class ItemDetailPage extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          InfoChip(
-            icon: Icons.location_on_rounded,
-            text: location,
-          ),
+          InfoChip(icon: Icons.location_on_rounded, text: location),
         ],
       ),
     );
@@ -290,8 +283,10 @@ class ItemDetailPage extends StatelessWidget {
         ),
         content: Text(
           isLost
-              ? (l10n?.foundItemDialogContent ?? 'You will be connected with the owner to return the item. Continue?')
-              : (l10n?.claimItemDialogContent ?? 'Please provide proof of ownership to claim this item.'),
+              ? (l10n?.foundItemDialogContent ??
+                    'You will be connected with the owner to return the item. Continue?')
+              : (l10n?.claimItemDialogContent ??
+                    'Please provide proof of ownership to claim this item.'),
         ),
         actions: [
           TextButton(

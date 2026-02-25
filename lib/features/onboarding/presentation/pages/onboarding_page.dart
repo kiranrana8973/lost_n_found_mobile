@@ -29,27 +29,39 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
     return [
       OnboardingItem(
         title: l10n?.reportLostItemsTitle ?? 'Report Lost Items',
-        description: l10n?.reportLostItemsDesc ??
+        description:
+            l10n?.reportLostItemsDesc ??
             'Quickly report lost items with photos and detailed descriptions. Our smart matching helps reunite you with your belongings.',
         icon: Icons.travel_explore_rounded,
         color: AppColors.onboarding1Primary,
-        gradientColors: [AppColors.onboarding1Primary, AppColors.onboarding1Secondary],
+        gradientColors: [
+          AppColors.onboarding1Primary,
+          AppColors.onboarding1Secondary,
+        ],
       ),
       OnboardingItem(
         title: l10n?.findDiscoverTitle ?? 'Find & Discover',
-        description: l10n?.findDiscoverDesc ??
+        description:
+            l10n?.findDiscoverDesc ??
             'Browse through found items in real-time. Advanced filters help you find exactly what you\'re looking for.',
         icon: Icons.location_searching_rounded,
         color: AppColors.onboarding2Primary,
-        gradientColors: [AppColors.onboarding2Primary, AppColors.onboarding2Secondary],
+        gradientColors: [
+          AppColors.onboarding2Primary,
+          AppColors.onboarding2Secondary,
+        ],
       ),
       OnboardingItem(
         title: l10n?.connectInstantlyTitle ?? 'Connect Instantly',
-        description: l10n?.connectInstantlyDesc ??
+        description:
+            l10n?.connectInstantlyDesc ??
             'Chat directly with finders or owners. Get instant notifications and recover your items quickly and securely.',
         icon: Icons.forum_rounded,
         color: AppColors.onboarding3Primary,
-        gradientColors: [AppColors.onboarding3Primary, AppColors.onboarding3Secondary],
+        gradientColors: [
+          AppColors.onboarding3Primary,
+          AppColors.onboarding3Secondary,
+        ],
       ),
     ];
   }
@@ -88,7 +100,6 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
   }
 
   void _navigateToLogin() {
-    // Mark onboarding as completed so it never shows again (even after logout)
     ref.read(userSessionServiceProvider).setOnboardingSeen();
     context.go(RouteConstants.login);
   }
@@ -130,11 +141,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
               ),
             ),
             const SizedBox(width: 6),
-            Icon(
-              Icons.language_rounded,
-              size: 20,
-              color: context.textPrimary,
-            ),
+            Icon(Icons.language_rounded, size: 20, color: context.textPrimary),
           ],
         ),
       ),
@@ -148,13 +155,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
 
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
-          gradient: context.backgroundGradient,
-        ),
+        decoration: BoxDecoration(gradient: context.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
-              // Top Bar with Language Switch and Skip Button
               Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Row(
@@ -188,7 +192,6 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                 ),
               ),
 
-              // PageView
               Expanded(
                 child: PageView.builder(
                   controller: _pageController,
@@ -197,20 +200,16 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                   itemBuilder: (context, index) {
                     return FadeTransition(
                       opacity: _animationController,
-                      child: OnboardingContent(
-                        item: onboardingItems[index],
-                      ),
+                      child: OnboardingContent(item: onboardingItems[index]),
                     );
                   },
                 ),
               ),
 
-              // Bottom Section
               Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   children: [
-                    // Page Indicator
                     PageIndicator(
                       itemCount: onboardingItems.length,
                       currentPage: _currentPage,
@@ -218,7 +217,6 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                     ),
                     const SizedBox(height: 32),
 
-                    // Next/Get Started Button
                     GradientButton(
                       text: _currentPage == onboardingItems.length - 1
                           ? (l10n?.getStarted ?? 'Get Started')

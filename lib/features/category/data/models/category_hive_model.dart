@@ -25,8 +25,8 @@ class CategoryHiveModel extends HiveObject {
     required this.name,
     this.description,
     String? status,
-  })  : categoryId = categoryId ?? const Uuid().v4(),
-        status = status ?? 'active';
+  }) : categoryId = categoryId ?? const Uuid().v4(),
+       status = status ?? 'active';
 
   CategoryEntity toEntity() {
     return CategoryEntity(
@@ -50,7 +50,6 @@ class CategoryHiveModel extends HiveObject {
     return models.map((model) => model.toEntity()).toList();
   }
 
-  /// Convert from API model to Hive model for caching
   factory CategoryHiveModel.fromApiModel(CategoryApiModel apiModel) {
     return CategoryHiveModel(
       categoryId: apiModel.id,
@@ -60,8 +59,11 @@ class CategoryHiveModel extends HiveObject {
     );
   }
 
-  /// Convert list of API models to Hive models for caching
-  static List<CategoryHiveModel> fromApiModelList(List<CategoryApiModel> apiModels) {
-    return apiModels.map((model) => CategoryHiveModel.fromApiModel(model)).toList();
+  static List<CategoryHiveModel> fromApiModelList(
+    List<CategoryApiModel> apiModels,
+  ) {
+    return apiModels
+        .map((model) => CategoryHiveModel.fromApiModel(model))
+        .toList();
   }
 }

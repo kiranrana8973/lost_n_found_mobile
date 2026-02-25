@@ -28,5 +28,3 @@ abstract interface class IItemRemoteDataSource {
   Future<bool> updateItem(ItemApiModel item);
   Future<bool> deleteItem(String itemId);
 }
-
-

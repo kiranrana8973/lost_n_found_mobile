@@ -43,10 +43,7 @@ class FoundItemCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildImageContainer(gradient),
-              _buildContent(context),
-            ],
+            children: [_buildImageContainer(gradient), _buildContent(context)],
           ),
         ),
       ),

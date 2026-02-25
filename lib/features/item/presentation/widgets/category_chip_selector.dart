@@ -91,8 +91,8 @@ class CategoryChipSelector extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: isSelected
                   ? (itemType == ItemType.lost
-                      ? AppColors.lostGradient
-                      : AppColors.foundGradient)
+                        ? AppColors.lostGradient
+                        : AppColors.foundGradient)
                   : null,
               color: isSelected ? null : context.surfaceColor,
               borderRadius: BorderRadius.circular(12),

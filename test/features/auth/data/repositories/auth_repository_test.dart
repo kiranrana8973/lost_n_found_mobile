@@ -10,7 +10,6 @@ import 'package:mocktail/mocktail.dart';
 
 import '../../../../mocks/test_mocks.dart';
 
-// Fake classes for registerFallbackValue
 class FakeAuthApiModel extends Fake implements AuthApiModel {}
 
 class FakeAuthHiveModel extends Fake implements AuthHiveModel {}
@@ -71,84 +70,78 @@ void main() {
   );
 
   group('register', () {
-    test('should return Right(true) when online and registration succeeds',
-        () async {
-      // Arrange
-      when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
-      when(() => mockRemoteDataSource.register(any()))
-          .thenAnswer((_) async => tAuthApiModel);
+    test(
+      'should return Right(true) when online and registration succeeds',
+      () async {
+        when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
+        when(
+          () => mockRemoteDataSource.register(any()),
+        ).thenAnswer((_) async => tAuthApiModel);
 
-      // Act
-      final result = await repository.register(tAuthEntity);
+        final result = await repository.register(tAuthEntity);
 
-      // Assert
-      expect(result, const Right(true));
-      verify(() => mockRemoteDataSource.register(any())).called(1);
-    });
+        expect(result, const Right(true));
+        verify(() => mockRemoteDataSource.register(any())).called(1);
+      },
+    );
 
     test(
-        'should return Left(ApiFailure) when online and DioException is thrown',
-        () async {
-      // Arrange
-      when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
-      when(() => mockRemoteDataSource.register(any())).thenThrow(
-        DioException(
-          requestOptions: RequestOptions(path: '/test'),
-          type: DioExceptionType.connectionTimeout,
-        ),
-      );
+      'should return Left(ApiFailure) when online and DioException is thrown',
+      () async {
+        when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
+        when(() => mockRemoteDataSource.register(any())).thenThrow(
+          DioException(
+            requestOptions: RequestOptions(path: '/test'),
+            type: DioExceptionType.connectionTimeout,
+          ),
+        );
 
-      // Act
-      final result = await repository.register(tAuthEntity);
+        final result = await repository.register(tAuthEntity);
 
-      // Assert
-      expect(result.isLeft(), true);
-      result.fold(
-        (failure) => expect(failure, isA<ApiFailure>()),
-        (_) => fail('Should be Left'),
-      );
-    });
+        expect(result.isLeft(), true);
+        result.fold(
+          (failure) => expect(failure, isA<ApiFailure>()),
+          (_) => fail('Should be Left'),
+        );
+      },
+    );
 
     test(
-        'should return Right(true) when offline and registration succeeds locally',
-        () async {
-      // Arrange
-      when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => false);
-      when(() => mockLocalDataSource.getUserByEmail(any()))
-          .thenAnswer((_) async => null);
-      when(() => mockLocalDataSource.register(any()))
-          .thenAnswer((_) async => tAuthHiveModel);
+      'should return Right(true) when offline and registration succeeds locally',
+      () async {
+        when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => false);
+        when(
+          () => mockLocalDataSource.getUserByEmail(any()),
+        ).thenAnswer((_) async => null);
+        when(
+          () => mockLocalDataSource.register(any()),
+        ).thenAnswer((_) async => tAuthHiveModel);
 
-      // Act
-      final result = await repository.register(tAuthEntity);
+        final result = await repository.register(tAuthEntity);
 
-      // Assert
-      expect(result, const Right(true));
-      verify(() => mockLocalDataSource.register(any())).called(1);
-    });
+        expect(result, const Right(true));
+        verify(() => mockLocalDataSource.register(any())).called(1);
+      },
+    );
 
     test(
-        'should return Left(LocalDatabaseFailure) when offline and email already exists',
-        () async {
-      // Arrange
-      when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => false);
-      when(() => mockLocalDataSource.getUserByEmail(any()))
-          .thenAnswer((_) async => tAuthHiveModel);
+      'should return Left(LocalDatabaseFailure) when offline and email already exists',
+      () async {
+        when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => false);
+        when(
+          () => mockLocalDataSource.getUserByEmail(any()),
+        ).thenAnswer((_) async => tAuthHiveModel);
 
-      // Act
-      final result = await repository.register(tAuthEntity);
+        final result = await repository.register(tAuthEntity);
 
-      // Assert
-      expect(result.isLeft(), true);
-      result.fold(
-        (failure) {
+        expect(result.isLeft(), true);
+        result.fold((failure) {
           expect(failure, isA<LocalDatabaseFailure>());
           expect(failure.message, 'Email already registered');
-        },
-        (_) => fail('Should be Left'),
-      );
-      verifyNever(() => mockLocalDataSource.register(any()));
-    });
+        }, (_) => fail('Should be Left'));
+        verifyNever(() => mockLocalDataSource.register(any()));
+      },
+    );
   });
 
   group('login', () {
@@ -156,153 +149,141 @@ void main() {
     const tPassword = 'password123';
 
     test(
-        'should return Right(AuthEntity) when online and login succeeds',
-        () async {
-      // Arrange
-      when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
-      when(() => mockRemoteDataSource.login(any(), any()))
-          .thenAnswer((_) async => tAuthApiModel);
-      when(() => mockLocalDataSource.register(any()))
-          .thenAnswer((_) async => tAuthHiveModel);
+      'should return Right(AuthEntity) when online and login succeeds',
+      () async {
+        when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
+        when(
+          () => mockRemoteDataSource.login(any(), any()),
+        ).thenAnswer((_) async => tAuthApiModel);
+        when(
+          () => mockLocalDataSource.register(any()),
+        ).thenAnswer((_) async => tAuthHiveModel);
 
-      // Act
-      final result = await repository.login(tEmail, tPassword);
+        final result = await repository.login(tEmail, tPassword);
 
-      // Assert
-      expect(result.isRight(), true);
-      result.fold(
-        (_) => fail('Should be Right'),
-        (entity) => expect(entity, isA<AuthEntity>()),
-      );
-      verify(() => mockLocalDataSource.register(any())).called(1);
-    });
-
-    test(
-        'should return Left(ApiFailure) when online and DioException is thrown',
-        () async {
-      // Arrange
-      when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
-      when(() => mockRemoteDataSource.login(any(), any())).thenThrow(
-        DioException(
-          requestOptions: RequestOptions(path: '/test'),
-          type: DioExceptionType.connectionTimeout,
-        ),
-      );
-
-      // Act
-      final result = await repository.login(tEmail, tPassword);
-
-      // Assert
-      expect(result.isLeft(), true);
-      result.fold(
-        (failure) => expect(failure, isA<ApiFailure>()),
-        (_) => fail('Should be Left'),
-      );
-    });
+        expect(result.isRight(), true);
+        result.fold(
+          (_) => fail('Should be Right'),
+          (entity) => expect(entity, isA<AuthEntity>()),
+        );
+        verify(() => mockLocalDataSource.register(any())).called(1);
+      },
+    );
 
     test(
-        'should return Right(AuthEntity) when offline and local login succeeds',
-        () async {
-      // Arrange
-      when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => false);
-      when(() => mockLocalDataSource.login(any(), any()))
-          .thenAnswer((_) async => tAuthHiveModel);
+      'should return Left(ApiFailure) when online and DioException is thrown',
+      () async {
+        when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
+        when(() => mockRemoteDataSource.login(any(), any())).thenThrow(
+          DioException(
+            requestOptions: RequestOptions(path: '/test'),
+            type: DioExceptionType.connectionTimeout,
+          ),
+        );
 
-      // Act
-      final result = await repository.login(tEmail, tPassword);
+        final result = await repository.login(tEmail, tPassword);
 
-      // Assert
-      expect(result.isRight(), true);
-      result.fold(
-        (_) => fail('Should be Right'),
-        (entity) => expect(entity, isA<AuthEntity>()),
-      );
-    });
+        expect(result.isLeft(), true);
+        result.fold(
+          (failure) => expect(failure, isA<ApiFailure>()),
+          (_) => fail('Should be Left'),
+        );
+      },
+    );
 
     test(
-        'should return Left(LocalDatabaseFailure) when offline and local login fails',
-        () async {
-      // Arrange
-      when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => false);
-      when(() => mockLocalDataSource.login(any(), any()))
-          .thenAnswer((_) async => null);
+      'should return Right(AuthEntity) when offline and local login succeeds',
+      () async {
+        when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => false);
+        when(
+          () => mockLocalDataSource.login(any(), any()),
+        ).thenAnswer((_) async => tAuthHiveModel);
 
-      // Act
-      final result = await repository.login(tEmail, tPassword);
+        final result = await repository.login(tEmail, tPassword);
 
-      // Assert
-      expect(result.isLeft(), true);
-      result.fold(
-        (failure) {
+        expect(result.isRight(), true);
+        result.fold(
+          (_) => fail('Should be Right'),
+          (entity) => expect(entity, isA<AuthEntity>()),
+        );
+      },
+    );
+
+    test(
+      'should return Left(LocalDatabaseFailure) when offline and local login fails',
+      () async {
+        when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => false);
+        when(
+          () => mockLocalDataSource.login(any(), any()),
+        ).thenAnswer((_) async => null);
+
+        final result = await repository.login(tEmail, tPassword);
+
+        expect(result.isLeft(), true);
+        result.fold((failure) {
           expect(failure, isA<LocalDatabaseFailure>());
           expect(failure.message, 'Invalid email or password');
-        },
-        (_) => fail('Should be Left'),
-      );
-    });
+        }, (_) => fail('Should be Left'));
+      },
+    );
   });
 
   group('getCurrentUser', () {
     test(
-        'should return Right(AuthEntity) from remote when online and API succeeds',
-        () async {
-      // Arrange
-      when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
-      when(() => mockRemoteDataSource.getCurrentUser())
-          .thenAnswer((_) async => tAuthApiModel);
-      when(() => mockLocalDataSource.updateUser(any()))
-          .thenAnswer((_) async => true);
+      'should return Right(AuthEntity) from remote when online and API succeeds',
+      () async {
+        when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
+        when(
+          () => mockRemoteDataSource.getCurrentUser(),
+        ).thenAnswer((_) async => tAuthApiModel);
+        when(
+          () => mockLocalDataSource.updateUser(any()),
+        ).thenAnswer((_) async => true);
 
-      // Act
-      final result = await repository.getCurrentUser();
+        final result = await repository.getCurrentUser();
 
-      // Assert
-      expect(result.isRight(), true);
-      result.fold(
-        (_) => fail('Should be Right'),
-        (entity) => expect(entity, isA<AuthEntity>()),
-      );
-      verify(() => mockRemoteDataSource.getCurrentUser()).called(1);
-      verify(() => mockLocalDataSource.updateUser(any())).called(1);
-    });
-
-    test(
-        'should fallback to local when online but API throws DioException',
-        () async {
-      // Arrange
-      when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
-      when(() => mockRemoteDataSource.getCurrentUser()).thenThrow(
-        DioException(
-          requestOptions: RequestOptions(path: '/test'),
-          type: DioExceptionType.connectionTimeout,
-        ),
-      );
-      when(() => mockLocalDataSource.getCurrentUser())
-          .thenAnswer((_) async => tAuthHiveModel);
-
-      // Act
-      final result = await repository.getCurrentUser();
-
-      // Assert
-      expect(result.isRight(), true);
-      result.fold(
-        (_) => fail('Should be Right'),
-        (entity) => expect(entity, isA<AuthEntity>()),
-      );
-    });
+        expect(result.isRight(), true);
+        result.fold(
+          (_) => fail('Should be Right'),
+          (entity) => expect(entity, isA<AuthEntity>()),
+        );
+        verify(() => mockRemoteDataSource.getCurrentUser()).called(1);
+        verify(() => mockLocalDataSource.updateUser(any())).called(1);
+      },
+    );
 
     test(
-        'should return Right(AuthEntity) from local when offline',
-        () async {
-      // Arrange
+      'should fallback to local when online but API throws DioException',
+      () async {
+        when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
+        when(() => mockRemoteDataSource.getCurrentUser()).thenThrow(
+          DioException(
+            requestOptions: RequestOptions(path: '/test'),
+            type: DioExceptionType.connectionTimeout,
+          ),
+        );
+        when(
+          () => mockLocalDataSource.getCurrentUser(),
+        ).thenAnswer((_) async => tAuthHiveModel);
+
+        final result = await repository.getCurrentUser();
+
+        expect(result.isRight(), true);
+        result.fold(
+          (_) => fail('Should be Right'),
+          (entity) => expect(entity, isA<AuthEntity>()),
+        );
+      },
+    );
+
+    test('should return Right(AuthEntity) from local when offline', () async {
       when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => false);
-      when(() => mockLocalDataSource.getCurrentUser())
-          .thenAnswer((_) async => tAuthHiveModel);
+      when(
+        () => mockLocalDataSource.getCurrentUser(),
+      ).thenAnswer((_) async => tAuthHiveModel);
 
-      // Act
       final result = await repository.getCurrentUser();
 
-      // Assert
       expect(result.isRight(), true);
       result.fold(
         (_) => fail('Should be Right'),
@@ -311,59 +292,47 @@ void main() {
       verifyNever(() => mockRemoteDataSource.getCurrentUser());
     });
 
-    test('should return Left(LocalDatabaseFailure) when offline and no local user',
-        () async {
-      // Arrange
-      when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => false);
-      when(() => mockLocalDataSource.getCurrentUser())
-          .thenAnswer((_) async => null);
+    test(
+      'should return Left(LocalDatabaseFailure) when offline and no local user',
+      () async {
+        when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => false);
+        when(
+          () => mockLocalDataSource.getCurrentUser(),
+        ).thenAnswer((_) async => null);
 
-      // Act
-      final result = await repository.getCurrentUser();
+        final result = await repository.getCurrentUser();
 
-      // Assert
-      expect(result.isLeft(), true);
-      result.fold(
-        (failure) {
+        expect(result.isLeft(), true);
+        result.fold((failure) {
           expect(failure, isA<LocalDatabaseFailure>());
           expect(failure.message, 'No user logged in');
-        },
-        (_) => fail('Should be Left'),
-      );
-    });
+        }, (_) => fail('Should be Left'));
+      },
+    );
   });
 
   group('logout', () {
     test('should return Right(true) when logout succeeds', () async {
-      // Arrange
-      when(() => mockLocalDataSource.logout())
-          .thenAnswer((_) async => true);
+      when(() => mockLocalDataSource.logout()).thenAnswer((_) async => true);
 
-      // Act
       final result = await repository.logout();
 
-      // Assert
       expect(result, const Right(true));
     });
 
-    test('should return Left(LocalDatabaseFailure) when logout fails',
-        () async {
-      // Arrange
-      when(() => mockLocalDataSource.logout())
-          .thenAnswer((_) async => false);
+    test(
+      'should return Left(LocalDatabaseFailure) when logout fails',
+      () async {
+        when(() => mockLocalDataSource.logout()).thenAnswer((_) async => false);
 
-      // Act
-      final result = await repository.logout();
+        final result = await repository.logout();
 
-      // Assert
-      expect(result.isLeft(), true);
-      result.fold(
-        (failure) {
+        expect(result.isLeft(), true);
+        result.fold((failure) {
           expect(failure, isA<LocalDatabaseFailure>());
           expect(failure.message, 'Failed to logout');
-        },
-        (_) => fail('Should be Left'),
-      );
-    });
+        }, (_) => fail('Should be Left'));
+      },
+    );
   });
 }

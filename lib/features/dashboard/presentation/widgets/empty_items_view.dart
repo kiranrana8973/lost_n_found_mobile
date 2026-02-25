@@ -21,11 +21,7 @@ class EmptyItemsView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              size: 64,
-              color: context.textTertiary.withAlpha(128),
-            ),
+            Icon(icon, size: 64, color: context.textTertiary.withAlpha(128)),
             const SizedBox(height: 16),
             Text(
               title,
@@ -38,10 +34,7 @@ class EmptyItemsView extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               subtitle,
-              style: TextStyle(
-                fontSize: 14,
-                color: context.textSecondary,
-              ),
+              style: TextStyle(fontSize: 14, color: context.textSecondary),
               textAlign: TextAlign.center,
             ),
           ],

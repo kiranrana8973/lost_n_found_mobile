@@ -12,11 +12,9 @@ void main() {
   late MockItemRepository mockItemRepository;
 
   setUpAll(() {
-    registerFallbackValue(const ItemEntity(
-      itemName: '',
-      type: ItemType.lost,
-      location: '',
-    ));
+    registerFallbackValue(
+      const ItemEntity(itemName: '', type: ItemType.lost, location: ''),
+    );
   });
 
   setUp(() {
@@ -40,29 +38,25 @@ void main() {
 
   group('UpdateItemUsecase', () {
     test('should return true on successful item update', () async {
-      // Arrange
-      when(() => mockItemRepository.updateItem(any()))
-          .thenAnswer((_) async => const Right(true));
+      when(
+        () => mockItemRepository.updateItem(any()),
+      ).thenAnswer((_) async => const Right(true));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Right(true));
       verify(() => mockItemRepository.updateItem(any())).called(1);
       verifyNoMoreInteractions(mockItemRepository);
     });
 
     test('should return Failure on unsuccessful item update', () async {
-      // Arrange
       const tFailure = ApiFailure(message: 'Failed to update item');
-      when(() => mockItemRepository.updateItem(any()))
-          .thenAnswer((_) async => const Left(tFailure));
+      when(
+        () => mockItemRepository.updateItem(any()),
+      ).thenAnswer((_) async => const Left(tFailure));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Left(tFailure));
       verify(() => mockItemRepository.updateItem(any())).called(1);
       verifyNoMoreInteractions(mockItemRepository);

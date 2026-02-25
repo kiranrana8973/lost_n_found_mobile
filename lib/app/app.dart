@@ -13,7 +13,6 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Initialize auth service for token expiration handling
     ref.watch(authServiceInitProvider);
 
     final router = ref.watch(routerProvider);
@@ -24,12 +23,10 @@ class MyApp extends ConsumerWidget {
       title: 'Lost & Found',
       debugShowCheckedModeBanner: false,
 
-      // Theme Configuration
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
 
-      // Localization
       locale: locale,
       supportedLocales: const [Locale('en'), Locale('ne')],
       localizationsDelegates: const [
@@ -39,7 +36,6 @@ class MyApp extends ConsumerWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
 
-      // GoRouter Configuration
       routerConfig: router,
     );
   }

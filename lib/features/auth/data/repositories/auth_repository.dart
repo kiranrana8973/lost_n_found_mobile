@@ -11,7 +11,6 @@ import 'package:lost_n_found/features/auth/data/models/auth_hive_model.dart';
 import 'package:lost_n_found/features/auth/domain/entities/auth_entity.dart';
 import 'package:lost_n_found/features/auth/domain/repositories/auth_repository.dart';
 
-// Create provider
 final authRepositoryProvider = Provider<IAuthRepository>((ref) {
   final authDatasource = ref.read(authLocalDatasourceProvider);
   final authRemoteDatasource = ref.read(authRemoteDatasourceProvider);
@@ -40,18 +39,18 @@ class AuthRepository implements IAuthRepository {
   Future<Either<Failure, bool>> register(AuthEntity user) async {
     if (await _networkInfo.isConnected) {
       try {
-        // remote ma ja
         final apiModel = AuthApiModel.fromEntity(user);
         await _authRemoteDataSource.register(apiModel);
         return const Right(true);
       } on DioException catch (e) {
-        return Left(ApiFailure.fromDioException(e, fallback: 'Registration failed'));
+        return Left(
+          ApiFailure.fromDioException(e, fallback: 'Registration failed'),
+        );
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }
     } else {
       try {
-        // Check if email already exists
         final existingUser = await _authDataSource.getUserByEmail(user.email);
         if (existingUser != null) {
           return const Left(
@@ -86,7 +85,6 @@ class AuthRepository implements IAuthRepository {
         final apiModel = await _authRemoteDataSource.login(email, password);
         if (apiModel != null) {
           final entity = apiModel.toEntity();
-          // Save to Hive so getCurrentUser() finds the user on next app start
           final hiveModel = AuthHiveModel.fromEntity(entity);
           await _authDataSource.register(hiveModel);
           return Right(entity);
@@ -117,24 +115,20 @@ class AuthRepository implements IAuthRepository {
   Future<Either<Failure, AuthEntity>> getCurrentUser() async {
     if (await _networkInfo.isConnected) {
       try {
-        // Online: fetch latest user data from /students/me
         final apiModel = await _authRemoteDataSource.getCurrentUser();
         if (apiModel != null) {
           final entity = apiModel.toEntity();
-          // Sync to Hive so offline access has fresh data
           final hiveModel = AuthHiveModel.fromEntity(entity);
           await _authDataSource.updateUser(hiveModel);
           return Right(entity);
         }
         return const Left(ApiFailure(message: "No user logged in"));
       } on DioException {
-        // API failed (e.g. token expired) — fallback to local
         return _getLocalCurrentUser();
       } catch (_) {
         return _getLocalCurrentUser();
       }
     } else {
-      // Offline: use local session
       return _getLocalCurrentUser();
     }
   }

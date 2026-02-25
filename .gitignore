@@ -99,3 +99,4 @@ app.*.map.json
 
 # Claude Code
 .claude/
+CLAUDE.md

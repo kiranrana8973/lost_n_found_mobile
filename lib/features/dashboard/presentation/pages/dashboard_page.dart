@@ -74,16 +74,14 @@ class _DashboardPageState extends State<DashboardPage> {
                     isSelected: _currentIndex == 1,
                     onTap: () => setState(() => _currentIndex = 1),
                   ),
-                  const SizedBox(width: 60), // Space for FAB
+                  const SizedBox(width: 60),
                   _NavItem(
                     icon: Icons.notifications_rounded,
                     label: l10n?.alerts ?? 'Alerts',
                     isSelected: false,
                     badge: 3,
                     badgeText: l10n?.formatNumber(3),
-                    onTap: () {
-                      // Show notifications
-                    },
+                    onTap: () {},
                   ),
                   _NavItem(
                     icon: Icons.person_rounded,
@@ -121,7 +119,6 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    // Responsive horizontal padding based on screen width
     final horizontalPadding = screenWidth < 360 ? 10.0 : 16.0;
     final fontSize = screenWidth < 360 ? 10.0 : 11.0;
 

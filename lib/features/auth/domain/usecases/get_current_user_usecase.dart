@@ -6,7 +6,6 @@ import 'package:lost_n_found/features/auth/data/repositories/auth_repository.dar
 import 'package:lost_n_found/features/auth/domain/entities/auth_entity.dart';
 import 'package:lost_n_found/features/auth/domain/repositories/auth_repository.dart';
 
-// Create Provider
 final getCurrentUserUsecaseProvider = Provider<GetCurrentUserUsecase>((ref) {
   final authRepository = ref.read(authRepositoryProvider);
   return GetCurrentUserUsecase(authRepository: authRepository);

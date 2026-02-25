@@ -45,7 +45,9 @@ class ItemRepository implements IItemRepository {
         await _remoteDataSource.createItem(itemApiModel);
         return const Right(true);
       } on DioException catch (e) {
-        return Left(ApiFailure.fromDioException(e, fallback: 'Failed to report item'));
+        return Left(
+          ApiFailure.fromDioException(e, fallback: 'Failed to report item'),
+        );
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }
@@ -61,7 +63,9 @@ class ItemRepository implements IItemRepository {
         await _remoteDataSource.deleteItem(itemId);
         return const Right(true);
       } on DioException catch (e) {
-        return Left(ApiFailure.fromDioException(e, fallback: 'Failed to delete item'));
+        return Left(
+          ApiFailure.fromDioException(e, fallback: 'Failed to delete item'),
+        );
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }
@@ -85,21 +89,21 @@ class ItemRepository implements IItemRepository {
     if (await _networkInfo.isConnected) {
       try {
         final models = await _remoteDataSource.getAllItems();
-        // Cache the data locally for offline access
         final hiveModels = ItemHiveModel.fromApiModelList(models);
         await _localDataSource.cacheAllItems(hiveModels);
         final entities = ItemApiModel.toEntityList(models);
         return Right(entities);
       } on DioException catch (e) {
-        // Connection error — try cache but also report the error
         if (e.response == null) {
           return _getCachedItems(
-            serverError: ApiFailure.fromDioException(e, fallback: 'Failed to load items'),
+            serverError: ApiFailure.fromDioException(
+              e,
+              fallback: 'Failed to load items',
+            ),
           );
         }
         return _getCachedItems();
       } catch (e) {
-        // Non-Dio error, try to return cached data
         return _getCachedItems();
       }
     } else {
@@ -107,9 +111,6 @@ class ItemRepository implements IItemRepository {
     }
   }
 
-  /// Helper method to get cached items.
-  /// If [serverError] is provided and cache is empty, returns that error
-  /// so the user knows the server was unreachable.
   Future<Either<Failure, List<ItemEntity>>> _getCachedItems({
     ApiFailure? serverError,
   }) async {
@@ -133,7 +134,9 @@ class ItemRepository implements IItemRepository {
         final model = await _remoteDataSource.getItemById(itemId);
         return Right(model.toEntity());
       } on DioException catch (e) {
-        return Left(ApiFailure.fromDioException(e, fallback: 'Failed to load item'));
+        return Left(
+          ApiFailure.fromDioException(e, fallback: 'Failed to load item'),
+        );
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }
@@ -160,7 +163,9 @@ class ItemRepository implements IItemRepository {
         final entities = ItemApiModel.toEntityList(models);
         return Right(entities);
       } on DioException catch (e) {
-        return Left(ApiFailure.fromDioException(e, fallback: 'Failed to load your items'));
+        return Left(
+          ApiFailure.fromDioException(e, fallback: 'Failed to load your items'),
+        );
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }
@@ -183,7 +188,9 @@ class ItemRepository implements IItemRepository {
         final entities = ItemApiModel.toEntityList(models);
         return Right(entities);
       } on DioException catch (e) {
-        return Left(ApiFailure.fromDioException(e, fallback: 'Failed to load lost items'));
+        return Left(
+          ApiFailure.fromDioException(e, fallback: 'Failed to load lost items'),
+        );
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }
@@ -206,7 +213,12 @@ class ItemRepository implements IItemRepository {
         final entities = ItemApiModel.toEntityList(models);
         return Right(entities);
       } on DioException catch (e) {
-        return Left(ApiFailure.fromDioException(e, fallback: 'Failed to load found items'));
+        return Left(
+          ApiFailure.fromDioException(
+            e,
+            fallback: 'Failed to load found items',
+          ),
+        );
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }
@@ -231,7 +243,9 @@ class ItemRepository implements IItemRepository {
         final entities = ItemApiModel.toEntityList(models);
         return Right(entities);
       } on DioException catch (e) {
-        return Left(ApiFailure.fromDioException(e, fallback: 'Failed to load items'));
+        return Left(
+          ApiFailure.fromDioException(e, fallback: 'Failed to load items'),
+        );
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }
@@ -254,7 +268,9 @@ class ItemRepository implements IItemRepository {
         await _remoteDataSource.updateItem(itemApiModel);
         return const Right(true);
       } on DioException catch (e) {
-        return Left(ApiFailure.fromDioException(e, fallback: 'Failed to update item'));
+        return Left(
+          ApiFailure.fromDioException(e, fallback: 'Failed to update item'),
+        );
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }
@@ -281,7 +297,9 @@ class ItemRepository implements IItemRepository {
         final url = await _remoteDataSource.uploadPhoto(photo);
         return Right(url);
       } on DioException catch (e) {
-        return Left(ApiFailure.fromDioException(e, fallback: 'Failed to upload photo'));
+        return Left(
+          ApiFailure.fromDioException(e, fallback: 'Failed to upload photo'),
+        );
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }
@@ -297,7 +315,9 @@ class ItemRepository implements IItemRepository {
         final url = await _remoteDataSource.uploadVideo(video);
         return Right(url);
       } on DioException catch (e) {
-        return Left(ApiFailure.fromDioException(e, fallback: 'Failed to upload video'));
+        return Left(
+          ApiFailure.fromDioException(e, fallback: 'Failed to upload video'),
+        );
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }

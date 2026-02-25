@@ -22,9 +22,6 @@ void main() {
     mockBatchRepository = MockBatchRepository();
   });
 
-  // ──────────────────────────────────────────────
-  // GetAllBatchUsecase
-  // ──────────────────────────────────────────────
   group('GetAllBatchUsecase', () {
     late GetAllBatchUsecase usecase;
 
@@ -38,38 +35,31 @@ void main() {
     ];
 
     test('should return list of batches on success', () async {
-      // Arrange
-      when(() => mockBatchRepository.getAllBatches())
-          .thenAnswer((_) async => Right(tBatchList));
+      when(
+        () => mockBatchRepository.getAllBatches(),
+      ).thenAnswer((_) async => Right(tBatchList));
 
-      // Act
       final result = await usecase();
 
-      // Assert
       expect(result, Right(tBatchList));
       verify(() => mockBatchRepository.getAllBatches()).called(1);
       verifyNoMoreInteractions(mockBatchRepository);
     });
 
     test('should return Failure when repository fails', () async {
-      // Arrange
       const tFailure = ApiFailure(message: 'Failed to fetch batches');
-      when(() => mockBatchRepository.getAllBatches())
-          .thenAnswer((_) async => const Left(tFailure));
+      when(
+        () => mockBatchRepository.getAllBatches(),
+      ).thenAnswer((_) async => const Left(tFailure));
 
-      // Act
       final result = await usecase();
 
-      // Assert
       expect(result, const Left(tFailure));
       verify(() => mockBatchRepository.getAllBatches()).called(1);
       verifyNoMoreInteractions(mockBatchRepository);
     });
   });
 
-  // ──────────────────────────────────────────────
-  // GetBatchByIdUsecase
-  // ──────────────────────────────────────────────
   group('GetBatchByIdUsecase', () {
     late GetBatchByIdUsecase usecase;
 
@@ -79,41 +69,37 @@ void main() {
 
     const tBatchId = 'batch-1';
     const tParams = GetBatchByIdParams(batchId: tBatchId);
-    const tBatchEntity = BatchEntity(batchId: tBatchId, batchName: 'Batch 2024');
+    const tBatchEntity = BatchEntity(
+      batchId: tBatchId,
+      batchName: 'Batch 2024',
+    );
 
     test('should return BatchEntity on success', () async {
-      // Arrange
-      when(() => mockBatchRepository.getBatchById(tBatchId))
-          .thenAnswer((_) async => const Right(tBatchEntity));
+      when(
+        () => mockBatchRepository.getBatchById(tBatchId),
+      ).thenAnswer((_) async => const Right(tBatchEntity));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Right(tBatchEntity));
       verify(() => mockBatchRepository.getBatchById(tBatchId)).called(1);
       verifyNoMoreInteractions(mockBatchRepository);
     });
 
     test('should return Failure when repository fails', () async {
-      // Arrange
       const tFailure = ApiFailure(message: 'Batch not found');
-      when(() => mockBatchRepository.getBatchById(tBatchId))
-          .thenAnswer((_) async => const Left(tFailure));
+      when(
+        () => mockBatchRepository.getBatchById(tBatchId),
+      ).thenAnswer((_) async => const Left(tFailure));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Left(tFailure));
       verify(() => mockBatchRepository.getBatchById(tBatchId)).called(1);
       verifyNoMoreInteractions(mockBatchRepository);
     });
   });
 
-  // ──────────────────────────────────────────────
-  // CreateBatchUsecase
-  // ──────────────────────────────────────────────
   group('CreateBatchUsecase', () {
     late CreateBatchUsecase usecase;
 
@@ -124,38 +110,31 @@ void main() {
     const tParams = CreateBatchParams(batchName: 'Batch 2024');
 
     test('should return true on successful batch creation', () async {
-      // Arrange
-      when(() => mockBatchRepository.createBatch(any()))
-          .thenAnswer((_) async => const Right(true));
+      when(
+        () => mockBatchRepository.createBatch(any()),
+      ).thenAnswer((_) async => const Right(true));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Right(true));
       verify(() => mockBatchRepository.createBatch(any())).called(1);
       verifyNoMoreInteractions(mockBatchRepository);
     });
 
     test('should return Failure on unsuccessful batch creation', () async {
-      // Arrange
       const tFailure = ApiFailure(message: 'Failed to create batch');
-      when(() => mockBatchRepository.createBatch(any()))
-          .thenAnswer((_) async => const Left(tFailure));
+      when(
+        () => mockBatchRepository.createBatch(any()),
+      ).thenAnswer((_) async => const Left(tFailure));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Left(tFailure));
       verify(() => mockBatchRepository.createBatch(any())).called(1);
       verifyNoMoreInteractions(mockBatchRepository);
     });
   });
 
-  // ──────────────────────────────────────────────
-  // UpdateBatchUsecase
-  // ──────────────────────────────────────────────
   group('UpdateBatchUsecase', () {
     late UpdateBatchUsecase usecase;
 
@@ -170,38 +149,31 @@ void main() {
     );
 
     test('should return true on successful batch update', () async {
-      // Arrange
-      when(() => mockBatchRepository.updateBatch(any()))
-          .thenAnswer((_) async => const Right(true));
+      when(
+        () => mockBatchRepository.updateBatch(any()),
+      ).thenAnswer((_) async => const Right(true));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Right(true));
       verify(() => mockBatchRepository.updateBatch(any())).called(1);
       verifyNoMoreInteractions(mockBatchRepository);
     });
 
     test('should return Failure on unsuccessful batch update', () async {
-      // Arrange
       const tFailure = ApiFailure(message: 'Failed to update batch');
-      when(() => mockBatchRepository.updateBatch(any()))
-          .thenAnswer((_) async => const Left(tFailure));
+      when(
+        () => mockBatchRepository.updateBatch(any()),
+      ).thenAnswer((_) async => const Left(tFailure));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Left(tFailure));
       verify(() => mockBatchRepository.updateBatch(any())).called(1);
       verifyNoMoreInteractions(mockBatchRepository);
     });
   });
 
-  // ──────────────────────────────────────────────
-  // DeleteBatchUsecase
-  // ──────────────────────────────────────────────
   group('DeleteBatchUsecase', () {
     late DeleteBatchUsecase usecase;
 
@@ -213,29 +185,25 @@ void main() {
     const tParams = DeleteBatchParams(batchId: tBatchId);
 
     test('should return true on successful batch deletion', () async {
-      // Arrange
-      when(() => mockBatchRepository.deleteBatch(tBatchId))
-          .thenAnswer((_) async => const Right(true));
+      when(
+        () => mockBatchRepository.deleteBatch(tBatchId),
+      ).thenAnswer((_) async => const Right(true));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Right(true));
       verify(() => mockBatchRepository.deleteBatch(tBatchId)).called(1);
       verifyNoMoreInteractions(mockBatchRepository);
     });
 
     test('should return Failure on unsuccessful batch deletion', () async {
-      // Arrange
       const tFailure = ApiFailure(message: 'Failed to delete batch');
-      when(() => mockBatchRepository.deleteBatch(tBatchId))
-          .thenAnswer((_) async => const Left(tFailure));
+      when(
+        () => mockBatchRepository.deleteBatch(tBatchId),
+      ).thenAnswer((_) async => const Left(tFailure));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Left(tFailure));
       verify(() => mockBatchRepository.deleteBatch(tBatchId)).called(1);
       verifyNoMoreInteractions(mockBatchRepository);

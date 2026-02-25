@@ -37,29 +37,25 @@ void main() {
 
   group('GetItemsByUserUsecase', () {
     test('should return list of items for a user on success', () async {
-      // Arrange
-      when(() => mockItemRepository.getItemsByUser(tUserId))
-          .thenAnswer((_) async => Right(tItemList));
+      when(
+        () => mockItemRepository.getItemsByUser(tUserId),
+      ).thenAnswer((_) async => Right(tItemList));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, Right(tItemList));
       verify(() => mockItemRepository.getItemsByUser(tUserId)).called(1);
       verifyNoMoreInteractions(mockItemRepository);
     });
 
     test('should return Failure when repository fails', () async {
-      // Arrange
       const tFailure = ApiFailure(message: 'Failed to fetch user items');
-      when(() => mockItemRepository.getItemsByUser(tUserId))
-          .thenAnswer((_) async => const Left(tFailure));
+      when(
+        () => mockItemRepository.getItemsByUser(tUserId),
+      ).thenAnswer((_) async => const Left(tFailure));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Left(tFailure));
       verify(() => mockItemRepository.getItemsByUser(tUserId)).called(1);
       verifyNoMoreInteractions(mockItemRepository);

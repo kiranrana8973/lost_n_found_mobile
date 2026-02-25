@@ -36,18 +36,18 @@ class UpdateItemParams extends Equatable {
 
   @override
   List<Object?> get props => [
-        itemId,
-        itemName,
-        description,
-        category,
-        location,
-        type,
-        claimedBy,
-        media,
-        mediaType,
-        isClaimed,
-        status,
-      ];
+    itemId,
+    itemName,
+    description,
+    category,
+    location,
+    type,
+    claimedBy,
+    media,
+    mediaType,
+    isClaimed,
+    status,
+  ];
 }
 
 final updateItemUsecaseProvider = Provider<UpdateItemUsecase>((ref) {
@@ -59,7 +59,7 @@ class UpdateItemUsecase implements UsecaseWithParams<bool, UpdateItemParams> {
   final IItemRepository _itemRepository;
 
   UpdateItemUsecase({required IItemRepository itemRepository})
-      : _itemRepository = itemRepository;
+    : _itemRepository = itemRepository;
 
   @override
   Future<Either<Failure, bool>> call(UpdateItemParams params) {

@@ -62,7 +62,9 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
       final userId = userSessionService.getCurrentUserId();
       final uploadedPhotoUrl = ref.read(itemViewModelProvider).uploadedPhotoUrl;
 
-      await ref.read(itemViewModelProvider.notifier).createItem(
+      await ref
+          .read(itemViewModelProvider.notifier)
+          .createItem(
             itemName: _titleController.text.trim(),
             description: _descriptionController.text.trim().isEmpty
                 ? null
@@ -101,7 +103,8 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
       builder: (dialogContext) => AlertDialog(
         title: Text(l10n?.permissionRequired ?? "Permission Required"),
         content: Text(
-          l10n?.permissionDeniedMessage ?? "This feature requires permission to access your camera or gallery. Please enable it in your device settings.",
+          l10n?.permissionDeniedMessage ??
+              "This feature requires permission to access your camera or gallery. Please enable it in your device settings.",
         ),
         actions: [
           TextButton(
@@ -164,7 +167,8 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
         final l10n = AppLocalizations.of(context);
         SnackbarUtils.showError(
           context,
-          l10n?.galleryError ?? 'Unable to access gallery. Please try using the camera instead.',
+          l10n?.galleryError ??
+              'Unable to access gallery. Please try using the camera instead.',
         );
       }
     }
@@ -209,7 +213,6 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
         final file = File(video.path);
         final fileSize = await file.length();
 
-        // Check file size (limit to 50MB)
         if (fileSize > 50 * 1024 * 1024) {
           if (mounted) {
             SnackbarUtils.showError(
@@ -226,9 +229,7 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
           _selectedMediaType = 'video';
         });
 
-        await ref
-            .read(itemViewModelProvider.notifier)
-            .uploadVideo(file);
+        await ref.read(itemViewModelProvider.notifier).uploadVideo(file);
       }
     } catch (e) {
       debugPrint('Video Gallery Error: $e');
@@ -310,10 +311,13 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
                       const SizedBox(height: 12),
                       StyledTextField(
                         controller: _titleController,
-                        hintText: l10n?.itemNameHint ?? 'e.g., iPhone 14 Pro, Blue Wallet',
+                        hintText:
+                            l10n?.itemNameHint ??
+                            'e.g., iPhone 14 Pro, Blue Wallet',
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return l10n?.pleaseEnterItemName ?? 'Please enter item name';
+                            return l10n?.pleaseEnterItemName ??
+                                'Please enter item name';
                           }
                           return null;
                         },
@@ -340,17 +344,22 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
                         prefixIcon: Icons.location_on_rounded,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return l10n?.pleaseEnterLocation ?? 'Please enter location';
+                            return l10n?.pleaseEnterLocation ??
+                                'Please enter location';
                           }
                           return null;
                         },
                       ),
                       const SizedBox(height: 24),
-                      FormSectionHeader(title: l10n?.description ?? 'Description'),
+                      FormSectionHeader(
+                        title: l10n?.description ?? 'Description',
+                      ),
                       const SizedBox(height: 12),
                       StyledTextField(
                         controller: _descriptionController,
-                        hintText: l10n?.provideDetails ?? 'Provide additional details about the item...',
+                        hintText:
+                            l10n?.provideDetails ??
+                            'Provide additional details about the item...',
                         maxLines: 4,
                       ),
                       const SizedBox(height: 32),
@@ -386,10 +395,7 @@ class _ReportItemPageState extends ConsumerState<ReportItemPage> {
                 borderRadius: BorderRadius.circular(14),
                 boxShadow: context.softShadow,
               ),
-              child: Icon(
-                Icons.arrow_back_rounded,
-                color: context.textPrimary,
-              ),
+              child: Icon(Icons.arrow_back_rounded, color: context.textPrimary),
             ),
           ),
           const SizedBox(width: 16),

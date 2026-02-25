@@ -9,7 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -19,11 +18,8 @@ void main() async {
     ),
   );
 
-  // initialize Hive or other services if needed
   await HiveService().init();
 
-  // Initialize SharedPreferences : because this is async operation
-  // but riverpod providers are sync so we need to initialize it here
   final sharedPreferences = await SharedPreferences.getInstance();
 
   runApp(

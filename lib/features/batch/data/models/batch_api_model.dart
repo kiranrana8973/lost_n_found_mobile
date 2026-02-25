@@ -7,12 +7,10 @@ class BatchApiModel {
 
   BatchApiModel({this.id, required this.batchName, this.status});
 
-  // toJSON
   Map<String, dynamic> toJson() {
     return {"batchName": batchName};
   }
 
-  // fromJSON
   factory BatchApiModel.fromJson(Map<String, dynamic> json) {
     return BatchApiModel(
       id: json['_id'] as String,
@@ -21,21 +19,15 @@ class BatchApiModel {
     );
   }
 
-  // toEntity
   BatchEntity toEntity() {
     return BatchEntity(batchId: id, batchName: batchName, status: status);
   }
-
-  // fromEntity
 
   factory BatchApiModel.fromEntity(BatchEntity entity) {
     return BatchApiModel(batchName: entity.batchName);
   }
 
-  // toEntityList
   static List<BatchEntity> toEntityList(List<BatchApiModel> models) {
     return models.map((model) => model.toEntity()).toList();
   }
-
-  // fromEntityList
 }

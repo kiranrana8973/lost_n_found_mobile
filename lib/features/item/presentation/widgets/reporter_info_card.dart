@@ -43,10 +43,7 @@ class ReporterInfoCard extends StatelessWidget {
               children: [
                 Text(
                   isLost ? 'Reported by' : 'Found by',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: context.textSecondary,
-                  ),
+                  style: TextStyle(fontSize: 12, color: context.textSecondary),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -67,11 +64,7 @@ class ReporterInfoCard extends StatelessWidget {
               color: AppColors.primary.withAlpha(26),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
-              Icons.chat_rounded,
-              color: AppColors.primary,
-              size: 22,
-            ),
+            child: Icon(Icons.chat_rounded, color: AppColors.primary, size: 22),
           ),
         ],
       ),

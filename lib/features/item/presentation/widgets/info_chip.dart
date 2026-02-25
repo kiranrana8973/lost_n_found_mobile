@@ -5,11 +5,7 @@ class InfoChip extends StatelessWidget {
   final IconData icon;
   final String text;
 
-  const InfoChip({
-    super.key,
-    required this.icon,
-    required this.text,
-  });
+  const InfoChip({super.key, required this.icon, required this.text});
 
   @override
   Widget build(BuildContext context) {

@@ -22,26 +22,17 @@ class AuthViewModel extends Notifier<AuthState> {
     _getCurrentUserUsecase = ref.read(getCurrentUserUsecaseProvider);
     _logoutUsecase = ref.read(logoutUsecaseProvider);
 
-    // Hydrate auth state from local storage on cold start.
-    // This runs asynchronously — state starts as `initial`, then resolves
-    // to `authenticated` or `unauthenticated` once local check completes.
     Future.microtask(() => _hydrateAuthState());
 
     return const AuthState();
   }
 
-  /// Restore session on app start. If online, fetches latest user from
-  /// /students/me (syncs password/profile changes). Falls back to local cache.
   Future<void> _hydrateAuthState() async {
     final result = await _getCurrentUserUsecase();
     result.fold(
-      (failure) => state = state.copyWith(
-        status: AuthStatus.unauthenticated,
-      ),
-      (user) => state = state.copyWith(
-        status: AuthStatus.authenticated,
-        user: user,
-      ),
+      (failure) => state = state.copyWith(status: AuthStatus.unauthenticated),
+      (user) =>
+          state = state.copyWith(status: AuthStatus.authenticated, user: user),
     );
   }
 

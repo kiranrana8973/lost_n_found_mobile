@@ -94,7 +94,6 @@ class ItemViewModel extends Notifier<ItemState> {
         errorMessage: failure.message,
       ),
       (items) {
-        // Filter by current user in case the backend returns all items
         final myItems = items
             .where((item) => item.reportedBy == userId)
             .toList();

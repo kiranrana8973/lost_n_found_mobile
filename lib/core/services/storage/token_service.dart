@@ -5,8 +5,6 @@ final tokenServiceProvider = Provider<TokenService>((ref) {
   return TokenService(apiClient: ref.read(apiClientProvider));
 });
 
-/// Delegates token operations to ApiClient's FlutterSecureStorage.
-/// Single source of truth for auth tokens — no more dual storage.
 class TokenService {
   final ApiClient _apiClient;
 

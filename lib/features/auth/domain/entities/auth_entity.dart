@@ -8,8 +8,8 @@ class AuthEntity extends Equatable {
   final String? phoneNumber;
   final String username;
   final String? password;
-  final String? batchId; // For sending to API
-  final BatchEntity? batch; // For displaying populated data
+  final String? batchId;
+  final BatchEntity? batch;
   final String? profilePicture;
 
   const AuthEntity({

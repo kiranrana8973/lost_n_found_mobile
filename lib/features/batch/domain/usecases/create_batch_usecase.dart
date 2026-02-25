@@ -1,4 +1,3 @@
-//Params
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,9 +16,6 @@ class CreateBatchParams extends Equatable {
   List<Object?> get props => [batchName];
 }
 
-//Usecase
-
-// Create Provider
 final createBatchUsecaseProvider = Provider<CreateBatchUsecase>((ref) {
   final batchRepository = ref.read(batchRepositoryProvider);
   return CreateBatchUsecase(batchRepository: batchRepository);
@@ -33,7 +29,6 @@ class CreateBatchUsecase implements UsecaseWithParams<bool, CreateBatchParams> {
 
   @override
   Future<Either<Failure, bool>> call(CreateBatchParams params) {
-    // object creation
     BatchEntity batchEntity = BatchEntity(batchName: params.batchName);
 
     return _batchRepository.createBatch(batchEntity);

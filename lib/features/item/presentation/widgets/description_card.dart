@@ -5,10 +5,7 @@ import '../../../../app/theme/theme_extensions.dart';
 class DescriptionCard extends StatelessWidget {
   final String? description;
 
-  const DescriptionCard({
-    super.key,
-    this.description,
-  });
+  const DescriptionCard({super.key, this.description});
 
   @override
   Widget build(BuildContext context) {

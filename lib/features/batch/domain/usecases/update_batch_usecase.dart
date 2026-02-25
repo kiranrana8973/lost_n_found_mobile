@@ -22,7 +22,6 @@ class UpdateBatchParams extends Equatable {
   List<Object?> get props => [batchId, batchName, status];
 }
 
-// Create Provider
 final updateBatchUsecaseProvider = Provider<UpdateBatchUsecase>((ref) {
   final batchRepository = ref.read(batchRepositoryProvider);
   return UpdateBatchUsecase(batchRepository: batchRepository);

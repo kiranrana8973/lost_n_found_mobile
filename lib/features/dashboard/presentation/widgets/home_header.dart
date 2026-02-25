@@ -8,10 +8,7 @@ import '../../../../core/localization/language_provider.dart';
 class HomeHeader extends ConsumerWidget {
   final String userName;
 
-  const HomeHeader({
-    super.key,
-    required this.userName,
-  });
+  const HomeHeader({super.key, required this.userName});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -89,11 +86,7 @@ class HomeHeader extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: 6),
-            Icon(
-              Icons.language_rounded,
-              size: 20,
-              color: AppColors.primary,
-            ),
+            Icon(Icons.language_rounded, size: 20, color: AppColors.primary),
           ],
         ),
       ),

@@ -11,10 +11,7 @@ class CreateCategoryParams extends Equatable {
   final String name;
   final String? description;
 
-  const CreateCategoryParams({
-    required this.name,
-    this.description,
-  });
+  const CreateCategoryParams({required this.name, this.description});
 
   @override
   List<Object?> get props => [name, description];
@@ -30,7 +27,7 @@ class CreateCategoryUsecase
   final ICategoryRepository _categoryRepository;
 
   CreateCategoryUsecase({required ICategoryRepository categoryRepository})
-      : _categoryRepository = categoryRepository;
+    : _categoryRepository = categoryRepository;
 
   @override
   Future<Either<Failure, bool>> call(CreateCategoryParams params) {

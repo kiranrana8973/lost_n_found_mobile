@@ -13,7 +13,6 @@ class AppTheme {
       ),
       scaffoldBackgroundColor: AppColors.background,
 
-      // AppBar Theme
       appBarTheme: const AppBarTheme(
         elevation: 0,
         centerTitle: true,
@@ -28,7 +27,6 @@ class AppTheme {
         ),
       ),
 
-      // Input Decoration Theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white,
@@ -64,12 +62,11 @@ class AppTheme {
         ),
         hintStyle: const TextStyle(
           fontFamily: 'Inter',
-          color: Color(0x996B7280), // textSecondary with 60% opacity
+          color: Color(0x996B7280),
           fontSize: 14,
         ),
       ),
 
-      // Elevated Button Theme
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
@@ -86,7 +83,6 @@ class AppTheme {
         ),
       ),
 
-      // Text Button Theme
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -101,7 +97,6 @@ class AppTheme {
         ),
       ),
 
-      // Outlined Button Theme
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -117,14 +112,12 @@ class AppTheme {
         ),
       ),
 
-      // Card Theme
       cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         color: Colors.white,
       ),
 
-      // Checkbox Theme
       checkboxTheme: CheckboxThemeData(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         fillColor: WidgetStateProperty.resolveWith((states) {
@@ -148,7 +141,6 @@ class AppTheme {
       ),
       scaffoldBackgroundColor: AppColors.darkBackground,
 
-      // AppBar Theme
       appBarTheme: const AppBarTheme(
         elevation: 0,
         centerTitle: true,
@@ -163,7 +155,6 @@ class AppTheme {
         ),
       ),
 
-      // Input Decoration Theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.darkInputFill,
@@ -202,19 +193,16 @@ class AppTheme {
           color: AppColors.darkTextTertiary,
           fontSize: 14,
         ),
-        // Add text style for input text
         floatingLabelStyle: const TextStyle(
           fontFamily: 'Inter',
           color: AppColors.primary,
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),
-        // This ensures the text color is visible
         prefixIconColor: AppColors.darkTextSecondary,
         suffixIconColor: AppColors.darkTextSecondary,
       ),
 
-      // Elevated Button Theme
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
@@ -233,7 +221,6 @@ class AppTheme {
         ),
       ),
 
-      // Text Button Theme
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primary,
@@ -249,7 +236,6 @@ class AppTheme {
         ),
       ),
 
-      // Outlined Button Theme
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.darkTextPrimary,
@@ -266,14 +252,12 @@ class AppTheme {
         ),
       ),
 
-      // Card Theme
       cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         color: AppColors.darkSurface,
       ),
 
-      // Checkbox Theme
       checkboxTheme: CheckboxThemeData(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         fillColor: WidgetStateProperty.resolveWith((states) {
@@ -286,7 +270,6 @@ class AppTheme {
         side: const BorderSide(color: AppColors.darkBorder, width: 1.5),
       ),
 
-      // Bottom Navigation Bar Theme
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.darkSurface,
         selectedItemColor: AppColors.primary,
@@ -295,23 +278,19 @@ class AppTheme {
         elevation: 0,
       ),
 
-      // Dialog Theme
       dialogTheme: DialogThemeData(
         backgroundColor: AppColors.darkSurface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         elevation: 8,
       ),
 
-      // Divider Theme
       dividerTheme: const DividerThemeData(
         color: AppColors.darkDivider,
         thickness: 1,
       ),
 
-      // Icon Theme
       iconTheme: const IconThemeData(color: AppColors.darkTextPrimary),
 
-      // Text Theme
       textTheme: const TextTheme(
         displayLarge: TextStyle(
           fontFamily: 'Inter',
@@ -385,7 +364,6 @@ class AppTheme {
         ),
       ),
 
-      // Chip Theme
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.darkSurfaceVariant,
         labelStyle: const TextStyle(
@@ -399,14 +377,12 @@ class AppTheme {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
 
-      // Floating Action Button Theme
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 4,
       ),
 
-      // Switch Theme
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
@@ -422,7 +398,6 @@ class AppTheme {
         }),
       ),
 
-      // Snackbar Theme
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.darkSurfaceVariant,
         contentTextStyle: const TextStyle(
@@ -434,7 +409,6 @@ class AppTheme {
         behavior: SnackBarBehavior.floating,
       ),
 
-      // Progress Indicator Theme
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.primary,
       ),

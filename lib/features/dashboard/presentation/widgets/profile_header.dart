@@ -65,10 +65,7 @@ class ProfileHeader extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             userEmail,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.white70,
-            ),
+            style: const TextStyle(fontSize: 14, color: Colors.white70),
           ),
           const SizedBox(height: 24),
           _buildStatsRow(),
@@ -112,11 +109,20 @@ class ProfileHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _StatItem(title: lostLabel ?? 'Lost', value: lostCountText ?? '$lostCount'),
+          _StatItem(
+            title: lostLabel ?? 'Lost',
+            value: lostCountText ?? '$lostCount',
+          ),
           Container(width: 1, height: 40, color: AppColors.white30),
-          _StatItem(title: foundLabel ?? 'Found', value: foundCountText ?? '$foundCount'),
+          _StatItem(
+            title: foundLabel ?? 'Found',
+            value: foundCountText ?? '$foundCount',
+          ),
           Container(width: 1, height: 40, color: AppColors.white30),
-          _StatItem(title: totalLabel ?? 'Total', value: totalCountText ?? '${lostCount + foundCount}'),
+          _StatItem(
+            title: totalLabel ?? 'Total',
+            value: totalCountText ?? '${lostCount + foundCount}',
+          ),
         ],
       ),
     );

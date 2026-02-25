@@ -6,11 +6,7 @@ void main() {
   group('EmptyItemsView', () {
     testWidgets('renders default title and subtitle', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: EmptyItemsView(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: EmptyItemsView())),
       );
 
       expect(find.text('No items found'), findsOneWidget);
@@ -38,11 +34,7 @@ void main() {
 
     testWidgets('renders default icon', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: EmptyItemsView(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: EmptyItemsView())),
       );
 
       expect(find.byIcon(Icons.inbox_rounded), findsOneWidget);
@@ -51,9 +43,7 @@ void main() {
     testWidgets('renders custom icon', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: EmptyItemsView(icon: Icons.error),
-          ),
+          home: Scaffold(body: EmptyItemsView(icon: Icons.error)),
         ),
       );
 

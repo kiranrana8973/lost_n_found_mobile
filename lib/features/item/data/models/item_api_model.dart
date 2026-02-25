@@ -16,7 +16,6 @@ class ItemApiModel {
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
-  // Constructor
   ItemApiModel({
     this.id,
     this.reportedBy,
@@ -48,7 +47,6 @@ class ItemApiModel {
   }
 
   factory ItemApiModel.fromJson(Map<String, dynamic> json) {
-    // Handle nested objects - server returns category and reportedBy as objects
     String? extractId(dynamic value) {
       if (value == null) return null;
       if (value is Map) return value['_id'] as String?;

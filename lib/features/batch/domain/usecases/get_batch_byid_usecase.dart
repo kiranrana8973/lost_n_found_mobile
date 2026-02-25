@@ -16,7 +16,6 @@ class GetBatchByIdParams extends Equatable {
   List<Object?> get props => [batchId];
 }
 
-// Create Provider
 final getBatchByIdUsecaseProvider = Provider<GetBatchByIdUsecase>((ref) {
   final batchRepository = ref.read(batchRepositoryProvider);
   return GetBatchByIdUsecase(batchRepository: batchRepository);

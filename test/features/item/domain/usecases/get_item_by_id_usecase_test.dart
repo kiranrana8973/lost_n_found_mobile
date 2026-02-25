@@ -27,29 +27,25 @@ void main() {
 
   group('GetItemByIdUsecase', () {
     test('should return ItemEntity on success', () async {
-      // Arrange
-      when(() => mockItemRepository.getItemById(tItemId))
-          .thenAnswer((_) async => const Right(tItemEntity));
+      when(
+        () => mockItemRepository.getItemById(tItemId),
+      ).thenAnswer((_) async => const Right(tItemEntity));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Right(tItemEntity));
       verify(() => mockItemRepository.getItemById(tItemId)).called(1);
       verifyNoMoreInteractions(mockItemRepository);
     });
 
     test('should return Failure when repository fails', () async {
-      // Arrange
       const tFailure = ApiFailure(message: 'Item not found');
-      when(() => mockItemRepository.getItemById(tItemId))
-          .thenAnswer((_) async => const Left(tFailure));
+      when(
+        () => mockItemRepository.getItemById(tItemId),
+      ).thenAnswer((_) async => const Left(tFailure));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Left(tFailure));
       verify(() => mockItemRepository.getItemById(tItemId)).called(1);
       verifyNoMoreInteractions(mockItemRepository);

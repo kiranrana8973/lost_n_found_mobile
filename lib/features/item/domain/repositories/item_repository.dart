@@ -19,5 +19,3 @@ abstract interface class IItemRepository {
   Future<Either<Failure, String>> uploadPhoto(File photo);
   Future<Either<Failure, String>> uploadVideo(File video);
 }
-
-

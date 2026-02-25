@@ -5,8 +5,6 @@ import 'package:lost_n_found/features/batch/data/datasources/batch_datasource.da
 import 'package:lost_n_found/features/batch/data/models/batch_api_model.dart';
 import 'package:lost_n_found/features/batch/data/models/batch_hive_model.dart';
 
-// provider
-
 final batchRemoteProvider = Provider<IBatchRemoteDataSource>((ref) {
   return BatchRemoteDatasource(apiClient: ref.read(apiClientProvider));
 });
@@ -27,20 +25,16 @@ class BatchRemoteDatasource implements IBatchRemoteDataSource {
   Future<List<BatchApiModel>> getAllBatches() async {
     final response = await _apiClient.get(ApiEndpoints.batches);
     final data = response.data['data'] as List;
-    // json -> api model -> entity : from Json
-    // entity -> apiu model -> json  : toJson
     return data.map((json) => BatchApiModel.fromJson(json)).toList();
   }
 
   @override
   Future<BatchApiModel?> getBatchById(String batchId) {
-    // TODO: implement getBatchById
     throw UnimplementedError();
   }
 
   @override
   Future<bool> updateBatch(BatchApiModel batch) {
-    // TODO: implement updateBatch
     throw UnimplementedError();
   }
 }

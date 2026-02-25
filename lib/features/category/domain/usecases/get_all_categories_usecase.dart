@@ -6,8 +6,9 @@ import 'package:lost_n_found/features/category/data/repositories/category_reposi
 import 'package:lost_n_found/features/category/domain/entities/category_entity.dart';
 import 'package:lost_n_found/features/category/domain/repositories/category_repository.dart';
 
-final getAllCategoriesUsecaseProvider =
-    Provider<GetAllCategoriesUsecase>((ref) {
+final getAllCategoriesUsecaseProvider = Provider<GetAllCategoriesUsecase>((
+  ref,
+) {
   final categoryRepository = ref.read(categoryRepositoryProvider);
   return GetAllCategoriesUsecase(categoryRepository: categoryRepository);
 });
@@ -17,7 +18,7 @@ class GetAllCategoriesUsecase
   final ICategoryRepository _categoryRepository;
 
   GetAllCategoriesUsecase({required ICategoryRepository categoryRepository})
-      : _categoryRepository = categoryRepository;
+    : _categoryRepository = categoryRepository;
 
   @override
   Future<Either<Failure, List<CategoryEntity>>> call() {

@@ -42,8 +42,7 @@ void main() {
     });
 
     group('copyWith', () {
-      test('should preserve unchanged fields when no arguments are passed',
-          () {
+      test('should preserve unchanged fields when no arguments are passed', () {
         const original = CategoryState(
           status: CategoryStatus.loaded,
           categories: [tCategory1],
@@ -73,8 +72,7 @@ void main() {
       test('should update only categories', () {
         const original = CategoryState();
 
-        final copied =
-            original.copyWith(categories: [tCategory1, tCategory2]);
+        final copied = original.copyWith(categories: [tCategory1, tCategory2]);
 
         expect(copied.status, CategoryStatus.initial);
         expect(copied.categories, [tCategory1, tCategory2]);

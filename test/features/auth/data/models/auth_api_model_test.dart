@@ -29,7 +29,6 @@ void main() {
 
   group('fromJson', () {
     test('should return a valid AuthApiModel from JSON', () {
-      // Arrange
       final json = {
         '_id': '1',
         'name': 'Test User',
@@ -41,10 +40,8 @@ void main() {
         'batch': null,
       };
 
-      // Act
       final result = AuthApiModel.fromJson(json);
 
-      // Assert
       expect(result.id, '1');
       expect(result.fullName, 'Test User');
       expect(result.email, 'test@test.com');
@@ -58,7 +55,6 @@ void main() {
 
   group('toJson', () {
     test('should return a JSON map with name key (not fullName)', () {
-      // Arrange
       final model = AuthApiModel(
         id: '1',
         fullName: 'Test User',
@@ -70,10 +66,8 @@ void main() {
         profilePicture: 'pic.jpg',
       );
 
-      // Act
       final result = model.toJson();
 
-      // Assert
       expect(result['name'], 'Test User');
       expect(result['email'], 'test@test.com');
       expect(result['phoneNumber'], '123');
@@ -87,10 +81,8 @@ void main() {
 
   group('toEntity', () {
     test('should convert AuthApiModel to AuthEntity correctly', () {
-      // Act
       final result = tAuthApiModel.toEntity();
 
-      // Assert
       expect(result, isA<AuthEntity>());
       expect(result.authId, '1');
       expect(result.fullName, 'Test User');
@@ -105,10 +97,8 @@ void main() {
 
   group('fromEntity', () {
     test('should convert AuthEntity to AuthApiModel correctly', () {
-      // Act
       final result = AuthApiModel.fromEntity(tAuthEntity);
 
-      // Assert
       expect(result, isA<AuthApiModel>());
       expect(result.fullName, 'Test User');
       expect(result.email, 'test@test.com');
@@ -122,13 +112,10 @@ void main() {
 
   group('toEntityList', () {
     test('should convert list of AuthApiModel to list of AuthEntity', () {
-      // Arrange
       final models = [tAuthApiModel, tAuthApiModel];
 
-      // Act
       final result = AuthApiModel.toEntityList(models);
 
-      // Assert
       expect(result, isA<List<AuthEntity>>());
       expect(result.length, 2);
       expect(result[0].fullName, 'Test User');

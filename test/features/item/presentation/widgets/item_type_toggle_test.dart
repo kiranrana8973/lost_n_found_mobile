@@ -21,8 +21,9 @@ void main() {
       expect(find.text('I Found Something'), findsOneWidget);
     });
 
-    testWidgets('calls onTypeChanged with found when Found is tapped',
-        (tester) async {
+    testWidgets('calls onTypeChanged with found when Found is tapped', (
+      tester,
+    ) async {
       ItemType? selectedType;
 
       await tester.pumpWidget(
@@ -40,8 +41,9 @@ void main() {
       expect(selectedType, ItemType.found);
     });
 
-    testWidgets('calls onTypeChanged with lost when Lost is tapped',
-        (tester) async {
+    testWidgets('calls onTypeChanged with lost when Lost is tapped', (
+      tester,
+    ) async {
       ItemType? selectedType;
 
       await tester.pumpWidget(

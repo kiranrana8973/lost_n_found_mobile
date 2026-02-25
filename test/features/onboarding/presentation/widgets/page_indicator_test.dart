@@ -11,7 +11,6 @@ void main() {
         ),
       );
 
-      // Should find 3 AnimatedContainer widgets inside the Row
       final row = tester.widget<Row>(find.byType(Row));
       expect(row.children.length, 3);
     });
@@ -27,8 +26,6 @@ void main() {
           .widgetList<AnimatedContainer>(find.byType(AnimatedContainer))
           .toList();
 
-      // Active indicator (index 1) should target width 40
-      // Inactive indicators should target width 10
       expect(animatedContainers.length, 3);
     });
   });

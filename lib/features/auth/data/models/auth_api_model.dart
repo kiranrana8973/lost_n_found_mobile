@@ -24,7 +24,6 @@ class AuthApiModel {
     this.batch,
   });
 
-  // toJSON
   Map<String, dynamic> toJson() {
     return {
       "name": fullName,
@@ -37,7 +36,6 @@ class AuthApiModel {
     };
   }
 
-  // fromJson
   factory AuthApiModel.fromJson(Map<String, dynamic> json) {
     return AuthApiModel(
       id: json['_id'] as String,
@@ -53,7 +51,6 @@ class AuthApiModel {
     );
   }
 
-  // toEntity
   AuthEntity toEntity() {
     return AuthEntity(
       authId: id,
@@ -67,7 +64,6 @@ class AuthApiModel {
     );
   }
 
-  // fromEntity
   factory AuthApiModel.fromEntity(AuthEntity entity) {
     return AuthApiModel(
       fullName: entity.fullName,
@@ -83,7 +79,6 @@ class AuthApiModel {
     );
   }
 
-  // toEntityList
   static List<AuthEntity> toEntityList(List<AuthApiModel> models) {
     return models.map((model) => model.toEntity()).toList();
   }

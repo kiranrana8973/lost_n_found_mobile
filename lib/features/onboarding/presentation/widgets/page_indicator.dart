@@ -30,18 +30,16 @@ class PageIndicator extends StatelessWidget {
                 ? LinearGradient(
                     colors: [
                       activeColor ?? AppColors.primary,
-                      (activeColor ?? AppColors.primary).withAlpha(179), // 70% opacity
+                      (activeColor ?? AppColors.primary).withAlpha(179),
                     ],
                   )
                 : null,
-            color: currentPage != index
-                ? AppColors.border
-                : null,
+            color: currentPage != index ? AppColors.border : null,
             borderRadius: BorderRadius.circular(5),
             boxShadow: currentPage == index
                 ? [
                     BoxShadow(
-                      color: (activeColor ?? AppColors.primary).withAlpha(102), // 40% opacity
+                      color: (activeColor ?? AppColors.primary).withAlpha(102),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),

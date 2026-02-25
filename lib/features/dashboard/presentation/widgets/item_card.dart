@@ -98,14 +98,16 @@ class ItemCard extends StatelessWidget {
               memCacheWidth: 128,
               placeholder: (context, url) => Container(
                 decoration: BoxDecoration(
-                  gradient:
-                      isLost ? AppColors.lostGradient : AppColors.foundGradient,
+                  gradient: isLost
+                      ? AppColors.lostGradient
+                      : AppColors.foundGradient,
                 ),
               ),
               errorWidget: (context, url, error) => Container(
                 decoration: BoxDecoration(
-                  gradient:
-                      isLost ? AppColors.lostGradient : AppColors.foundGradient,
+                  gradient: isLost
+                      ? AppColors.lostGradient
+                      : AppColors.foundGradient,
                 ),
                 child: Icon(
                   _getCategoryIcon(category),
@@ -114,11 +116,7 @@ class ItemCard extends StatelessWidget {
                 ),
               ),
             )
-          : Icon(
-              _getCategoryIcon(category),
-              color: Colors.white,
-              size: 28,
-            ),
+          : Icon(_getCategoryIcon(category), color: Colors.white, size: 28),
     );
   }
 
@@ -159,19 +157,12 @@ class ItemCard extends StatelessWidget {
   Widget _buildLocationRow(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          Icons.location_on_rounded,
-          size: 14,
-          color: context.textSecondary,
-        ),
+        Icon(Icons.location_on_rounded, size: 14, color: context.textSecondary),
         const SizedBox(width: 4),
         Expanded(
           child: Text(
             location,
-            style: TextStyle(
-              fontSize: 13,
-              color: context.textSecondary,
-            ),
+            style: TextStyle(fontSize: 13, color: context.textSecondary),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

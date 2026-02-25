@@ -35,7 +35,6 @@ class RegisterParams extends Equatable {
   ];
 }
 
-// Create Provider
 final registerUsecaseProvider = Provider<RegisterUsecase>((ref) {
   final authRepository = ref.read(authRepositoryProvider);
   return RegisterUsecase(authRepository: authRepository);

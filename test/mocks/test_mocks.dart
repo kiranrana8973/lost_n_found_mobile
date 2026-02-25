@@ -32,7 +32,6 @@ import 'package:lost_n_found/features/category/domain/usecases/create_category_u
 import 'package:lost_n_found/features/category/domain/usecases/update_category_usecase.dart';
 import 'package:lost_n_found/features/category/domain/usecases/delete_category_usecase.dart';
 
-// Repository Mocks
 class MockAuthRepository extends Mock implements IAuthRepository {}
 
 class MockItemRepository extends Mock implements IItemRepository {}
@@ -41,7 +40,6 @@ class MockBatchRepository extends Mock implements IBatchRepository {}
 
 class MockCategoryRepository extends Mock implements ICategoryRepository {}
 
-// DataSource Mocks
 class MockAuthLocalDataSource extends Mock implements IAuthLocalDataSource {}
 
 class MockAuthRemoteDataSource extends Mock implements IAuthRemoteDataSource {}
@@ -52,34 +50,29 @@ class MockItemRemoteDataSource extends Mock implements IItemRemoteDataSource {}
 
 class MockBatchLocalDataSource extends Mock implements IBatchLocalDataSource {}
 
-class MockBatchRemoteDataSource extends Mock implements IBatchRemoteDataSource {}
+class MockBatchRemoteDataSource extends Mock
+    implements IBatchRemoteDataSource {}
 
-class MockCategoryLocalDataSource extends Mock
-    implements ICategoryDataSource {}
+class MockCategoryLocalDataSource extends Mock implements ICategoryDataSource {}
 
 class MockCategoryRemoteDataSource extends Mock
     implements ICategoryRemoteDataSource {}
 
-// Service Mocks
 class MockNetworkInfo extends Mock implements NetworkInfo {}
 
-// Auth Usecase Mocks
 class MockLoginUsecase extends Mock implements LoginUsecase {}
 
 class MockRegisterUsecase extends Mock implements RegisterUsecase {}
 
 class MockLogoutUsecase extends Mock implements LogoutUsecase {}
 
-class MockGetCurrentUserUsecase extends Mock
-    implements GetCurrentUserUsecase {}
+class MockGetCurrentUserUsecase extends Mock implements GetCurrentUserUsecase {}
 
-// Item Usecase Mocks
 class MockGetAllItemsUsecase extends Mock implements GetAllItemsUsecase {}
 
 class MockGetItemByIdUsecase extends Mock implements GetItemByIdUsecase {}
 
-class MockGetItemsByUserUsecase extends Mock
-    implements GetItemsByUserUsecase {}
+class MockGetItemsByUserUsecase extends Mock implements GetItemsByUserUsecase {}
 
 class MockCreateItemUsecase extends Mock implements CreateItemUsecase {}
 
@@ -91,7 +84,6 @@ class MockUploadPhotoUsecase extends Mock implements UploadPhotoUsecase {}
 
 class MockUploadVideoUsecase extends Mock implements UploadVideoUsecase {}
 
-// Batch Usecase Mocks
 class MockGetAllBatchUsecase extends Mock implements GetAllBatchUsecase {}
 
 class MockGetBatchByIdUsecase extends Mock implements GetBatchByIdUsecase {}
@@ -102,21 +94,16 @@ class MockUpdateBatchUsecase extends Mock implements UpdateBatchUsecase {}
 
 class MockDeleteBatchUsecase extends Mock implements DeleteBatchUsecase {}
 
-// Category Usecase Mocks
 class MockGetAllCategoriesUsecase extends Mock
     implements GetAllCategoriesUsecase {}
 
 class MockGetCategoryByIdUsecase extends Mock
     implements GetCategoryByIdUsecase {}
 
-class MockCreateCategoryUsecase extends Mock
-    implements CreateCategoryUsecase {}
+class MockCreateCategoryUsecase extends Mock implements CreateCategoryUsecase {}
 
-class MockUpdateCategoryUsecase extends Mock
-    implements UpdateCategoryUsecase {}
+class MockUpdateCategoryUsecase extends Mock implements UpdateCategoryUsecase {}
 
-class MockDeleteCategoryUsecase extends Mock
-    implements DeleteCategoryUsecase {}
+class MockDeleteCategoryUsecase extends Mock implements DeleteCategoryUsecase {}
 
-// Fake classes for mocktail registerFallbackValue
 class FakeFile extends Fake implements File {}

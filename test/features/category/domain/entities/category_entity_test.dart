@@ -22,7 +22,10 @@ void main() {
     test('should create a CategoryEntity with all fields', () {
       expect(tCategoryEntity.categoryId, 'cat-1');
       expect(tCategoryEntity.name, 'Electronics');
-      expect(tCategoryEntity.description, 'Electronic items like phones, laptops');
+      expect(
+        tCategoryEntity.description,
+        'Electronic items like phones, laptops',
+      );
       expect(tCategoryEntity.status, 'active');
     });
 

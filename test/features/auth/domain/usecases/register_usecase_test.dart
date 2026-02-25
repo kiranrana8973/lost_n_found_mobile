@@ -12,11 +12,9 @@ void main() {
   late MockAuthRepository mockAuthRepository;
 
   setUpAll(() {
-    registerFallbackValue(const AuthEntity(
-      fullName: '',
-      email: '',
-      username: '',
-    ));
+    registerFallbackValue(
+      const AuthEntity(fullName: '', email: '', username: ''),
+    );
   });
 
   setUp(() {
@@ -35,29 +33,25 @@ void main() {
 
   group('RegisterUsecase', () {
     test('should return true on successful registration', () async {
-      // Arrange
-      when(() => mockAuthRepository.register(any()))
-          .thenAnswer((_) async => const Right(true));
+      when(
+        () => mockAuthRepository.register(any()),
+      ).thenAnswer((_) async => const Right(true));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Right(true));
       verify(() => mockAuthRepository.register(any())).called(1);
       verifyNoMoreInteractions(mockAuthRepository);
     });
 
     test('should return Failure on unsuccessful registration', () async {
-      // Arrange
       const tFailure = ApiFailure(message: 'Email already exists');
-      when(() => mockAuthRepository.register(any()))
-          .thenAnswer((_) async => const Left(tFailure));
+      when(
+        () => mockAuthRepository.register(any()),
+      ).thenAnswer((_) async => const Left(tFailure));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Left(tFailure));
       verify(() => mockAuthRepository.register(any())).called(1);
       verifyNoMoreInteractions(mockAuthRepository);

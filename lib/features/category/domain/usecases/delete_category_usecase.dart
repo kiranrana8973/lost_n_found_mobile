@@ -25,7 +25,7 @@ class DeleteCategoryUsecase
   final ICategoryRepository _categoryRepository;
 
   DeleteCategoryUsecase({required ICategoryRepository categoryRepository})
-      : _categoryRepository = categoryRepository;
+    : _categoryRepository = categoryRepository;
 
   @override
   Future<Either<Failure, bool>> call(DeleteCategoryParams params) {

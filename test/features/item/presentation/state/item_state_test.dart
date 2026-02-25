@@ -57,8 +57,7 @@ void main() {
     });
 
     group('copyWith', () {
-      test('should preserve unchanged fields when no arguments are passed',
-          () {
+      test('should preserve unchanged fields when no arguments are passed', () {
         const original = ItemState(
           status: ItemStatus.loaded,
           items: [tItem1],
@@ -110,8 +109,7 @@ void main() {
         expect(copied.selectedItem, tItem1);
       });
 
-      test('should reset selectedItem to null with resetSelectedItem flag',
-          () {
+      test('should reset selectedItem to null with resetSelectedItem flag', () {
         const original = ItemState(selectedItem: tItem1);
 
         final copied = original.copyWith(resetSelectedItem: true);
@@ -119,8 +117,7 @@ void main() {
         expect(copied.selectedItem, isNull);
       });
 
-      test('should reset errorMessage to null with resetErrorMessage flag',
-          () {
+      test('should reset errorMessage to null with resetErrorMessage flag', () {
         const original = ItemState(errorMessage: 'Some error');
 
         final copied = original.copyWith(resetErrorMessage: true);
@@ -129,15 +126,17 @@ void main() {
       });
 
       test(
-          'should reset uploadedPhotoUrl to null with resetUploadedPhotoUrl flag',
-          () {
-        const original =
-            ItemState(uploadedPhotoUrl: 'https://example.com/photo.jpg');
+        'should reset uploadedPhotoUrl to null with resetUploadedPhotoUrl flag',
+        () {
+          const original = ItemState(
+            uploadedPhotoUrl: 'https://example.com/photo.jpg',
+          );
 
-        final copied = original.copyWith(resetUploadedPhotoUrl: true);
+          final copied = original.copyWith(resetUploadedPhotoUrl: true);
 
-        expect(copied.uploadedPhotoUrl, isNull);
-      });
+          expect(copied.uploadedPhotoUrl, isNull);
+        },
+      );
 
       test('should update multiple fields at once', () {
         const original = ItemState();

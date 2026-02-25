@@ -32,8 +32,7 @@ void main() {
     });
 
     group('copyWith', () {
-      test('should preserve unchanged fields when no arguments are passed',
-          () {
+      test('should preserve unchanged fields when no arguments are passed', () {
         const original = AuthState(
           status: AuthStatus.authenticated,
           user: tUser,
@@ -48,10 +47,7 @@ void main() {
       });
 
       test('should update only status', () {
-        const original = AuthState(
-          status: AuthStatus.initial,
-          user: tUser,
-        );
+        const original = AuthState(status: AuthStatus.initial, user: tUser);
 
         final copied = original.copyWith(status: AuthStatus.loading);
 
@@ -106,14 +102,8 @@ void main() {
 
     group('equality', () {
       test('should be equal when all properties are the same', () {
-        const state1 = AuthState(
-          status: AuthStatus.authenticated,
-          user: tUser,
-        );
-        const state2 = AuthState(
-          status: AuthStatus.authenticated,
-          user: tUser,
-        );
+        const state1 = AuthState(status: AuthStatus.authenticated, user: tUser);
+        const state2 = AuthState(status: AuthStatus.authenticated, user: tUser);
 
         expect(state1, equals(state2));
       });

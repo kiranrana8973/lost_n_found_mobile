@@ -28,29 +28,25 @@ void main() {
 
   group('LoginUsecase', () {
     test('should return AuthEntity on successful login', () async {
-      // Arrange
-      when(() => mockAuthRepository.login(tEmail, tPassword))
-          .thenAnswer((_) async => const Right(tAuthEntity));
+      when(
+        () => mockAuthRepository.login(tEmail, tPassword),
+      ).thenAnswer((_) async => const Right(tAuthEntity));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Right(tAuthEntity));
       verify(() => mockAuthRepository.login(tEmail, tPassword)).called(1);
       verifyNoMoreInteractions(mockAuthRepository);
     });
 
     test('should return Failure on unsuccessful login', () async {
-      // Arrange
       const tFailure = ApiFailure(message: 'Invalid credentials');
-      when(() => mockAuthRepository.login(tEmail, tPassword))
-          .thenAnswer((_) async => const Left(tFailure));
+      when(
+        () => mockAuthRepository.login(tEmail, tPassword),
+      ).thenAnswer((_) async => const Left(tFailure));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Left(tFailure));
       verify(() => mockAuthRepository.login(tEmail, tPassword)).called(1);
       verifyNoMoreInteractions(mockAuthRepository);

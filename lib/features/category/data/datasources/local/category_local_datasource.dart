@@ -1,25 +1,25 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lost_n_found/core/services/hive/hive_service.dart';
+import 'package:lost_n_found/core/constants/hive_table_constant.dart';
+import 'package:lost_n_found/core/services/hive/hive_box.dart';
 import 'package:lost_n_found/features/category/data/datasources/category_datasource.dart';
 import 'package:lost_n_found/features/category/data/models/category_hive_model.dart';
 
 final categoryLocalDatasourceProvider = Provider<CategoryLocalDatasource>((
   ref,
 ) {
-  final hiveService = ref.read(hiveServiceProvider);
-  return CategoryLocalDatasource(hiveService: hiveService);
+  return CategoryLocalDatasource();
 });
 
 class CategoryLocalDatasource implements ICategoryDataSource {
-  final HiveService _hiveService;
+  final HiveBox<CategoryHiveModel> _box;
 
-  CategoryLocalDatasource({required HiveService hiveService})
-    : _hiveService = hiveService;
+  CategoryLocalDatasource()
+    : _box = HiveBox<CategoryHiveModel>(HiveTableConstant.categoryTable);
 
   @override
   Future<bool> createCategory(CategoryHiveModel category) async {
     try {
-      await _hiveService.createCategory(category);
+      await _box.put(category.categoryId!, category);
       return true;
     } catch (e) {
       return false;
@@ -29,7 +29,7 @@ class CategoryLocalDatasource implements ICategoryDataSource {
   @override
   Future<bool> deleteCategory(String categoryId) async {
     try {
-      await _hiveService.deleteCategory(categoryId);
+      await _box.delete(categoryId);
       return true;
     } catch (e) {
       return false;
@@ -39,7 +39,7 @@ class CategoryLocalDatasource implements ICategoryDataSource {
   @override
   Future<List<CategoryHiveModel>> getAllCategories() async {
     try {
-      return _hiveService.getAllCategories();
+      return _box.getAll();
     } catch (e) {
       return [];
     }
@@ -48,7 +48,7 @@ class CategoryLocalDatasource implements ICategoryDataSource {
   @override
   Future<CategoryHiveModel?> getCategoryById(String categoryId) async {
     try {
-      return _hiveService.getCategoryById(categoryId);
+      return _box.get(categoryId);
     } catch (e) {
       return null;
     }
@@ -57,15 +57,13 @@ class CategoryLocalDatasource implements ICategoryDataSource {
   @override
   Future<bool> updateCategory(CategoryHiveModel category) async {
     try {
-      await _hiveService.updateCategory(category);
-      return true;
+      return await _box.update(category.categoryId!, category);
     } catch (e) {
       return false;
     }
   }
 
-  /// Cache all categories from API response
   Future<void> cacheAllCategories(List<CategoryHiveModel> categories) async {
-    await _hiveService.cacheAllCategories(categories);
+    await _box.replaceAll({for (final c in categories) c.categoryId!: c});
   }
 }

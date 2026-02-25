@@ -12,11 +12,9 @@ void main() {
   late MockItemRepository mockItemRepository;
 
   setUpAll(() {
-    registerFallbackValue(const ItemEntity(
-      itemName: '',
-      type: ItemType.lost,
-      location: '',
-    ));
+    registerFallbackValue(
+      const ItemEntity(itemName: '', type: ItemType.lost, location: ''),
+    );
   });
 
   setUp(() {
@@ -37,29 +35,25 @@ void main() {
 
   group('CreateItemUsecase', () {
     test('should return true on successful item creation', () async {
-      // Arrange
-      when(() => mockItemRepository.createItem(any()))
-          .thenAnswer((_) async => const Right(true));
+      when(
+        () => mockItemRepository.createItem(any()),
+      ).thenAnswer((_) async => const Right(true));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Right(true));
       verify(() => mockItemRepository.createItem(any())).called(1);
       verifyNoMoreInteractions(mockItemRepository);
     });
 
     test('should return Failure on unsuccessful item creation', () async {
-      // Arrange
       const tFailure = ApiFailure(message: 'Failed to create item');
-      when(() => mockItemRepository.createItem(any()))
-          .thenAnswer((_) async => const Left(tFailure));
+      when(
+        () => mockItemRepository.createItem(any()),
+      ).thenAnswer((_) async => const Left(tFailure));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Left(tFailure));
       verify(() => mockItemRepository.createItem(any())).called(1);
       verifyNoMoreInteractions(mockItemRepository);

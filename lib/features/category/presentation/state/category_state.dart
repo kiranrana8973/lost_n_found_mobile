@@ -1,7 +1,15 @@
 import 'package:equatable/equatable.dart';
 import 'package:lost_n_found/features/category/domain/entities/category_entity.dart';
 
-enum CategoryStatus { initial, loading, loaded, error, created, updated, deleted }
+enum CategoryStatus {
+  initial,
+  loading,
+  loaded,
+  error,
+  created,
+  updated,
+  deleted,
+}
 
 class CategoryState extends Equatable {
   final CategoryStatus status;
@@ -31,5 +39,10 @@ class CategoryState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [status, categories, selectedCategory, errorMessage];
+  List<Object?> get props => [
+    status,
+    categories,
+    selectedCategory,
+    errorMessage,
+  ];
 }

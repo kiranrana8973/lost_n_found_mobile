@@ -16,8 +16,7 @@ class GetCategoryByIdParams extends Equatable {
   List<Object?> get props => [categoryId];
 }
 
-final getCategoryByIdUsecaseProvider =
-    Provider<GetCategoryByIdUsecase>((ref) {
+final getCategoryByIdUsecaseProvider = Provider<GetCategoryByIdUsecase>((ref) {
   final categoryRepository = ref.read(categoryRepositoryProvider);
   return GetCategoryByIdUsecase(categoryRepository: categoryRepository);
 });
@@ -27,7 +26,7 @@ class GetCategoryByIdUsecase
   final ICategoryRepository _categoryRepository;
 
   GetCategoryByIdUsecase({required ICategoryRepository categoryRepository})
-      : _categoryRepository = categoryRepository;
+    : _categoryRepository = categoryRepository;
 
   @override
   Future<Either<Failure, CategoryEntity>> call(GetCategoryByIdParams params) {

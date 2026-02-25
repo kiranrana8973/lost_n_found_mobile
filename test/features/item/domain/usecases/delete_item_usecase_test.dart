@@ -20,29 +20,25 @@ void main() {
 
   group('DeleteItemUsecase', () {
     test('should return true on successful item deletion', () async {
-      // Arrange
-      when(() => mockItemRepository.deleteItem(tItemId))
-          .thenAnswer((_) async => const Right(true));
+      when(
+        () => mockItemRepository.deleteItem(tItemId),
+      ).thenAnswer((_) async => const Right(true));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Right(true));
       verify(() => mockItemRepository.deleteItem(tItemId)).called(1);
       verifyNoMoreInteractions(mockItemRepository);
     });
 
     test('should return Failure on unsuccessful item deletion', () async {
-      // Arrange
       const tFailure = ApiFailure(message: 'Failed to delete item');
-      when(() => mockItemRepository.deleteItem(tItemId))
-          .thenAnswer((_) async => const Left(tFailure));
+      when(
+        () => mockItemRepository.deleteItem(tItemId),
+      ).thenAnswer((_) async => const Left(tFailure));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Left(tFailure));
       verify(() => mockItemRepository.deleteItem(tItemId)).called(1);
       verifyNoMoreInteractions(mockItemRepository);

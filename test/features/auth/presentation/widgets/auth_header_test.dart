@@ -10,11 +10,7 @@ void main() {
   }) {
     return MaterialApp(
       home: Scaffold(
-        body: AuthHeader(
-          icon: icon,
-          title: title,
-          subtitle: subtitle,
-        ),
+        body: AuthHeader(icon: icon, title: title, subtitle: subtitle),
       ),
     );
   }

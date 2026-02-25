@@ -14,7 +14,6 @@ import 'package:lost_n_found/features/item/presentation/pages/report_item_page.d
 import 'package:lost_n_found/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:lost_n_found/features/splash/presentation/pages/splash_page.dart';
 
-/// GoRouter configuration provider
 final routerProvider = Provider<GoRouter>((ref) {
   final routerNotifier = ref.watch(routerNotifierProvider);
 
@@ -23,12 +22,6 @@ final routerProvider = Provider<GoRouter>((ref) {
     initialLocation: RouteConstants.splash,
     refreshListenable: routerNotifier,
 
-    // ============================================================
-    // SINGLE NAVIGATION AUTHORITY
-    // All navigation decisions happen HERE — not in splash page,
-    // not in login page. This redirect is the only place that
-    // decides where the user goes.
-    // ============================================================
     redirect: (context, state) {
       final currentPath = state.uri.path;
 
@@ -41,22 +34,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         );
       }
 
-      // ── Phase 1: Not ready yet (auth hydrating or splash timer) ──
-      // Keep user on splash until both conditions are met:
-      // 1. Minimum splash display time has passed
-      // 2. Auth state has resolved (not initial/loading)
       if (!routerNotifier.isReady) {
         return currentPath == RouteConstants.splash
-            ? null // already on splash, stay
-            : RouteConstants.splash; // force to splash
+            ? null
+            : RouteConstants.splash;
       }
-
-      // ── Phase 2: Auth resolved — make navigation decisions ──
 
       final isAuthenticated = routerNotifier.isAuthenticated;
       final authStatus = routerNotifier.authStatus;
 
-      // Public routes that don't require authentication
       const publicRoutes = [
         RouteConstants.splash,
         RouteConstants.onboarding,
@@ -65,7 +51,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       ];
       final isPublicRoute = publicRoutes.contains(currentPath);
 
-      // Authenticated user on splash/onboarding/login → go to dashboard
       if (isAuthenticated) {
         if (currentPath == RouteConstants.splash ||
             currentPath == RouteConstants.onboarding ||
@@ -73,35 +58,26 @@ final routerProvider = Provider<GoRouter>((ref) {
             currentPath == RouteConstants.signup) {
           return RouteConstants.dashboard;
         }
-        return null; // already on a valid protected route
+        return null;
       }
 
-      // Not authenticated —
-
-      // Just registered → go to login
       if (authStatus == AuthStatus.registered &&
           currentPath != RouteConstants.login) {
         return RouteConstants.login;
       }
 
-      // On splash → decide: onboarding or login
       if (currentPath == RouteConstants.splash) {
         return routerNotifier.hasCompletedOnboarding
             ? RouteConstants.login
             : RouteConstants.onboarding;
       }
 
-      // On a public route (login, signup, onboarding) → allow
       if (isPublicRoute) return null;
 
-      // Trying to access protected route without auth → login
       return RouteConstants.login;
     },
 
     routes: [
-      // ============ Public Routes ============
-
-      // Splash Screen
       GoRoute(
         path: RouteConstants.splash,
         name: RouteNames.splash,
@@ -112,7 +88,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
 
-      // Onboarding
       GoRoute(
         path: RouteConstants.onboarding,
         name: RouteNames.onboarding,
@@ -123,9 +98,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
 
-      // ============ Auth Routes ============
-
-      // Login
       GoRoute(
         path: RouteConstants.login,
         name: RouteNames.login,
@@ -136,7 +108,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
 
-      // Signup
       GoRoute(
         path: RouteConstants.signup,
         name: RouteNames.signup,
@@ -147,9 +118,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
 
-      // ============ Protected Routes ============
-
-      // Dashboard (with bottom navigation)
       GoRoute(
         path: RouteConstants.dashboard,
         name: RouteNames.dashboard,
@@ -160,7 +128,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
 
-      // Report Item
       GoRoute(
         path: RouteConstants.reportItem,
         name: RouteNames.reportItem,
@@ -171,12 +138,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
 
-      // Item Detail
       GoRoute(
         path: RouteConstants.itemDetail,
         name: RouteNames.itemDetail,
         pageBuilder: (context, state) {
-          // Extract data from state.extra if passed
           final extra = state.extra as Map<String, dynamic>?;
 
           return _buildPageWithSlideTransition(
@@ -196,7 +161,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
 
-      // Batches
       GoRoute(
         path: RouteConstants.batches,
         name: RouteNames.batches,
@@ -208,7 +172,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
     ],
 
-    // Error page (404)
     errorBuilder: (context, state) => Scaffold(
       appBar: AppBar(title: const Text('Page Not Found')),
       body: Center(
@@ -233,9 +196,6 @@ final routerProvider = Provider<GoRouter>((ref) {
   );
 });
 
-// ============ Page Transition Builders ============
-
-/// Default page transition (fade)
 Page _buildPageWithDefaultTransition({
   required BuildContext context,
   required GoRouterState state,
@@ -250,7 +210,6 @@ Page _buildPageWithDefaultTransition({
   );
 }
 
-/// Slide transition (from right)
 Page _buildPageWithSlideTransition({
   required BuildContext context,
   required GoRouterState state,

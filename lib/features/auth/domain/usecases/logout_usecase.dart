@@ -5,7 +5,6 @@ import 'package:lost_n_found/core/usecases/app_usecases.dart';
 import 'package:lost_n_found/features/auth/data/repositories/auth_repository.dart';
 import 'package:lost_n_found/features/auth/domain/repositories/auth_repository.dart';
 
-// Create Provider
 final logoutUsecaseProvider = Provider<LogoutUsecase>((ref) {
   final authRepository = ref.read(authRepositoryProvider);
   return LogoutUsecase(authRepository: authRepository);

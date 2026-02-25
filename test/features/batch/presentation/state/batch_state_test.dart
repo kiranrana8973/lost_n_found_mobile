@@ -40,8 +40,7 @@ void main() {
     });
 
     group('copyWith', () {
-      test('should preserve unchanged fields when no arguments are passed',
-          () {
+      test('should preserve unchanged fields when no arguments are passed', () {
         const original = BatchState(
           status: BatchStatus.loaded,
           batches: [tBatch1],

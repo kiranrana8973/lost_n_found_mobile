@@ -26,7 +26,7 @@ class GetItemsByUserUsecase
   final IItemRepository _itemRepository;
 
   GetItemsByUserUsecase({required IItemRepository itemRepository})
-      : _itemRepository = itemRepository;
+    : _itemRepository = itemRepository;
 
   @override
   Future<Either<Failure, List<ItemEntity>>> call(GetItemsByUserParams params) {

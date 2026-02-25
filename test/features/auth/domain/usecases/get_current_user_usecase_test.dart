@@ -25,29 +25,25 @@ void main() {
 
   group('GetCurrentUserUsecase', () {
     test('should return AuthEntity when user is logged in', () async {
-      // Arrange
-      when(() => mockAuthRepository.getCurrentUser())
-          .thenAnswer((_) async => const Right(tAuthEntity));
+      when(
+        () => mockAuthRepository.getCurrentUser(),
+      ).thenAnswer((_) async => const Right(tAuthEntity));
 
-      // Act
       final result = await usecase();
 
-      // Assert
       expect(result, const Right(tAuthEntity));
       verify(() => mockAuthRepository.getCurrentUser()).called(1);
       verifyNoMoreInteractions(mockAuthRepository);
     });
 
     test('should return Failure when no user is logged in', () async {
-      // Arrange
       const tFailure = ApiFailure(message: 'No user found');
-      when(() => mockAuthRepository.getCurrentUser())
-          .thenAnswer((_) async => const Left(tFailure));
+      when(
+        () => mockAuthRepository.getCurrentUser(),
+      ).thenAnswer((_) async => const Left(tFailure));
 
-      // Act
       final result = await usecase();
 
-      // Assert
       expect(result, const Left(tFailure));
       verify(() => mockAuthRepository.getCurrentUser()).called(1);
       verifyNoMoreInteractions(mockAuthRepository);

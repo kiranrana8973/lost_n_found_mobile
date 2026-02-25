@@ -41,8 +41,9 @@ void main() {
       expect(selectedIndex, 1);
     });
 
-    testWidgets('calls onFilterChanged with correct index for Found',
-        (tester) async {
+    testWidgets('calls onFilterChanged with correct index for Found', (
+      tester,
+    ) async {
       int? selectedIndex;
 
       await tester.pumpWidget(

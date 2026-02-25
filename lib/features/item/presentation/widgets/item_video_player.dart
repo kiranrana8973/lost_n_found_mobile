@@ -29,8 +29,9 @@ class _ItemVideoPlayerState extends State<ItemVideoPlayer> {
   }
 
   Future<void> _initializePlayer() async {
-    _videoController =
-        VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl));
+    _videoController = VideoPlayerController.networkUrl(
+      Uri.parse(widget.videoUrl),
+    );
     try {
       await _videoController.initialize();
       _chewieController = ChewieController(
@@ -39,7 +40,9 @@ class _ItemVideoPlayerState extends State<ItemVideoPlayer> {
         looping: false,
         showControlsOnInitialize: true,
         materialProgressColors: ChewieProgressColors(
-          playedColor: widget.isLost ? AppColors.lostColor : AppColors.foundColor,
+          playedColor: widget.isLost
+              ? AppColors.lostColor
+              : AppColors.foundColor,
           handleColor: Colors.white,
           bufferedColor: Colors.white38,
           backgroundColor: Colors.white24,
@@ -79,8 +82,7 @@ class _ItemVideoPlayerState extends State<ItemVideoPlayer> {
       return _buildErrorWidget();
     }
 
-    if (_chewieController == null ||
-        !_videoController.value.isInitialized) {
+    if (_chewieController == null || !_videoController.value.isInitialized) {
       return _buildLoadingWidget();
     }
 
@@ -90,14 +92,12 @@ class _ItemVideoPlayerState extends State<ItemVideoPlayer> {
   Widget _buildLoadingWidget() {
     return Container(
       decoration: BoxDecoration(
-        gradient:
-            widget.isLost ? AppColors.lostGradient : AppColors.foundGradient,
+        gradient: widget.isLost
+            ? AppColors.lostGradient
+            : AppColors.foundGradient,
       ),
       child: const Center(
-        child: CircularProgressIndicator(
-          color: Colors.white,
-          strokeWidth: 3,
-        ),
+        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
       ),
     );
   }
@@ -105,14 +105,19 @@ class _ItemVideoPlayerState extends State<ItemVideoPlayer> {
   Widget _buildErrorWidget() {
     return Container(
       decoration: BoxDecoration(
-        gradient:
-            widget.isLost ? AppColors.lostGradient : AppColors.foundGradient,
+        gradient: widget.isLost
+            ? AppColors.lostGradient
+            : AppColors.foundGradient,
       ),
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.videocam_off_rounded, color: Colors.white, size: 48),
+            const Icon(
+              Icons.videocam_off_rounded,
+              color: Colors.white,
+              size: 48,
+            ),
             const SizedBox(height: 8),
             const Text(
               'Could not load video',

@@ -42,22 +42,20 @@ void main() {
     testWidgets('text is obscured by default', (tester) async {
       await tester.pumpWidget(buildTestWidget());
 
-      // Find the EditableText which holds the actual obscureText property
-      final editableText = tester.widget<EditableText>(find.byType(EditableText));
+      final editableText = tester.widget<EditableText>(
+        find.byType(EditableText),
+      );
       expect(editableText.obscureText, isTrue);
     });
 
     testWidgets('toggles visibility when icon is tapped', (tester) async {
       await tester.pumpWidget(buildTestWidget());
 
-      // Initially obscured - visibility icon shown
       expect(find.byIcon(Icons.visibility_outlined), findsOneWidget);
 
-      // Tap to show password
       await tester.tap(find.byIcon(Icons.visibility_outlined));
       await tester.pump();
 
-      // Now showing - visibility_off icon shown
       expect(find.byIcon(Icons.visibility_off_outlined), findsOneWidget);
     });
 

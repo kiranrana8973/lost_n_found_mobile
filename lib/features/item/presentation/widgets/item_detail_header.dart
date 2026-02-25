@@ -39,7 +39,9 @@ class ItemDetailHeader extends StatelessWidget {
             memCacheWidth: 600,
             placeholder: (context, url) => Container(
               decoration: BoxDecoration(
-                gradient: isLost ? AppColors.lostGradient : AppColors.foundGradient,
+                gradient: isLost
+                    ? AppColors.lostGradient
+                    : AppColors.foundGradient,
               ),
               child: const Center(
                 child: CircularProgressIndicator(
@@ -50,7 +52,9 @@ class ItemDetailHeader extends StatelessWidget {
             ),
             errorWidget: (context, url, error) => Container(
               decoration: BoxDecoration(
-                gradient: isLost ? AppColors.lostGradient : AppColors.foundGradient,
+                gradient: isLost
+                    ? AppColors.lostGradient
+                    : AppColors.foundGradient,
               ),
               child: Center(
                 child: Icon(categoryIcon, size: 50, color: Colors.white),
@@ -111,7 +115,9 @@ class ItemDetailHeader extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    isLost ? Icons.search_off_rounded : Icons.check_circle_rounded,
+                    isLost
+                        ? Icons.search_off_rounded
+                        : Icons.check_circle_rounded,
                     size: 18,
                     color: Colors.white,
                   ),

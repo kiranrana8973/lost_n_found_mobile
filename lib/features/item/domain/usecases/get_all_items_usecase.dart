@@ -22,4 +22,3 @@ class GetAllItemsUsecase implements UsecaseWithoutParams<List<ItemEntity>> {
     return _itemRepository.getAllItems();
   }
 }
-

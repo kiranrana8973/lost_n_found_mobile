@@ -43,7 +43,6 @@ class AuthHiveModel extends HiveObject {
     this.profilePicture,
   }) : authId = authId ?? const Uuid().v4();
 
-  // To Entity
   AuthEntity toEntity({BatchEntity? batch}) {
     return AuthEntity(
       authId: authId,
@@ -58,7 +57,6 @@ class AuthHiveModel extends HiveObject {
     );
   }
 
-  // From Entity
   factory AuthHiveModel.fromEntity(AuthEntity entity) {
     return AuthHiveModel(
       authId: entity.authId,
@@ -72,7 +70,6 @@ class AuthHiveModel extends HiveObject {
     );
   }
 
-  // To Entity List
   static List<AuthEntity> toEntityList(List<AuthHiveModel> models) {
     return models.map((model) => model.toEntity()).toList();
   }

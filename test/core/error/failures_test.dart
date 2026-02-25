@@ -68,8 +68,7 @@ void main() {
 
         final failure = ApiFailure.fromDioException(dioException);
 
-        expect(failure.message,
-            'Connection timed out. Is the server running?');
+        expect(failure.message, 'Connection timed out. Is the server running?');
         expect(failure.statusCode, isNull);
       });
 
@@ -92,8 +91,10 @@ void main() {
 
         final failure = ApiFailure.fromDioException(dioException);
 
-        expect(failure.message,
-            'Server took too long to respond. Please try again.');
+        expect(
+          failure.message,
+          'Server took too long to respond. Please try again.',
+        );
       });
 
       test('should return correct message for connectionError', () {
@@ -104,8 +105,10 @@ void main() {
 
         final failure = ApiFailure.fromDioException(dioException);
 
-        expect(failure.message,
-            'Cannot connect to server. Please make sure the backend is running.');
+        expect(
+          failure.message,
+          'Cannot connect to server. Please make sure the backend is running.',
+        );
       });
 
       test('should return correct message for cancel', () {
@@ -137,22 +140,24 @@ void main() {
       });
 
       test(
-          'should use fallback message when response has no message field', () {
-        final dioException = DioException(
-          type: DioExceptionType.badResponse,
-          requestOptions: RequestOptions(path: '/test'),
-          response: Response(
+        'should use fallback message when response has no message field',
+        () {
+          final dioException = DioException(
+            type: DioExceptionType.badResponse,
             requestOptions: RequestOptions(path: '/test'),
-            statusCode: 500,
-            data: {'error': 'Internal server error'},
-          ),
-        );
+            response: Response(
+              requestOptions: RequestOptions(path: '/test'),
+              statusCode: 500,
+              data: {'error': 'Internal server error'},
+            ),
+          );
 
-        final failure = ApiFailure.fromDioException(dioException);
+          final failure = ApiFailure.fromDioException(dioException);
 
-        expect(failure.message, 'Something went wrong');
-        expect(failure.statusCode, 500);
-      });
+          expect(failure.message, 'Something went wrong');
+          expect(failure.statusCode, 500);
+        },
+      );
 
       test('should use custom fallback message', () {
         final dioException = DioException(

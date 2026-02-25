@@ -14,10 +14,7 @@ final itemRemoteDatasourceProvider = Provider<IItemRemoteDataSource>((ref) {
 class ItemRemoteDatasource implements IItemRemoteDataSource {
   final ApiClient _apiClient;
 
-  ItemRemoteDatasource({required ApiClient apiClient})
-    : _apiClient = apiClient;
-
-  // Token is auto-attached by _AuthInterceptor for non-public endpoints
+  ItemRemoteDatasource({required ApiClient apiClient}) : _apiClient = apiClient;
 
   @override
   Future<String> uploadPhoto(File photo) async {
@@ -112,10 +109,7 @@ class ItemRemoteDatasource implements IItemRemoteDataSource {
 
   @override
   Future<bool> updateItem(ItemApiModel item) async {
-    await _apiClient.put(
-      ApiEndpoints.itemById(item.id!),
-      data: item.toJson(),
-    );
+    await _apiClient.put(ApiEndpoints.itemById(item.id!), data: item.toJson());
     return true;
   }
 

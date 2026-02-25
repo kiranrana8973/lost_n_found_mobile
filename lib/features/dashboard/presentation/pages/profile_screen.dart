@@ -53,8 +53,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 lostCount: itemState.myLostItems.length,
                 foundCount: itemState.myFoundItems.length,
                 lostCountText: l10n?.formatNumber(itemState.myLostItems.length),
-                foundCountText: l10n?.formatNumber(itemState.myFoundItems.length),
-                totalCountText: l10n?.formatNumber(itemState.myLostItems.length + itemState.myFoundItems.length),
+                foundCountText: l10n?.formatNumber(
+                  itemState.myFoundItems.length,
+                ),
+                totalCountText: l10n?.formatNumber(
+                  itemState.myLostItems.length + itemState.myFoundItems.length,
+                ),
                 lostLabel: l10n?.lost,
                 foundLabel: l10n?.found,
                 totalLabel: l10n?.total,
@@ -81,7 +85,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       icon: Icons.notifications_outlined,
                       title: l10n?.notifications ?? 'Notifications',
                       trailing: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           gradient: AppColors.secondaryGradient,
                           borderRadius: BorderRadius.circular(12),
@@ -146,12 +153,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(l10n?.logout ?? 'Logout', style: const TextStyle(fontWeight: FontWeight.bold)),
-        content: Text(l10n?.logoutConfirm ?? 'Are you sure you want to logout?'),
+        title: Text(
+          l10n?.logout ?? 'Logout',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          l10n?.logoutConfirm ?? 'Are you sure you want to logout?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(l10n?.cancel ?? 'Cancel', style: TextStyle(color: context.textSecondary)),
+            child: Text(
+              l10n?.cancel ?? 'Cancel',
+              style: TextStyle(color: context.textSecondary),
+            ),
           ),
           TextButton(
             onPressed: () async {
@@ -163,7 +178,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             },
             child: Text(
               l10n?.logout ?? 'Logout',
-              style: TextStyle(color: AppColors.error, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: AppColors.error,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],

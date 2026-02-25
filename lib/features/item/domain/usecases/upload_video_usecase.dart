@@ -16,12 +16,10 @@ class UploadVideoUsecase implements UsecaseWithParams<String, File> {
   final IItemRepository _itemRepository;
 
   UploadVideoUsecase({required IItemRepository itemRepository})
-      : _itemRepository = itemRepository;
+    : _itemRepository = itemRepository;
 
   @override
   Future<Either<Failure, String>> call(File video) {
     return _itemRepository.uploadVideo(video);
   }
 }
-
-

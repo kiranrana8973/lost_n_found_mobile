@@ -33,11 +33,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   String _searchQuery = '';
 
   List<String> _getFilters(AppLocalizations? l10n) {
-    return [
-      l10n?.all ?? 'All',
-      l10n?.lost ?? 'Lost',
-      l10n?.found ?? 'Found',
-    ];
+    return [l10n?.all ?? 'All', l10n?.lost ?? 'Lost', l10n?.found ?? 'Found'];
   }
 
   @override
@@ -56,7 +52,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final filterType = _selectedFilter;
     final categoryId = _selectedCategoryId;
 
-    // Single-pass filtering instead of chained .where().toList()
     return items.where((item) {
       if (filterType == 1 && item.type != ItemType.lost) return false;
       if (filterType == 2 && item.type != ItemType.found) return false;
@@ -70,7 +65,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }).toList();
   }
 
-  /// Build a category ID -> name map for O(1) lookups instead of O(n) firstWhere
   Map<String, String> _buildCategoryMap(List<CategoryEntity> categories) {
     return {
       for (final c in categories)
@@ -97,9 +91,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            SliverToBoxAdapter(
-              child: HomeHeader(userName: userName),
-            ),
+            SliverToBoxAdapter(child: HomeHeader(userName: userName)),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -144,7 +136,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       child: StatCard(
                         icon: Icons.search_off_rounded,
                         title: l10n?.lostItems ?? 'Lost Items',
-                        value: l10n?.formatNumber(itemState.lostItems.length) ?? '${itemState.lostItems.length}',
+                        value:
+                            l10n?.formatNumber(itemState.lostItems.length) ??
+                            '${itemState.lostItems.length}',
                         gradient: AppColors.lostGradient,
                       ),
                     ),
@@ -153,7 +147,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       child: StatCard(
                         icon: Icons.check_circle_rounded,
                         title: l10n?.foundItems ?? 'Found Items',
-                        value: l10n?.formatNumber(itemState.foundItems.length) ?? '${itemState.foundItems.length}',
+                        value:
+                            l10n?.formatNumber(itemState.foundItems.length) ??
+                            '${itemState.foundItems.length}',
                         gradient: AppColors.foundGradient,
                       ),
                     ),
@@ -191,7 +187,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 12)),
-            _buildItemsList(itemState, filteredItems, _buildCategoryMap(categoryState.categories), l10n),
+            _buildItemsList(
+              itemState,
+              filteredItems,
+              _buildCategoryMap(categoryState.categories),
+              l10n,
+            ),
             const SliverToBoxAdapter(child: SizedBox(height: 100)),
           ],
         ),
@@ -223,15 +224,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             padding: const EdgeInsets.all(40.0),
             child: Column(
               children: [
-                Icon(Icons.cloud_off_rounded, size: 48, color: Colors.grey[400]),
+                Icon(
+                  Icons.cloud_off_rounded,
+                  size: 48,
+                  color: Colors.grey[400],
+                ),
                 const SizedBox(height: 12),
                 Text(
                   itemState.errorMessage ?? 'Something went wrong',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
@@ -262,43 +264,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       sliver: SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final item = filteredItems[index];
-            final categoryName = (item.category != null ? categoryMap[item.category] : null) ?? 'Other';
-            final isVideo = item.isVideo;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: ItemCard(
-                title: item.itemName,
-                location: item.location,
-                category: categoryName,
-                isLost: item.type == ItemType.lost,
-                imageUrl: item.media != null && !isVideo
-                    ? ApiEndpoints.itemPicture(item.media!)
-                    : null,
-                onTap: () {
-                  context.goToItemDetail(
-                    id: item.itemId ?? '',
-                    title: item.itemName,
-                    location: item.location,
-                    category: categoryName,
-                    isLost: item.type == ItemType.lost,
-                    description: item.description ?? (l10n?.noDescription ?? 'No description provided.'),
-                    reportedBy: item.reportedBy ?? 'Anonymous',
-                    imageUrl: item.media != null && !isVideo
-                        ? ApiEndpoints.itemPicture(item.media!)
-                        : null,
-                    videoUrl: item.media != null && isVideo
-                        ? ApiEndpoints.itemVideo(item.media!)
-                        : null,
-                  );
-                },
-              ),
-            );
-          },
-          childCount: filteredItems.length,
-        ),
+        delegate: SliverChildBuilderDelegate((context, index) {
+          final item = filteredItems[index];
+          final categoryName =
+              (item.category != null ? categoryMap[item.category] : null) ??
+              'Other';
+          final isVideo = item.isVideo;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: ItemCard(
+              title: item.itemName,
+              location: item.location,
+              category: categoryName,
+              isLost: item.type == ItemType.lost,
+              imageUrl: item.media != null && !isVideo
+                  ? ApiEndpoints.itemPicture(item.media!)
+                  : null,
+              onTap: () {
+                context.goToItemDetail(
+                  id: item.itemId ?? '',
+                  title: item.itemName,
+                  location: item.location,
+                  category: categoryName,
+                  isLost: item.type == ItemType.lost,
+                  description:
+                      item.description ??
+                      (l10n?.noDescription ?? 'No description provided.'),
+                  reportedBy: item.reportedBy ?? 'Anonymous',
+                  imageUrl: item.media != null && !isVideo
+                      ? ApiEndpoints.itemPicture(item.media!)
+                      : null,
+                  videoUrl: item.media != null && isVideo
+                      ? ApiEndpoints.itemVideo(item.media!)
+                      : null,
+                );
+              },
+            ),
+          );
+        }, childCount: filteredItems.length),
       ),
     );
   }

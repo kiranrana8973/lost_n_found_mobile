@@ -4,10 +4,7 @@ import '../../../../app/theme/theme_extensions.dart';
 class FormSectionHeader extends StatelessWidget {
   final String title;
 
-  const FormSectionHeader({
-    super.key,
-    required this.title,
-  });
+  const FormSectionHeader({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {

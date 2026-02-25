@@ -14,7 +14,6 @@ class AppLocalizations {
 
   static final Map<String, Map<String, String>> _localizedValues = {
     'en': {
-      // Common
       'app_name': 'Lost & Found',
       'search': 'Search',
       'cancel': 'Cancel',
@@ -31,7 +30,6 @@ class AppLocalizations {
       'no': 'No',
       'ok': 'OK',
 
-      // Home Screen
       'welcome_back': 'Welcome Back!',
       'search_items': 'Search items...',
       'all': 'All',
@@ -46,12 +44,10 @@ class AppLocalizations {
       'no_items_description':
           'There are no items matching your search criteria.',
 
-      // Categories
       'categories': 'Categories',
       'all_categories': 'All Categories',
       'select_category': 'Select Category',
 
-      // Item Details
       'item_details': 'Item Details',
       'description': 'Description',
       'location': 'Location',
@@ -61,7 +57,6 @@ class AppLocalizations {
       'report_item': 'Report Item',
       'no_description': 'No description provided.',
 
-      // Report Item
       'report_lost_item': 'Report Lost Item',
       'report_found_item': 'Report Found Item',
       'item_name': 'Item Name',
@@ -71,7 +66,6 @@ class AppLocalizations {
       'add_photo': 'Add Photo',
       'add_video': 'Add Video',
 
-      // Profile
       'profile': 'Profile',
       'my_items': 'My Items',
       'settings': 'Settings',
@@ -79,7 +73,6 @@ class AppLocalizations {
       'edit_profile': 'Edit Profile',
       'change_password': 'Change Password',
 
-      // Auth
       'login': 'Login',
       'signup': 'Sign Up',
       'email': 'Email',
@@ -91,7 +84,6 @@ class AppLocalizations {
       'dont_have_account': "Don't have an account?",
       'already_have_account': 'Already have an account?',
 
-      // Settings
       'language': 'Language',
       'english': 'English',
       'nepali': 'Nepali',
@@ -101,7 +93,6 @@ class AppLocalizations {
       'privacy_policy': 'Privacy Policy',
       'terms_of_service': 'Terms of Service',
 
-      // Messages
       'item_reported_success': 'Item reported successfully!',
       'item_claimed_success': 'Item claimed successfully!',
       'item_deleted_success': 'Item deleted successfully!',
@@ -109,7 +100,6 @@ class AppLocalizations {
       'no_internet': 'No internet connection',
       'something_went_wrong': 'Something went wrong',
 
-      // Additional Auth
       'sign_in_to_continue': 'Sign in to continue',
       'enter_your_email': 'Enter your email',
       'enter_your_password': 'Enter your password',
@@ -137,7 +127,6 @@ class AppLocalizations {
       'create_account': 'Create Account',
       'registration_success': 'Registration successful! Please login.',
 
-      // Onboarding
       'skip': 'Skip',
       'next': 'Next',
       'get_started': 'Get Started',
@@ -151,17 +140,14 @@ class AppLocalizations {
       'connect_instantly_desc':
           'Chat directly with finders or owners. Get instant notifications and recover your items quickly and securely.',
 
-      // Dashboard & Navigation
       'home': 'Home',
       'alerts': 'Alerts',
 
-      // Profile Screen
       'privacy_security': 'Privacy & Security',
       'help_support': 'Help & Support',
       'logout_confirm': 'Are you sure you want to logout?',
       'version': 'Version',
 
-      // Report Item Page
       'category': 'Category',
       'where_lost': 'Where did you lose it?',
       'where_found': 'Where did you find it?',
@@ -175,7 +161,6 @@ class AppLocalizations {
       'gallery_error':
           'Unable to access gallery. Please try using the camera instead.',
 
-      // Item Detail
       'anonymous': 'Anonymous',
       'found_this_item': 'Found This Item?',
       'claim_item_title': 'Claim Item',
@@ -187,7 +172,6 @@ class AppLocalizations {
       'owner_notified': 'Owner has been notified!',
       'claim_request_sent': 'Claim request sent!',
 
-      // My Items Page
       'track_your_reports': 'Track your reports',
       'no_lost_items': 'No lost items reported',
       'no_found_items': 'No found items reported',
@@ -195,13 +179,11 @@ class AppLocalizations {
       'delete_confirm': 'Are you sure you want to delete',
       'other': 'Other',
 
-      // Report Item Page
       'please_enter_item_name': 'Please enter item name',
       'please_enter_location': 'Please enter location',
       'item_name_hint': 'e.g., iPhone 14 Pro, Blue Wallet',
     },
     'ne': {
-      // Common
       'app_name': 'हराएको र भेटिएको',
       'search': 'खोज्नुहोस्',
       'cancel': 'रद्द गर्नुहोस्',
@@ -218,7 +200,6 @@ class AppLocalizations {
       'no': 'होइन',
       'ok': 'ठीक छ',
 
-      // Home Screen
       'welcome_back': 'फेरि स्वागत छ!',
       'search_items': 'वस्तुहरू खोज्नुहोस्...',
       'all': 'सबै',
@@ -232,12 +213,10 @@ class AppLocalizations {
       'no_items_found': 'कुनै वस्तु भेटिएन',
       'no_items_description': 'तपाईंको खोज मापदण्डसँग मेल खाने कुनै वस्तु छैन।',
 
-      // Categories
       'categories': 'वर्गहरू',
       'all_categories': 'सबै वर्गहरू',
       'select_category': 'वर्ग छान्नुहोस्',
 
-      // Item Details
       'item_details': 'वस्तुको विवरण',
       'description': 'विवरण',
       'location': 'स्थान',
@@ -247,7 +226,6 @@ class AppLocalizations {
       'report_item': 'वस्तु रिपोर्ट गर्नुहोस्',
       'no_description': 'कुनै विवरण प्रदान गरिएको छैन।',
 
-      // Report Item
       'report_lost_item': 'हराएको वस्तु रिपोर्ट गर्नुहोस्',
       'report_found_item': 'भेटिएको वस्तु रिपोर्ट गर्नुहोस्',
       'item_name': 'वस्तुको नाम',
@@ -257,7 +235,6 @@ class AppLocalizations {
       'add_photo': 'फोटो थप्नुहोस्',
       'add_video': 'भिडियो थप्नुहोस्',
 
-      // Profile
       'profile': 'प्रोफाइल',
       'my_items': 'मेरा वस्तुहरू',
       'settings': 'सेटिङहरू',
@@ -265,7 +242,6 @@ class AppLocalizations {
       'edit_profile': 'प्रोफाइल सम्पादन गर्नुहोस्',
       'change_password': 'पासवर्ड परिवर्तन गर्नुहोस्',
 
-      // Auth
       'login': 'लग इन',
       'signup': 'साइन अप',
       'email': 'इमेल',
@@ -277,7 +253,6 @@ class AppLocalizations {
       'dont_have_account': 'खाता छैन?',
       'already_have_account': 'पहिले नै खाता छ?',
 
-      // Settings
       'language': 'भाषा',
       'english': 'अंग्रेजी',
       'nepali': 'नेपाली',
@@ -287,7 +262,6 @@ class AppLocalizations {
       'privacy_policy': 'गोपनीयता नीति',
       'terms_of_service': 'सेवाका सर्तहरू',
 
-      // Messages
       'item_reported_success': 'वस्तु सफलतापूर्वक रिपोर्ट गरियो!',
       'item_claimed_success': 'वस्तु सफलतापूर्वक दावी गरियो!',
       'item_deleted_success': 'वस्तु सफलतापूर्वक मेटाइयो!',
@@ -295,7 +269,6 @@ class AppLocalizations {
       'no_internet': 'इन्टरनेट जडान छैन',
       'something_went_wrong': 'केही गलत भयो',
 
-      // Additional Auth
       'sign_in_to_continue': 'जारी राख्न साइन इन गर्नुहोस्',
       'enter_your_email': 'तपाईंको इमेल प्रविष्ट गर्नुहोस्',
       'enter_your_password': 'तपाईंको पासवर्ड प्रविष्ट गर्नुहोस्',
@@ -323,7 +296,6 @@ class AppLocalizations {
       'create_account': 'खाता बनाउनुहोस्',
       'registration_success': 'दर्ता सफल भयो! कृपया लग इन गर्नुहोस्।',
 
-      // Onboarding
       'skip': 'छोड्नुहोस्',
       'next': 'अर्को',
       'get_started': 'सुरु गर्नुहोस्',
@@ -337,17 +309,14 @@ class AppLocalizations {
       'connect_instantly_desc':
           'खोज्ने वा मालिकसँग सीधा च्याट गर्नुहोस्। तुरुन्त सूचनाहरू प्राप्त गर्नुहोस् र आफ्नो वस्तुहरू छिटो र सुरक्षित रूपमा पुन: प्राप्त गर्नुहोस्।',
 
-      // Dashboard & Navigation
       'home': 'गृह',
       'alerts': 'अलर्टहरू',
 
-      // Profile Screen
       'privacy_security': 'गोपनीयता र सुरक्षा',
       'help_support': 'मद्दत र सहयोग',
       'logout_confirm': 'के तपाईं लग आउट गर्न चाहनुहुन्छ?',
       'version': 'संस्करण',
 
-      // Report Item Page
       'category': 'वर्ग',
       'where_lost': 'तपाईंले कहाँ हराउनुभयो?',
       'where_found': 'तपाईंले कहाँ भेट्नुभयो?',
@@ -361,7 +330,6 @@ class AppLocalizations {
       'gallery_error':
           'ग्यालेरी पहुँच गर्न सकिएन। कृपया क्यामेरा प्रयोग गर्नुहोस्।',
 
-      // Item Detail
       'anonymous': 'अज्ञात',
       'found_this_item': 'यो वस्तु भेट्टाउनुभयो?',
       'claim_item_title': 'वस्तु दावी गर्नुहोस्',
@@ -373,7 +341,6 @@ class AppLocalizations {
       'owner_notified': 'मालिकलाई सूचित गरिएको छ!',
       'claim_request_sent': 'दावी अनुरोध पठाइयो!',
 
-      // My Items Page
       'track_your_reports': 'तपाईंको रिपोर्टहरू ट्र्याक गर्नुहोस्',
       'no_lost_items': 'कुनै हराएको वस्तु रिपोर्ट गरिएको छैन',
       'no_found_items': 'कुनै भेटिएको वस्तु रिपोर्ट गरिएको छैन',
@@ -381,7 +348,6 @@ class AppLocalizations {
       'delete_confirm': 'के तपाईं मेटाउन चाहनुहुन्छ',
       'other': 'अन्य',
 
-      // Report Item Page
       'please_enter_item_name': 'कृपया वस्तुको नाम प्रविष्ट गर्नुहोस्',
       'please_enter_location': 'कृपया स्थान प्रविष्ट गर्नुहोस्',
       'item_name_hint': 'जस्तै, iPhone 14 Pro, नीलो वालेट',
@@ -392,7 +358,6 @@ class AppLocalizations {
     return _localizedValues[locale.languageCode]?[key] ?? key;
   }
 
-  // Nepali numerals mapping
   static const Map<String, String> _nepaliNumerals = {
     '0': '०',
     '1': '१',
@@ -406,7 +371,6 @@ class AppLocalizations {
     '9': '९',
   };
 
-  /// Converts a number to locale-specific format (Nepali numerals for Nepali locale)
   String formatNumber(dynamic number) {
     final numberString = number.toString();
     if (locale.languageCode == 'ne') {
@@ -420,7 +384,6 @@ class AppLocalizations {
     return numberString;
   }
 
-  // Getters for common translations
   String get appName => translate('app_name');
   String get search => translate('search');
   String get cancel => translate('cancel');
@@ -437,7 +400,6 @@ class AppLocalizations {
   String get no => translate('no');
   String get ok => translate('ok');
 
-  // Home Screen
   String get welcomeBack => translate('welcome_back');
   String get searchItems => translate('search_items');
   String get all => translate('all');
@@ -451,12 +413,10 @@ class AppLocalizations {
   String get noItemsFound => translate('no_items_found');
   String get noItemsDescription => translate('no_items_description');
 
-  // Categories
   String get categories => translate('categories');
   String get allCategories => translate('all_categories');
   String get selectCategory => translate('select_category');
 
-  // Item Details
   String get itemDetails => translate('item_details');
   String get description => translate('description');
   String get location => translate('location');
@@ -466,7 +426,6 @@ class AppLocalizations {
   String get reportItem => translate('report_item');
   String get noDescription => translate('no_description');
 
-  // Report Item
   String get reportLostItem => translate('report_lost_item');
   String get reportFoundItem => translate('report_found_item');
   String get itemName => translate('item_name');
@@ -476,7 +435,6 @@ class AppLocalizations {
   String get addPhoto => translate('add_photo');
   String get addVideo => translate('add_video');
 
-  // Profile
   String get profile => translate('profile');
   String get myItems => translate('my_items');
   String get settings => translate('settings');
@@ -484,7 +442,6 @@ class AppLocalizations {
   String get editProfile => translate('edit_profile');
   String get changePassword => translate('change_password');
 
-  // Auth
   String get login => translate('login');
   String get signup => translate('signup');
   String get email => translate('email');
@@ -496,7 +453,6 @@ class AppLocalizations {
   String get dontHaveAccount => translate('dont_have_account');
   String get alreadyHaveAccount => translate('already_have_account');
 
-  // Settings
   String get language => translate('language');
   String get english => translate('english');
   String get nepali => translate('nepali');
@@ -506,7 +462,6 @@ class AppLocalizations {
   String get privacyPolicy => translate('privacy_policy');
   String get termsOfService => translate('terms_of_service');
 
-  // Messages
   String get itemReportedSuccess => translate('item_reported_success');
   String get itemClaimedSuccess => translate('item_claimed_success');
   String get itemDeletedSuccess => translate('item_deleted_success');
@@ -514,7 +469,6 @@ class AppLocalizations {
   String get noInternet => translate('no_internet');
   String get somethingWentWrong => translate('something_went_wrong');
 
-  // Additional Auth
   String get signInToContinue => translate('sign_in_to_continue');
   String get enterYourEmail => translate('enter_your_email');
   String get enterYourPassword => translate('enter_your_password');
@@ -542,7 +496,6 @@ class AppLocalizations {
   String get createAccount => translate('create_account');
   String get registrationSuccess => translate('registration_success');
 
-  // Onboarding
   String get skip => translate('skip');
   String get next => translate('next');
   String get getStarted => translate('get_started');
@@ -553,17 +506,14 @@ class AppLocalizations {
   String get connectInstantlyTitle => translate('connect_instantly_title');
   String get connectInstantlyDesc => translate('connect_instantly_desc');
 
-  // Dashboard & Navigation
   String get home => translate('home');
   String get alerts => translate('alerts');
 
-  // Profile Screen
   String get privacySecurity => translate('privacy_security');
   String get helpSupport => translate('help_support');
   String get logoutConfirm => translate('logout_confirm');
   String get version => translate('version');
 
-  // Report Item Page
   String get category => translate('category');
   String get whereLost => translate('where_lost');
   String get whereFound => translate('where_found');
@@ -575,7 +525,6 @@ class AppLocalizations {
   String get openSettings => translate('open_settings');
   String get galleryError => translate('gallery_error');
 
-  // Item Detail
   String get anonymous => translate('anonymous');
   String get foundThisItem => translate('found_this_item');
   String get claimItemTitle => translate('claim_item_title');
@@ -585,7 +534,6 @@ class AppLocalizations {
   String get ownerNotified => translate('owner_notified');
   String get claimRequestSent => translate('claim_request_sent');
 
-  // My Items Page
   String get trackYourReports => translate('track_your_reports');
   String get noLostItems => translate('no_lost_items');
   String get noFoundItems => translate('no_found_items');
@@ -593,7 +541,6 @@ class AppLocalizations {
   String get deleteConfirm => translate('delete_confirm');
   String get other => translate('other');
 
-  // Report Item Page
   String get pleaseEnterItemName => translate('please_enter_item_name');
   String get pleaseEnterLocation => translate('please_enter_location');
   String get itemNameHint => translate('item_name_hint');

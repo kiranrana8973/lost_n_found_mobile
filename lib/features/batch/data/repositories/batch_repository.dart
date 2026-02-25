@@ -11,7 +11,6 @@ import 'package:lost_n_found/features/batch/data/models/batch_hive_model.dart';
 import 'package:lost_n_found/features/batch/domain/entities/batch_entity.dart';
 import 'package:lost_n_found/features/batch/domain/repositories/batch_repository.dart';
 
-// Create provider
 final batchRepositoryProvider = Provider<IBatchRepository>((ref) {
   final batchLocalDatasource = ref.read(batchLocalDatasourceProvider);
   final batchRemoteDataSource = ref.read(batchRemoteProvider);
@@ -39,8 +38,6 @@ class BatchRepository implements IBatchRepository {
   @override
   Future<Either<Failure, bool>> createBatch(BatchEntity batch) async {
     try {
-      // conversion
-      // entity lai model ma convert gara
       final batchModel = BatchHiveModel.fromEntity(batch);
       final result = await _batchLocalDataSource.createBatch(batchModel);
       if (result) {
@@ -73,7 +70,6 @@ class BatchRepository implements IBatchRepository {
     if (await _networkInfo.isConnected) {
       try {
         final apiModels = await _batchRemoteDataSource.getAllBatches();
-        // Cache the data locally for offline access
         final hiveModels = BatchHiveModel.fromApiModelList(apiModels);
         await _batchLocalDataSource.cacheAllBatches(hiveModels);
         final result = BatchApiModel.toEntityList(apiModels);
@@ -81,7 +77,10 @@ class BatchRepository implements IBatchRepository {
       } on DioException catch (e) {
         if (e.response == null) {
           return _getCachedBatches(
-            serverError: ApiFailure.fromDioException(e, fallback: 'Failed to load batches'),
+            serverError: ApiFailure.fromDioException(
+              e,
+              fallback: 'Failed to load batches',
+            ),
           );
         }
         return _getCachedBatches();
@@ -93,8 +92,6 @@ class BatchRepository implements IBatchRepository {
     }
   }
 
-  /// Helper method to get cached batches.
-  /// If [serverError] is provided and cache is empty, returns that error.
   Future<Either<Failure, List<BatchEntity>>> _getCachedBatches({
     ApiFailure? serverError,
   }) async {

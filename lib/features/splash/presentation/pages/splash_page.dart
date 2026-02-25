@@ -3,11 +3,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/theme_extensions.dart';
 
-/// Splash page is PURE UI — no navigation logic.
-///
-/// The GoRouter redirect in [app_router.dart] is the single authority
-/// that decides when to leave splash and where to go next.
-/// This page just shows the branding animation while auth state hydrates.
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
 
@@ -15,8 +10,7 @@ class SplashPage extends StatefulWidget {
   State<SplashPage> createState() => _SplashPageState();
 }
 
-class _SplashPageState extends State<SplashPage>
-    with TickerProviderStateMixin {
+class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   late AnimationController _fadeController;
   late AnimationController _slideController;
   late AnimationController _scaleController;
@@ -105,14 +99,11 @@ class _SplashPageState extends State<SplashPage>
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: context.backgroundGradient,
-        ),
+        decoration: BoxDecoration(gradient: context.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
               const Spacer(flex: 3),
-              // Logo Section
               AnimatedBuilder(
                 animation: _scaleController,
                 builder: (context, child) {
@@ -147,7 +138,6 @@ class _SplashPageState extends State<SplashPage>
                 },
               ),
               SizedBox(height: verticalSpacing),
-              // App Title
               FadeTransition(
                 opacity: _fadeAnimation,
                 child: SlideTransition(
@@ -185,7 +175,6 @@ class _SplashPageState extends State<SplashPage>
                 ),
               ),
               const Spacer(flex: 3),
-              // Loading indicator
               FadeTransition(
                 opacity: _fadeAnimation,
                 child: SizedBox(
@@ -200,7 +189,6 @@ class _SplashPageState extends State<SplashPage>
                 ),
               ),
               const Spacer(flex: 1),
-              // Bottom branding
               FadeTransition(
                 opacity: _fadeAnimation,
                 child: Padding(

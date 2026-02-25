@@ -16,12 +16,10 @@ class UploadPhotoUsecase implements UsecaseWithParams<String, File> {
   final IItemRepository _itemRepository;
 
   UploadPhotoUsecase({required IItemRepository itemRepository})
-      : _itemRepository = itemRepository;
+    : _itemRepository = itemRepository;
 
   @override
   Future<Either<Failure, String>> call(File photo) {
     return _itemRepository.uploadPhoto(photo);
   }
 }
-
-

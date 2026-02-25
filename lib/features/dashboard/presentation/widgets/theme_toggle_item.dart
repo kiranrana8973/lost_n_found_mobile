@@ -61,9 +61,9 @@ class ThemeToggleItem extends ConsumerWidget {
             Switch(
               value: isDarkMode,
               onChanged: (value) {
-                ref.read(themeModeProvider.notifier).setThemeMode(
-                      value ? ThemeMode.dark : ThemeMode.light,
-                    );
+                ref
+                    .read(themeModeProvider.notifier)
+                    .setThemeMode(value ? ThemeMode.dark : ThemeMode.light);
               },
               activeTrackColor: AppColors.primary,
               activeThumbColor: Colors.white,

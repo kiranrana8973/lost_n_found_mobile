@@ -42,10 +42,7 @@ class ItemActionBar extends StatelessWidget {
               ),
               child: IconButton(
                 onPressed: onMessageTap,
-                icon: Icon(
-                  Icons.chat_bubble_rounded,
-                  color: AppColors.primary,
-                ),
+                icon: Icon(Icons.chat_bubble_rounded, color: AppColors.primary),
               ),
             ),
             const SizedBox(width: 16),

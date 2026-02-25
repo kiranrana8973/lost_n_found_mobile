@@ -19,7 +19,6 @@ void main() {
 
   group('fromJson', () {
     test('should return a valid CategoryApiModel from JSON', () {
-      // Arrange
       final json = {
         '_id': '1',
         'name': 'Electronics',
@@ -27,10 +26,8 @@ void main() {
         'status': 'active',
       };
 
-      // Act
       final result = CategoryApiModel.fromJson(json);
 
-      // Assert
       expect(result.id, '1');
       expect(result.name, 'Electronics');
       expect(result.description, 'Electronic items');
@@ -40,10 +37,8 @@ void main() {
 
   group('toJson', () {
     test('should return a JSON map with name and description', () {
-      // Act
       final result = tCategoryApiModel.toJson();
 
-      // Assert
       expect(result['name'], 'Electronics');
       expect(result['description'], 'Electronic items');
       expect(result.containsKey('_id'), false);
@@ -51,16 +46,10 @@ void main() {
     });
 
     test('should not include description when null', () {
-      // Arrange
-      final modelWithoutDesc = CategoryApiModel(
-        id: '2',
-        name: 'Books',
-      );
+      final modelWithoutDesc = CategoryApiModel(id: '2', name: 'Books');
 
-      // Act
       final result = modelWithoutDesc.toJson();
 
-      // Assert
       expect(result['name'], 'Books');
       expect(result.containsKey('description'), false);
     });
@@ -68,10 +57,8 @@ void main() {
 
   group('toEntity', () {
     test('should convert CategoryApiModel to CategoryEntity correctly', () {
-      // Act
       final result = tCategoryApiModel.toEntity();
 
-      // Assert
       expect(result, isA<CategoryEntity>());
       expect(result.categoryId, '1');
       expect(result.name, 'Electronics');
@@ -82,10 +69,8 @@ void main() {
 
   group('fromEntity', () {
     test('should convert CategoryEntity to CategoryApiModel correctly', () {
-      // Act
       final result = CategoryApiModel.fromEntity(tCategoryEntity);
 
-      // Assert
       expect(result, isA<CategoryApiModel>());
       expect(result.id, '1');
       expect(result.name, 'Electronics');
@@ -96,19 +81,17 @@ void main() {
 
   group('toEntityList', () {
     test(
-        'should convert list of CategoryApiModel to list of CategoryEntity',
-        () {
-      // Arrange
-      final models = [tCategoryApiModel, tCategoryApiModel];
+      'should convert list of CategoryApiModel to list of CategoryEntity',
+      () {
+        final models = [tCategoryApiModel, tCategoryApiModel];
 
-      // Act
-      final result = CategoryApiModel.toEntityList(models);
+        final result = CategoryApiModel.toEntityList(models);
 
-      // Assert
-      expect(result, isA<List<CategoryEntity>>());
-      expect(result.length, 2);
-      expect(result[0].name, 'Electronics');
-      expect(result[1].name, 'Electronics');
-    });
+        expect(result, isA<List<CategoryEntity>>());
+        expect(result.length, 2);
+        expect(result[0].name, 'Electronics');
+        expect(result[1].name, 'Electronics');
+      },
+    );
   });
 }

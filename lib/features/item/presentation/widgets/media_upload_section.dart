@@ -34,16 +34,10 @@ class MediaUploadSection extends StatelessWidget {
         const SizedBox(height: 12),
         Row(
           children: [
-            _AddMediaButton(
-              itemType: itemType,
-              onTap: onAddMedia,
-            ),
+            _AddMediaButton(itemType: itemType, onTap: onAddMedia),
             if (selectedMedia.isNotEmpty) ...[
               const SizedBox(width: 12),
-              _MediaPreview(
-                file: selectedMedia.first,
-                onRemove: onRemoveMedia,
-              ),
+              _MediaPreview(file: selectedMedia.first, onRemove: onRemoveMedia),
             ],
           ],
         ),
@@ -56,10 +50,7 @@ class _AddMediaButton extends StatelessWidget {
   final ItemType itemType;
   final VoidCallback onTap;
 
-  const _AddMediaButton({
-    required this.itemType,
-    required this.onTap,
-  });
+  const _AddMediaButton({required this.itemType, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -115,10 +106,7 @@ class _MediaPreview extends StatelessWidget {
   final File file;
   final VoidCallback onRemove;
 
-  const _MediaPreview({
-    required this.file,
-    required this.onRemove,
-  });
+  const _MediaPreview({required this.file, required this.onRemove});
 
   @override
   Widget build(BuildContext context) {
@@ -129,10 +117,7 @@ class _MediaPreview extends StatelessWidget {
           height: 120,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            image: DecorationImage(
-              image: FileImage(file),
-              fit: BoxFit.cover,
-            ),
+            image: DecorationImage(image: FileImage(file), fit: BoxFit.cover),
           ),
         ),
         Positioned(
@@ -146,11 +131,7 @@ class _MediaPreview extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               padding: const EdgeInsets.all(4),
-              child: const Icon(
-                Icons.close,
-                color: Colors.white,
-                size: 16,
-              ),
+              child: const Icon(Icons.close, color: Colors.white, size: 16),
             ),
           ),
         ),

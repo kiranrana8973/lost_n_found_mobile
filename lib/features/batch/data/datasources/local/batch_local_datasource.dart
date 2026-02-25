@@ -1,25 +1,23 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lost_n_found/core/services/hive/hive_service.dart';
+import 'package:lost_n_found/core/constants/hive_table_constant.dart';
+import 'package:lost_n_found/core/services/hive/hive_box.dart';
 import 'package:lost_n_found/features/batch/data/datasources/batch_datasource.dart';
 import 'package:lost_n_found/features/batch/data/models/batch_hive_model.dart';
 
-// create provider
 final batchLocalDatasourceProvider = Provider<BatchLocalDatasource>((ref) {
-  final hiveService = ref.read(hiveServiceProvider);
-  return BatchLocalDatasource(hiveService: hiveService);
+  return BatchLocalDatasource();
 });
 
 class BatchLocalDatasource implements IBatchLocalDataSource {
-  // Dependency Injection
-  final HiveService _hiveService;
+  final HiveBox<BatchHiveModel> _box;
 
-  BatchLocalDatasource({required HiveService hiveService})
-    : _hiveService = hiveService;
+  BatchLocalDatasource()
+    : _box = HiveBox<BatchHiveModel>(HiveTableConstant.batchTable);
 
   @override
   Future<bool> createBatch(BatchHiveModel batch) async {
     try {
-      await _hiveService.createBatch(batch);
+      await _box.put(batch.batchId!, batch);
       return true;
     } catch (e) {
       return false;
@@ -29,7 +27,7 @@ class BatchLocalDatasource implements IBatchLocalDataSource {
   @override
   Future<bool> deleteBatch(String batchId) async {
     try {
-      await _hiveService.deleteBatch(batchId);
+      await _box.delete(batchId);
       return true;
     } catch (e) {
       return false;
@@ -39,7 +37,7 @@ class BatchLocalDatasource implements IBatchLocalDataSource {
   @override
   Future<List<BatchHiveModel>> getAllBatches() async {
     try {
-      return _hiveService.getAllBatches();
+      return _box.getAll();
     } catch (e) {
       return [];
     }
@@ -48,7 +46,7 @@ class BatchLocalDatasource implements IBatchLocalDataSource {
   @override
   Future<BatchHiveModel?> getBatchById(String batchId) async {
     try {
-      return _hiveService.getBatchById(batchId);
+      return _box.get(batchId);
     } catch (e) {
       return null;
     }
@@ -57,15 +55,13 @@ class BatchLocalDatasource implements IBatchLocalDataSource {
   @override
   Future<bool> updateBatch(BatchHiveModel batch) async {
     try {
-      _hiveService.updateBatch(batch);
-      return true;
+      return await _box.update(batch.batchId!, batch);
     } catch (e) {
       return false;
     }
   }
 
-  /// Cache all batches from API response
   Future<void> cacheAllBatches(List<BatchHiveModel> batches) async {
-    await _hiveService.cacheAllBatches(batches);
+    await _box.replaceAll({for (final b in batches) b.batchId!: b});
   }
 }

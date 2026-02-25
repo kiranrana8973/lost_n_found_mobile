@@ -35,8 +35,6 @@ class ItemEntity extends Equatable {
     this.updatedAt,
   });
 
-  /// Whether this item's media is a video.
-  /// Checks mediaType first, falls back to file extension.
   bool get isVideo {
     if (mediaType == 'video') return true;
     if (media == null) return false;
@@ -46,19 +44,19 @@ class ItemEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        itemId,
-        reportedBy,
-        claimedBy,
-        category,
-        itemName,
-        description,
-        type,
-        location,
-        media,
-        mediaType,
-        isClaimed,
-        status,
-        createdAt,
-        updatedAt,
-      ];
+    itemId,
+    reportedBy,
+    claimedBy,
+    category,
+    itemName,
+    description,
+    type,
+    location,
+    media,
+    mediaType,
+    isClaimed,
+    status,
+    createdAt,
+    updatedAt,
+  ];
 }

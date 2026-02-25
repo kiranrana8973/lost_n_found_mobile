@@ -6,7 +6,6 @@ import 'package:lost_n_found/features/batch/data/repositories/batch_repository.d
 import 'package:lost_n_found/features/batch/domain/entities/batch_entity.dart';
 import 'package:lost_n_found/features/batch/domain/repositories/batch_repository.dart';
 
-// Create Provider
 final getAllBatchUsecaseProvider = Provider<GetAllBatchUsecase>((ref) {
   final batchRepository = ref.read(batchRepositoryProvider);
   return GetAllBatchUsecase(batchRepository: batchRepository);

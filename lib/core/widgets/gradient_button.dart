@@ -51,10 +51,7 @@ class GradientButton extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (icon != null) ...[
-                          icon!,
-                          const SizedBox(width: 12),
-                        ],
+                        if (icon != null) ...[icon!, const SizedBox(width: 12)],
                         Text(
                           text,
                           style: const TextStyle(

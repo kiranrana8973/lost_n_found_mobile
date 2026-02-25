@@ -7,12 +7,7 @@ void main() {
     testWidgets('renders terms text', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: TermsCheckbox(
-              value: false,
-              onChanged: (_) {},
-            ),
-          ),
+          home: Scaffold(body: TermsCheckbox(value: false, onChanged: (_) {})),
         ),
       );
 
@@ -23,12 +18,7 @@ void main() {
     testWidgets('checkbox reflects value', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: TermsCheckbox(
-              value: true,
-              onChanged: (_) {},
-            ),
-          ),
+          home: Scaffold(body: TermsCheckbox(value: true, onChanged: (_) {})),
         ),
       );
 

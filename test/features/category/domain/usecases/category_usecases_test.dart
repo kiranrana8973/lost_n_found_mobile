@@ -22,15 +22,13 @@ void main() {
     mockCategoryRepository = MockCategoryRepository();
   });
 
-  // ──────────────────────────────────────────────
-  // GetAllCategoriesUsecase
-  // ──────────────────────────────────────────────
   group('GetAllCategoriesUsecase', () {
     late GetAllCategoriesUsecase usecase;
 
     setUp(() {
       usecase = GetAllCategoriesUsecase(
-          categoryRepository: mockCategoryRepository);
+        categoryRepository: mockCategoryRepository,
+      );
     });
 
     final tCategoryList = [
@@ -47,44 +45,38 @@ void main() {
     ];
 
     test('should return list of categories on success', () async {
-      // Arrange
-      when(() => mockCategoryRepository.getAllCategories())
-          .thenAnswer((_) async => Right(tCategoryList));
+      when(
+        () => mockCategoryRepository.getAllCategories(),
+      ).thenAnswer((_) async => Right(tCategoryList));
 
-      // Act
       final result = await usecase();
 
-      // Assert
       expect(result, Right(tCategoryList));
       verify(() => mockCategoryRepository.getAllCategories()).called(1);
       verifyNoMoreInteractions(mockCategoryRepository);
     });
 
     test('should return Failure when repository fails', () async {
-      // Arrange
       const tFailure = ApiFailure(message: 'Failed to fetch categories');
-      when(() => mockCategoryRepository.getAllCategories())
-          .thenAnswer((_) async => const Left(tFailure));
+      when(
+        () => mockCategoryRepository.getAllCategories(),
+      ).thenAnswer((_) async => const Left(tFailure));
 
-      // Act
       final result = await usecase();
 
-      // Assert
       expect(result, const Left(tFailure));
       verify(() => mockCategoryRepository.getAllCategories()).called(1);
       verifyNoMoreInteractions(mockCategoryRepository);
     });
   });
 
-  // ──────────────────────────────────────────────
-  // GetCategoryByIdUsecase
-  // ──────────────────────────────────────────────
   group('GetCategoryByIdUsecase', () {
     late GetCategoryByIdUsecase usecase;
 
     setUp(() {
       usecase = GetCategoryByIdUsecase(
-          categoryRepository: mockCategoryRepository);
+        categoryRepository: mockCategoryRepository,
+      );
     });
 
     const tCategoryId = 'cat-1';
@@ -96,46 +88,42 @@ void main() {
     );
 
     test('should return CategoryEntity on success', () async {
-      // Arrange
-      when(() => mockCategoryRepository.getCategoryById(tCategoryId))
-          .thenAnswer((_) async => const Right(tCategoryEntity));
+      when(
+        () => mockCategoryRepository.getCategoryById(tCategoryId),
+      ).thenAnswer((_) async => const Right(tCategoryEntity));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Right(tCategoryEntity));
-      verify(() => mockCategoryRepository.getCategoryById(tCategoryId))
-          .called(1);
+      verify(
+        () => mockCategoryRepository.getCategoryById(tCategoryId),
+      ).called(1);
       verifyNoMoreInteractions(mockCategoryRepository);
     });
 
     test('should return Failure when repository fails', () async {
-      // Arrange
       const tFailure = ApiFailure(message: 'Category not found');
-      when(() => mockCategoryRepository.getCategoryById(tCategoryId))
-          .thenAnswer((_) async => const Left(tFailure));
+      when(
+        () => mockCategoryRepository.getCategoryById(tCategoryId),
+      ).thenAnswer((_) async => const Left(tFailure));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Left(tFailure));
-      verify(() => mockCategoryRepository.getCategoryById(tCategoryId))
-          .called(1);
+      verify(
+        () => mockCategoryRepository.getCategoryById(tCategoryId),
+      ).called(1);
       verifyNoMoreInteractions(mockCategoryRepository);
     });
   });
 
-  // ──────────────────────────────────────────────
-  // CreateCategoryUsecase
-  // ──────────────────────────────────────────────
   group('CreateCategoryUsecase', () {
     late CreateCategoryUsecase usecase;
 
     setUp(() {
       usecase = CreateCategoryUsecase(
-          categoryRepository: mockCategoryRepository);
+        categoryRepository: mockCategoryRepository,
+      );
     });
 
     const tParams = CreateCategoryParams(
@@ -144,44 +132,38 @@ void main() {
     );
 
     test('should return true on successful category creation', () async {
-      // Arrange
-      when(() => mockCategoryRepository.createCategory(any()))
-          .thenAnswer((_) async => const Right(true));
+      when(
+        () => mockCategoryRepository.createCategory(any()),
+      ).thenAnswer((_) async => const Right(true));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Right(true));
       verify(() => mockCategoryRepository.createCategory(any())).called(1);
       verifyNoMoreInteractions(mockCategoryRepository);
     });
 
     test('should return Failure on unsuccessful category creation', () async {
-      // Arrange
       const tFailure = ApiFailure(message: 'Failed to create category');
-      when(() => mockCategoryRepository.createCategory(any()))
-          .thenAnswer((_) async => const Left(tFailure));
+      when(
+        () => mockCategoryRepository.createCategory(any()),
+      ).thenAnswer((_) async => const Left(tFailure));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Left(tFailure));
       verify(() => mockCategoryRepository.createCategory(any())).called(1);
       verifyNoMoreInteractions(mockCategoryRepository);
     });
   });
 
-  // ──────────────────────────────────────────────
-  // UpdateCategoryUsecase
-  // ──────────────────────────────────────────────
   group('UpdateCategoryUsecase', () {
     late UpdateCategoryUsecase usecase;
 
     setUp(() {
       usecase = UpdateCategoryUsecase(
-          categoryRepository: mockCategoryRepository);
+        categoryRepository: mockCategoryRepository,
+      );
     });
 
     const tParams = UpdateCategoryParams(
@@ -192,77 +174,69 @@ void main() {
     );
 
     test('should return true on successful category update', () async {
-      // Arrange
-      when(() => mockCategoryRepository.updateCategory(any()))
-          .thenAnswer((_) async => const Right(true));
+      when(
+        () => mockCategoryRepository.updateCategory(any()),
+      ).thenAnswer((_) async => const Right(true));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Right(true));
       verify(() => mockCategoryRepository.updateCategory(any())).called(1);
       verifyNoMoreInteractions(mockCategoryRepository);
     });
 
     test('should return Failure on unsuccessful category update', () async {
-      // Arrange
       const tFailure = ApiFailure(message: 'Failed to update category');
-      when(() => mockCategoryRepository.updateCategory(any()))
-          .thenAnswer((_) async => const Left(tFailure));
+      when(
+        () => mockCategoryRepository.updateCategory(any()),
+      ).thenAnswer((_) async => const Left(tFailure));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Left(tFailure));
       verify(() => mockCategoryRepository.updateCategory(any())).called(1);
       verifyNoMoreInteractions(mockCategoryRepository);
     });
   });
 
-  // ──────────────────────────────────────────────
-  // DeleteCategoryUsecase
-  // ──────────────────────────────────────────────
   group('DeleteCategoryUsecase', () {
     late DeleteCategoryUsecase usecase;
 
     setUp(() {
       usecase = DeleteCategoryUsecase(
-          categoryRepository: mockCategoryRepository);
+        categoryRepository: mockCategoryRepository,
+      );
     });
 
     const tCategoryId = 'cat-1';
     const tParams = DeleteCategoryParams(categoryId: tCategoryId);
 
     test('should return true on successful category deletion', () async {
-      // Arrange
-      when(() => mockCategoryRepository.deleteCategory(tCategoryId))
-          .thenAnswer((_) async => const Right(true));
+      when(
+        () => mockCategoryRepository.deleteCategory(tCategoryId),
+      ).thenAnswer((_) async => const Right(true));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Right(true));
-      verify(() => mockCategoryRepository.deleteCategory(tCategoryId))
-          .called(1);
+      verify(
+        () => mockCategoryRepository.deleteCategory(tCategoryId),
+      ).called(1);
       verifyNoMoreInteractions(mockCategoryRepository);
     });
 
     test('should return Failure on unsuccessful category deletion', () async {
-      // Arrange
       const tFailure = ApiFailure(message: 'Failed to delete category');
-      when(() => mockCategoryRepository.deleteCategory(tCategoryId))
-          .thenAnswer((_) async => const Left(tFailure));
+      when(
+        () => mockCategoryRepository.deleteCategory(tCategoryId),
+      ).thenAnswer((_) async => const Left(tFailure));
 
-      // Act
       final result = await usecase(tParams);
 
-      // Assert
       expect(result, const Left(tFailure));
-      verify(() => mockCategoryRepository.deleteCategory(tCategoryId))
-          .called(1);
+      verify(
+        () => mockCategoryRepository.deleteCategory(tCategoryId),
+      ).called(1);
       verifyNoMoreInteractions(mockCategoryRepository);
     });
   });
