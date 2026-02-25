@@ -49,6 +49,7 @@ class ApiEndpoints {
 
   static const String studentLogin = '/students/login';
   static const String studentRegister = '/students/register';
+  static const String studentMe = '/students/me';
   static const String refreshToken = '/auth/refresh';
 
   // ============================================================================

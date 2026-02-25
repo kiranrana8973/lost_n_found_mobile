@@ -21,7 +21,7 @@ final deleteCategoryUsecaseProvider = Provider<DeleteCategoryUsecase>((ref) {
 });
 
 class DeleteCategoryUsecase
-    implements UsecaseWithParms<bool, DeleteCategoryParams> {
+    implements UsecaseWithParams<bool, DeleteCategoryParams> {
   final ICategoryRepository _categoryRepository;
 
   DeleteCategoryUsecase({required ICategoryRepository categoryRepository})

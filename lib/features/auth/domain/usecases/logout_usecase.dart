@@ -11,7 +11,7 @@ final logoutUsecaseProvider = Provider<LogoutUsecase>((ref) {
   return LogoutUsecase(authRepository: authRepository);
 });
 
-class LogoutUsecase implements UsecaseWithoutParms<bool> {
+class LogoutUsecase implements UsecaseWithoutParams<bool> {
   final IAuthRepository _authRepository;
 
   LogoutUsecase({required IAuthRepository authRepository})

@@ -11,7 +11,7 @@ final getAllItemsUsecaseProvider = Provider<GetAllItemsUsecase>((ref) {
   return GetAllItemsUsecase(itemRepository: itemRepository);
 });
 
-class GetAllItemsUsecase implements UsecaseWithoutParms<List<ItemEntity>> {
+class GetAllItemsUsecase implements UsecaseWithoutParams<List<ItemEntity>> {
   final IItemRepository _itemRepository;
 
   GetAllItemsUsecase({required IItemRepository itemRepository})

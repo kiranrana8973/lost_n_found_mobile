@@ -20,7 +20,7 @@ final deleteItemUsecaseProvider = Provider<DeleteItemUsecase>((ref) {
   return DeleteItemUsecase(itemRepository: itemRepository);
 });
 
-class DeleteItemUsecase implements UsecaseWithParms<bool, DeleteItemParams> {
+class DeleteItemUsecase implements UsecaseWithParams<bool, DeleteItemParams> {
   final IItemRepository _itemRepository;
 
   DeleteItemUsecase({required IItemRepository itemRepository})

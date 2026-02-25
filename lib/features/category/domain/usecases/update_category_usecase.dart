@@ -30,7 +30,7 @@ final updateCategoryUsecaseProvider = Provider<UpdateCategoryUsecase>((ref) {
 });
 
 class UpdateCategoryUsecase
-    implements UsecaseWithParms<bool, UpdateCategoryParams> {
+    implements UsecaseWithParams<bool, UpdateCategoryParams> {
   final ICategoryRepository _categoryRepository;
 
   UpdateCategoryUsecase({required ICategoryRepository categoryRepository})

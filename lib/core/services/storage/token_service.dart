@@ -1,30 +1,26 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lost_n_found/core/services/storage/user_session_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:lost_n_found/core/api/api_client.dart';
 
-// provider
 final tokenServiceProvider = Provider<TokenService>((ref) {
-  return TokenService(prefs: ref.read(sharedPreferencesProvider));
+  return TokenService(apiClient: ref.read(apiClientProvider));
 });
 
+/// Delegates token operations to ApiClient's FlutterSecureStorage.
+/// Single source of truth for auth tokens — no more dual storage.
 class TokenService {
-  static const String _tokenKey = 'auth_token';
-  final SharedPreferences _prefs;
+  final ApiClient _apiClient;
 
-  TokenService({required SharedPreferences prefs}) : _prefs = prefs;
+  TokenService({required ApiClient apiClient}) : _apiClient = apiClient;
 
-  // Save token
   Future<void> saveToken(String token) async {
-    await _prefs.setString(_tokenKey, token);
+    await _apiClient.saveTokens(accessToken: token);
   }
 
-  // Get token
   Future<String?> getToken() async {
-    return _prefs.getString(_tokenKey);
+    return _apiClient.getAccessToken();
   }
 
-  // Remove token (for logout)
   Future<void> removeToken() async {
-    await _prefs.remove(_tokenKey);
+    await _apiClient.clearTokens();
   }
 }

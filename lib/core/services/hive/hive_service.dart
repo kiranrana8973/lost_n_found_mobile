@@ -11,290 +11,199 @@ final hiveServiceProvider = Provider<HiveService>((ref) {
   return HiveService();
 });
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Generic Hive box wrapper — eliminates CRUD boilerplate
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _BoxOps<T extends HiveObject> {
+  final String _boxName;
+
+  _BoxOps(this._boxName);
+
+  Box<T> get _box => Hive.box<T>(_boxName);
+
+  Future<T> put(String key, T value) async {
+    await _box.put(key, value);
+    return value;
+  }
+
+  T? get(String key) => _box.get(key);
+
+  List<T> getAll() => _box.values.toList();
+
+  List<T> where(bool Function(T) test) => _box.values.where(test).toList();
+
+  T? firstWhere(bool Function(T) test) {
+    for (final value in _box.values) {
+      if (test(value)) return value;
+    }
+    return null;
+  }
+
+  Future<bool> update(String key, T value) async {
+    if (!_box.containsKey(key)) return false;
+    await _box.put(key, value);
+    return true;
+  }
+
+  Future<void> delete(String key) => _box.delete(key);
+
+  /// Atomic cache replace — clear + bulk insert in one go.
+  Future<void> replaceAll(Map<String, T> entries) async {
+    await _box.clear();
+    if (entries.isNotEmpty) {
+      await _box.putAll(entries);
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Adapter registration table — single source of truth
+// ─────────────────────────────────────────────────────────────────────────────
+
+typedef _AdapterEntry = ({int typeId, TypeAdapter adapter, String boxName});
+
+List<_AdapterEntry> _buildAdapterTable() => [
+  (
+    typeId: HiveTableConstant.batchTypeId,
+    adapter: BatchHiveModelAdapter(),
+    boxName: HiveTableConstant.batchTable,
+  ),
+  (
+    typeId: HiveTableConstant.studentTypeId,
+    adapter: AuthHiveModelAdapter(),
+    boxName: HiveTableConstant.studentTable,
+  ),
+  (
+    typeId: HiveTableConstant.itemTypeId,
+    adapter: ItemHiveModelAdapter(),
+    boxName: HiveTableConstant.itemTable,
+  ),
+  (
+    typeId: HiveTableConstant.categoryTypeId,
+    adapter: CategoryHiveModelAdapter(),
+    boxName: HiveTableConstant.categoryTable,
+  ),
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HiveService — central Hive facade
+// ─────────────────────────────────────────────────────────────────────────────
+
 class HiveService {
-  // init
+  // Typed box wrappers — lazy access, no field storage needed
+  final _batches = _BoxOps<BatchHiveModel>(HiveTableConstant.batchTable);
+  final _students = _BoxOps<AuthHiveModel>(HiveTableConstant.studentTable);
+  final _items = _BoxOps<ItemHiveModel>(HiveTableConstant.itemTable);
+  final _categories = _BoxOps<CategoryHiveModel>(
+    HiveTableConstant.categoryTable,
+  );
+
+  /// Call once in main.dart before runApp().
   Future<void> init() async {
     final directory = await getApplicationDocumentsDirectory();
-    final path = '${directory.path}/${HiveTableConstant.dbName}';
-    Hive.init(path);
+    Hive.init('${directory.path}/${HiveTableConstant.dbName}');
 
-    // register adapter
-    _registerAdapter();
-    await _openBoxes();
-    // insert dummy data
-    // await insertBatchDummyData();
-    //await insertCategoryDummyData();
-  }
-
-  Future<void> insertBatchDummyData() async {
-    final batchBox = Hive.box<BatchHiveModel>(HiveTableConstant.batchTable);
-
-    if (batchBox.isNotEmpty) {
-      return;
+    for (final entry in _buildAdapterTable()) {
+      if (!Hive.isAdapterRegistered(entry.typeId)) {
+        Hive.registerAdapter(entry.adapter);
+      }
     }
 
-    final dummyBatches = [
-      BatchHiveModel(batchName: '35A'),
-      BatchHiveModel(batchName: '35B'),
-      BatchHiveModel(batchName: '35C'),
-      BatchHiveModel(batchName: '36A'),
-      BatchHiveModel(batchName: '36B'),
-      BatchHiveModel(batchName: '37A'),
-      BatchHiveModel(batchName: '38B'),
-    ];
-
-    for (var batch in dummyBatches) {
-      await batchBox.put(batch.batchId, batch);
-    }
+    await Future.wait([
+      Hive.openBox<BatchHiveModel>(HiveTableConstant.batchTable),
+      Hive.openBox<AuthHiveModel>(HiveTableConstant.studentTable),
+      Hive.openBox<ItemHiveModel>(HiveTableConstant.itemTable),
+      Hive.openBox<CategoryHiveModel>(HiveTableConstant.categoryTable),
+    ]);
   }
 
-  Future<void> insertCategoryDummyData() async {
-    final categoryBox = Hive.box<CategoryHiveModel>(
-      HiveTableConstant.categoryTable,
-    );
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Batch
+  // ═══════════════════════════════════════════════════════════════════════════
 
-    if (categoryBox.isNotEmpty) {
-      return;
-    }
+  Future<BatchHiveModel> createBatch(BatchHiveModel batch) =>
+      _batches.put(batch.batchId!, batch);
 
-    final dummyCategories = [
-      CategoryHiveModel(
-        name: 'Electronics',
-        description: 'Phones, laptops, tablets, etc.',
-      ),
-      CategoryHiveModel(name: 'Personal', description: 'Personal belongings'),
-      CategoryHiveModel(
-        name: 'Accessories',
-        description: 'Watches, jewelry, etc.',
-      ),
-      CategoryHiveModel(
-        name: 'Documents',
-        description: 'IDs, certificates, papers',
-      ),
-      CategoryHiveModel(
-        name: 'Keys',
-        description: 'House keys, car keys, etc.',
-      ),
-      CategoryHiveModel(
-        name: 'Bags',
-        description: 'Backpacks, handbags, wallets',
-      ),
-      CategoryHiveModel(name: 'Other', description: 'Miscellaneous items'),
-    ];
+  List<BatchHiveModel> getAllBatches() => _batches.getAll();
 
-    for (var category in dummyCategories) {
-      await categoryBox.put(category.categoryId, category);
-    }
-  }
+  BatchHiveModel? getBatchById(String batchId) => _batches.get(batchId);
 
-  // Adapter register
-  void _registerAdapter() {
-    if (!Hive.isAdapterRegistered(HiveTableConstant.batchTypeId)) {
-      Hive.registerAdapter(BatchHiveModelAdapter());
-    }
-    if (!Hive.isAdapterRegistered(HiveTableConstant.studentTypeId)) {
-      Hive.registerAdapter(AuthHiveModelAdapter());
-    }
-    if (!Hive.isAdapterRegistered(HiveTableConstant.iteTypeId)) {
-      Hive.registerAdapter(ItemHiveModelAdapter());
-    }
-    if (!Hive.isAdapterRegistered(HiveTableConstant.categoryTypeId)) {
-      Hive.registerAdapter(CategoryHiveModelAdapter());
-    }
-  }
+  Future<bool> updateBatch(BatchHiveModel batch) =>
+      _batches.update(batch.batchId!, batch);
 
-  // box open
-  Future<void> _openBoxes() async {
-    await Hive.openBox<BatchHiveModel>(HiveTableConstant.batchTable);
-    await Hive.openBox<AuthHiveModel>(HiveTableConstant.studentTable);
-    await Hive.openBox<ItemHiveModel>(HiveTableConstant.itemTable);
-    await Hive.openBox<CategoryHiveModel>(HiveTableConstant.categoryTable);
-  }
+  Future<void> deleteBatch(String batchId) => _batches.delete(batchId);
 
-  // box close
-  Future<void> _close() async {
-    await Hive.close();
-  }
+  Future<void> cacheAllBatches(List<BatchHiveModel> batches) =>
+      _batches.replaceAll({for (final b in batches) b.batchId!: b});
 
-  // ======================= Batch Queries =========================
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Auth (Student)
+  // ═══════════════════════════════════════════════════════════════════════════
 
-  Box<BatchHiveModel> get _batchBox =>
-      Hive.box<BatchHiveModel>(HiveTableConstant.batchTable);
+  Future<AuthHiveModel> register(AuthHiveModel user) =>
+      _students.put(user.authId!, user);
 
-  Future<BatchHiveModel> createBatch(BatchHiveModel batch) async {
-    await _batchBox.put(batch.batchId, batch);
-    return batch;
-  }
+  AuthHiveModel? login(String email, String password) =>
+      _students.firstWhere((u) => u.email == email && u.password == password);
 
-  List<BatchHiveModel> getAllBatches() {
-    return _batchBox.values.toList();
-  }
+  AuthHiveModel? getUserById(String authId) => _students.get(authId);
 
-  BatchHiveModel? getBatchById(String batchId) {
-    return _batchBox.get(batchId);
-  }
+  AuthHiveModel? getUserByEmail(String email) =>
+      _students.firstWhere((u) => u.email == email);
 
-  Future<bool> updateBatch(BatchHiveModel batch) async {
-    if (_batchBox.containsKey(batch.batchId)) {
-      await _batchBox.put(batch.batchId, batch);
-      return true;
-    }
-    return false;
-  }
+  Future<bool> updateUser(AuthHiveModel user) =>
+      _students.update(user.authId!, user);
 
-  Future<void> deleteBatch(String batchId) async {
-    await _batchBox.delete(batchId);
-  }
+  Future<void> deleteUser(String authId) => _students.delete(authId);
 
-  /// Cache all batches (clear existing and replace with new data)
-  Future<void> cacheAllBatches(List<BatchHiveModel> batches) async {
-    await _batchBox.clear();
-    for (var batch in batches) {
-      await _batchBox.put(batch.batchId, batch);
-    }
-  }
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Item
+  // ═══════════════════════════════════════════════════════════════════════════
 
-  // ======================= Auth Queries =========================
+  Future<ItemHiveModel> createItem(ItemHiveModel item) =>
+      _items.put(item.itemId!, item);
 
-  Box<AuthHiveModel> get _authBox =>
-      Hive.box<AuthHiveModel>(HiveTableConstant.studentTable);
+  List<ItemHiveModel> getAllItems() => _items.getAll();
 
-  // Register user
-  Future<AuthHiveModel> register(AuthHiveModel user) async {
-    await _authBox.put(user.authId, user);
-    return user;
-  }
+  ItemHiveModel? getItemById(String itemId) => _items.get(itemId);
 
-  // Login - find user by email and password
-  AuthHiveModel? login(String email, String password) {
-    try {
-      return _authBox.values.firstWhere(
-        (user) => user.email == email && user.password == password,
-      );
-    } catch (e) {
-      return null;
-    }
-  }
+  List<ItemHiveModel> getItemsByUser(String userId) =>
+      _items.where((i) => i.reportedBy == userId);
 
-  // Get user by ID
-  AuthHiveModel? getUserById(String authId) {
-    return _authBox.get(authId);
-  }
+  List<ItemHiveModel> getLostItems() => _items.where((i) => i.type == 'lost');
 
-  // Get user by email
-  AuthHiveModel? getUserByEmail(String email) {
-    try {
-      return _authBox.values.firstWhere((user) => user.email == email);
-    } catch (e) {
-      return null;
-    }
-  }
+  List<ItemHiveModel> getFoundItems() => _items.where((i) => i.type == 'found');
 
-  // Update user
-  Future<bool> updateUser(AuthHiveModel user) async {
-    if (_authBox.containsKey(user.authId)) {
-      await _authBox.put(user.authId, user);
-      return true;
-    }
-    return false;
-  }
+  List<ItemHiveModel> getItemsByCategory(String categoryId) =>
+      _items.where((i) => i.category == categoryId);
 
-  // Delete user
-  Future<void> deleteUser(String authId) async {
-    await _authBox.delete(authId);
-  }
+  Future<bool> updateItem(ItemHiveModel item) =>
+      _items.update(item.itemId!, item);
 
-  // ======================= Item Queries =========================
+  Future<void> deleteItem(String itemId) => _items.delete(itemId);
 
-  Box<ItemHiveModel> get _itemBox =>
-      Hive.box<ItemHiveModel>(HiveTableConstant.itemTable);
+  Future<void> cacheAllItems(List<ItemHiveModel> items) =>
+      _items.replaceAll({for (final i in items) i.itemId!: i});
 
-  Future<ItemHiveModel> createItem(ItemHiveModel item) async {
-    await _itemBox.put(item.itemId, item);
-    return item;
-  }
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Category
+  // ═══════════════════════════════════════════════════════════════════════════
 
-  List<ItemHiveModel> getAllItems() {
-    return _itemBox.values.toList();
-  }
+  Future<CategoryHiveModel> createCategory(CategoryHiveModel category) =>
+      _categories.put(category.categoryId!, category);
 
-  ItemHiveModel? getItemById(String itemId) {
-    return _itemBox.get(itemId);
-  }
+  List<CategoryHiveModel> getAllCategories() => _categories.getAll();
 
-  List<ItemHiveModel> getItemsByUser(String userId) {
-    return _itemBox.values.where((item) => item.reportedBy == userId).toList();
-  }
+  CategoryHiveModel? getCategoryById(String categoryId) =>
+      _categories.get(categoryId);
 
-  List<ItemHiveModel> getLostItems() {
-    return _itemBox.values.where((item) => item.type == 'lost').toList();
-  }
+  Future<bool> updateCategory(CategoryHiveModel category) =>
+      _categories.update(category.categoryId!, category);
 
-  List<ItemHiveModel> getFoundItems() {
-    return _itemBox.values.where((item) => item.type == 'found').toList();
-  }
+  Future<void> deleteCategory(String categoryId) =>
+      _categories.delete(categoryId);
 
-  List<ItemHiveModel> getItemsByCategory(String categoryId) {
-    return _itemBox.values
-        .where((item) => item.category == categoryId)
-        .toList();
-  }
-
-  Future<bool> updateItem(ItemHiveModel item) async {
-    if (_itemBox.containsKey(item.itemId)) {
-      await _itemBox.put(item.itemId, item);
-      return true;
-    }
-    return false;
-  }
-
-  Future<void> deleteItem(String itemId) async {
-    await _itemBox.delete(itemId);
-  }
-
-  /// Cache all items (clear existing and replace with new data)
-  Future<void> cacheAllItems(List<ItemHiveModel> items) async {
-    await _itemBox.clear();
-    for (var item in items) {
-      await _itemBox.put(item.itemId, item);
-    }
-  }
-
-  // ======================= Category Queries =========================
-
-  Box<CategoryHiveModel> get _categoryBox =>
-      Hive.box<CategoryHiveModel>(HiveTableConstant.categoryTable);
-
-  Future<CategoryHiveModel> createCategory(CategoryHiveModel category) async {
-    await _categoryBox.put(category.categoryId, category);
-    return category;
-  }
-
-  List<CategoryHiveModel> getAllCategories() {
-    return _categoryBox.values.toList();
-  }
-
-  CategoryHiveModel? getCategoryById(String categoryId) {
-    return _categoryBox.get(categoryId);
-  }
-
-  Future<bool> updateCategory(CategoryHiveModel category) async {
-    if (_categoryBox.containsKey(category.categoryId)) {
-      await _categoryBox.put(category.categoryId, category);
-      return true;
-    }
-    return false;
-  }
-
-  Future<void> deleteCategory(String categoryId) async {
-    await _categoryBox.delete(categoryId);
-  }
-
-  /// Cache all categories (clear existing and replace with new data)
-  Future<void> cacheAllCategories(List<CategoryHiveModel> categories) async {
-    await _categoryBox.clear();
-    for (var category in categories) {
-      await _categoryBox.put(category.categoryId, category);
-    }
-  }
+  Future<void> cacheAllCategories(List<CategoryHiveModel> categories) =>
+      _categories.replaceAll({for (final c in categories) c.categoryId!: c});
 }

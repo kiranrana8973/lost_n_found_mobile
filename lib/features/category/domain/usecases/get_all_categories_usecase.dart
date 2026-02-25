@@ -13,7 +13,7 @@ final getAllCategoriesUsecaseProvider =
 });
 
 class GetAllCategoriesUsecase
-    implements UsecaseWithoutParms<List<CategoryEntity>> {
+    implements UsecaseWithoutParams<List<CategoryEntity>> {
   final ICategoryRepository _categoryRepository;
 
   GetAllCategoriesUsecase({required ICategoryRepository categoryRepository})

@@ -26,7 +26,7 @@ final createCategoryUsecaseProvider = Provider<CreateCategoryUsecase>((ref) {
 });
 
 class CreateCategoryUsecase
-    implements UsecaseWithParms<bool, CreateCategoryParams> {
+    implements UsecaseWithParams<bool, CreateCategoryParams> {
   final ICategoryRepository _categoryRepository;
 
   CreateCategoryUsecase({required ICategoryRepository categoryRepository})

@@ -23,7 +23,7 @@ final getCategoryByIdUsecaseProvider =
 });
 
 class GetCategoryByIdUsecase
-    implements UsecaseWithParms<CategoryEntity, GetCategoryByIdParams> {
+    implements UsecaseWithParams<CategoryEntity, GetCategoryByIdParams> {
   final ICategoryRepository _categoryRepository;
 
   GetCategoryByIdUsecase({required ICategoryRepository categoryRepository})

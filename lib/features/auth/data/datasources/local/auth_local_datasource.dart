@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lost_n_found/core/services/hive/hive_service.dart';
+import 'package:lost_n_found/core/services/storage/token_service.dart';
 import 'package:lost_n_found/core/services/storage/user_session_service.dart';
 import 'package:lost_n_found/features/auth/data/datasources/auth_datasource.dart';
 import 'package:lost_n_found/features/auth/data/models/auth_hive_model.dart';
@@ -8,21 +9,26 @@ import 'package:lost_n_found/features/auth/data/models/auth_hive_model.dart';
 final authLocalDatasourceProvider = Provider<AuthLocalDatasource>((ref) {
   final hiveService = ref.read(hiveServiceProvider);
   final userSessionService = ref.read(userSessionServiceProvider);
+  final tokenService = ref.read(tokenServiceProvider);
   return AuthLocalDatasource(
     hiveService: hiveService,
     userSessionService: userSessionService,
+    tokenService: tokenService,
   );
 });
 
 class AuthLocalDatasource implements IAuthLocalDataSource {
   final HiveService _hiveService;
   final UserSessionService _userSessionService;
+  final TokenService _tokenService;
 
   AuthLocalDatasource({
     required HiveService hiveService,
     required UserSessionService userSessionService,
+    required TokenService tokenService,
   }) : _hiveService = hiveService,
-       _userSessionService = userSessionService;
+       _userSessionService = userSessionService,
+       _tokenService = tokenService;
 
   @override
   Future<AuthHiveModel> register(AuthHiveModel user) async {
@@ -76,6 +82,7 @@ class AuthLocalDatasource implements IAuthLocalDataSource {
   Future<bool> logout() async {
     try {
       await _userSessionService.clearSession();
+      await _tokenService.removeToken();
       return true;
     } catch (e) {
       return false;

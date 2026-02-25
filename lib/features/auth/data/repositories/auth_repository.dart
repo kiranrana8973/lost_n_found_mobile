@@ -115,11 +115,35 @@ class AuthRepository implements IAuthRepository {
 
   @override
   Future<Either<Failure, AuthEntity>> getCurrentUser() async {
+    if (await _networkInfo.isConnected) {
+      try {
+        // Online: fetch latest user data from /students/me
+        final apiModel = await _authRemoteDataSource.getCurrentUser();
+        if (apiModel != null) {
+          final entity = apiModel.toEntity();
+          // Sync to Hive so offline access has fresh data
+          final hiveModel = AuthHiveModel.fromEntity(entity);
+          await _authDataSource.updateUser(hiveModel);
+          return Right(entity);
+        }
+        return const Left(ApiFailure(message: "No user logged in"));
+      } on DioException {
+        // API failed (e.g. token expired) — fallback to local
+        return _getLocalCurrentUser();
+      } catch (_) {
+        return _getLocalCurrentUser();
+      }
+    } else {
+      // Offline: use local session
+      return _getLocalCurrentUser();
+    }
+  }
+
+  Future<Either<Failure, AuthEntity>> _getLocalCurrentUser() async {
     try {
       final model = await _authDataSource.getCurrentUser();
       if (model != null) {
-        final entity = model.toEntity();
-        return Right(entity);
+        return Right(model.toEntity());
       }
       return const Left(LocalDatabaseFailure(message: "No user logged in"));
     } catch (e) {

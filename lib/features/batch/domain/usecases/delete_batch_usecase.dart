@@ -21,7 +21,7 @@ final deleteBatchUsecaseProvider = Provider<DeleteBatchUsecase>((ref) {
   return DeleteBatchUsecase(batchRepository: batchRepository);
 });
 
-class DeleteBatchUsecase implements UsecaseWithParms<bool, DeleteBatchParams> {
+class DeleteBatchUsecase implements UsecaseWithParams<bool, DeleteBatchParams> {
   final IBatchRepository _batchRepository;
 
   DeleteBatchUsecase({required IBatchRepository batchRepository})

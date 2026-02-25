@@ -22,7 +22,7 @@ final getItemByIdUsecaseProvider = Provider<GetItemByIdUsecase>((ref) {
 });
 
 class GetItemByIdUsecase
-    implements UsecaseWithParms<ItemEntity, GetItemByIdParams> {
+    implements UsecaseWithParams<ItemEntity, GetItemByIdParams> {
   final IItemRepository _itemRepository;
 
   GetItemByIdUsecase({required IItemRepository itemRepository})

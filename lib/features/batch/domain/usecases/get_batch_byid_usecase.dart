@@ -23,7 +23,7 @@ final getBatchByIdUsecaseProvider = Provider<GetBatchByIdUsecase>((ref) {
 });
 
 class GetBatchByIdUsecase
-    implements UsecaseWithParms<BatchEntity, GetBatchByIdParams> {
+    implements UsecaseWithParams<BatchEntity, GetBatchByIdParams> {
   final IBatchRepository _batchRepository;
 
   GetBatchByIdUsecase({required IBatchRepository batchRepository})

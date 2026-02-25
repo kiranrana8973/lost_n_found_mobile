@@ -55,7 +55,7 @@ final updateItemUsecaseProvider = Provider<UpdateItemUsecase>((ref) {
   return UpdateItemUsecase(itemRepository: itemRepository);
 });
 
-class UpdateItemUsecase implements UsecaseWithParms<bool, UpdateItemParams> {
+class UpdateItemUsecase implements UsecaseWithParams<bool, UpdateItemParams> {
   final IItemRepository _itemRepository;
 
   UpdateItemUsecase({required IItemRepository itemRepository})

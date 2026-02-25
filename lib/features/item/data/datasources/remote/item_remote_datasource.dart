@@ -4,26 +4,20 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lost_n_found/core/api/api_client.dart';
 import 'package:lost_n_found/core/api/api_endpoints.dart';
-import 'package:lost_n_found/core/services/storage/token_service.dart';
 import 'package:lost_n_found/features/item/data/datasources/item_datasource.dart';
 import 'package:lost_n_found/features/item/data/models/item_api_model.dart';
 
 final itemRemoteDatasourceProvider = Provider<IItemRemoteDataSource>((ref) {
-  return ItemRemoteDatasource(
-    apiClient: ref.read(apiClientProvider),
-    tokenService: ref.read(tokenServiceProvider),
-  );
+  return ItemRemoteDatasource(apiClient: ref.read(apiClientProvider));
 });
 
 class ItemRemoteDatasource implements IItemRemoteDataSource {
   final ApiClient _apiClient;
-  final TokenService _tokenService;
 
-  ItemRemoteDatasource({
-    required ApiClient apiClient,
-    required TokenService tokenService,
-  }) : _apiClient = apiClient,
-       _tokenService = tokenService;
+  ItemRemoteDatasource({required ApiClient apiClient})
+    : _apiClient = apiClient;
+
+  // Token is auto-attached by _AuthInterceptor for non-public endpoints
 
   @override
   Future<String> uploadPhoto(File photo) async {
@@ -31,12 +25,9 @@ class ItemRemoteDatasource implements IItemRemoteDataSource {
     final formData = FormData.fromMap({
       'itemPhoto': await MultipartFile.fromFile(photo.path, filename: fileName),
     });
-    // Get token from token service
-    final token = await _tokenService.getToken();
     final response = await _apiClient.uploadFile(
       ApiEndpoints.itemUploadPhoto,
       formData: formData,
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
     );
 
     return response.data['data'];
@@ -48,12 +39,9 @@ class ItemRemoteDatasource implements IItemRemoteDataSource {
     final formData = FormData.fromMap({
       'itemVideo': await MultipartFile.fromFile(video.path, filename: fileName),
     });
-    // Get token from token service
-    final token = await _tokenService.getToken();
     final response = await _apiClient.uploadFile(
       ApiEndpoints.itemUploadVideo,
       formData: formData,
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
     );
 
     return response.data['data'];
@@ -61,11 +49,9 @@ class ItemRemoteDatasource implements IItemRemoteDataSource {
 
   @override
   Future<ItemApiModel> createItem(ItemApiModel item) async {
-    final token = await _tokenService.getToken();
     final response = await _apiClient.post(
       ApiEndpoints.items,
       data: item.toJson(),
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
     );
 
     return ItemApiModel.fromJson(response.data['data']);
@@ -126,22 +112,16 @@ class ItemRemoteDatasource implements IItemRemoteDataSource {
 
   @override
   Future<bool> updateItem(ItemApiModel item) async {
-    final token = await _tokenService.getToken();
     await _apiClient.put(
       ApiEndpoints.itemById(item.id!),
       data: item.toJson(),
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
     );
     return true;
   }
 
   @override
   Future<bool> deleteItem(String itemId) async {
-    final token = await _tokenService.getToken();
-    await _apiClient.delete(
-      ApiEndpoints.itemById(itemId),
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
-    );
+    await _apiClient.delete(ApiEndpoints.itemById(itemId));
     return true;
   }
 }

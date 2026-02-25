@@ -51,12 +51,12 @@ extension ThemeColorsExtension on BuildContext {
 
   /// Text secondary with 60% opacity (adapts to theme)
   Color get textSecondary60 => isDarkMode
-      ? AppColors.darkTextSecondary.withOpacity(0.6)
+      ? AppColors.darkTextSecondary.withValues(alpha: 0.6)
       : AppColors.textSecondary60;
 
   /// Text secondary with 50% opacity (adapts to theme)
   Color get textSecondary50 => isDarkMode
-      ? AppColors.darkTextSecondary.withOpacity(0.5)
+      ? AppColors.darkTextSecondary.withValues(alpha: 0.5)
       : AppColors.textSecondary50;
 
   /// Background gradient (adapts to theme)

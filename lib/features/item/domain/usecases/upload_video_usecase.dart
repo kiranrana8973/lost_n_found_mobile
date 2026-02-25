@@ -12,7 +12,7 @@ final uploadVideoUsecaseProvider = Provider<UploadVideoUsecase>((ref) {
   return UploadVideoUsecase(itemRepository: itemRepository);
 });
 
-class UploadVideoUsecase implements UsecaseWithParms<String, File> {
+class UploadVideoUsecase implements UsecaseWithParams<String, File> {
   final IItemRepository _itemRepository;
 
   UploadVideoUsecase({required IItemRepository itemRepository})

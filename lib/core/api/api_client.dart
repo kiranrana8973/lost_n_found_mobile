@@ -224,7 +224,7 @@ class ApiClient {
 // Token Manager - Handles token storage and retrieval
 class _TokenManager {
   final _storage = const FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+    aOptions: AndroidOptions(),
     iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
   );
 
@@ -256,7 +256,6 @@ class _TokenManager {
 class _AuthInterceptor extends QueuedInterceptor {
   final Dio _dio;
   final _TokenManager _tokenManager;
-  final _storage = const FlutterSecureStorage();
 
   // Lock to prevent multiple simultaneous refresh requests
   Completer<bool>? _refreshCompleter;

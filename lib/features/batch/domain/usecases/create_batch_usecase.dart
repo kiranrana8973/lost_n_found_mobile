@@ -25,7 +25,7 @@ final createBatchUsecaseProvider = Provider<CreateBatchUsecase>((ref) {
   return CreateBatchUsecase(batchRepository: batchRepository);
 });
 
-class CreateBatchUsecase implements UsecaseWithParms<bool, CreateBatchParams> {
+class CreateBatchUsecase implements UsecaseWithParams<bool, CreateBatchParams> {
   final IBatchRepository _batchRepository;
 
   CreateBatchUsecase({required IBatchRepository batchRepository})

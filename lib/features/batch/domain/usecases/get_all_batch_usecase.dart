@@ -12,7 +12,7 @@ final getAllBatchUsecaseProvider = Provider<GetAllBatchUsecase>((ref) {
   return GetAllBatchUsecase(batchRepository: batchRepository);
 });
 
-class GetAllBatchUsecase implements UsecaseWithoutParms<List<BatchEntity>> {
+class GetAllBatchUsecase implements UsecaseWithoutParams<List<BatchEntity>> {
   final IBatchRepository _batchRepository;
 
   GetAllBatchUsecase({required IBatchRepository batchRepository})

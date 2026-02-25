@@ -28,7 +28,7 @@ final updateBatchUsecaseProvider = Provider<UpdateBatchUsecase>((ref) {
   return UpdateBatchUsecase(batchRepository: batchRepository);
 });
 
-class UpdateBatchUsecase implements UsecaseWithParms<bool, UpdateBatchParams> {
+class UpdateBatchUsecase implements UsecaseWithParams<bool, UpdateBatchParams> {
   final IBatchRepository _batchRepository;
 
   UpdateBatchUsecase({required IBatchRepository batchRepository})

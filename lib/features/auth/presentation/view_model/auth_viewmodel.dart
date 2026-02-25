@@ -30,8 +30,8 @@ class AuthViewModel extends Notifier<AuthState> {
     return const AuthState();
   }
 
-  /// Check local storage for existing session (no network call).
-  /// Called automatically on app start via build().
+  /// Restore session on app start. If online, fetches latest user from
+  /// /students/me (syncs password/profile changes). Falls back to local cache.
   Future<void> _hydrateAuthState() async {
     final result = await _getCurrentUserUsecase();
     result.fold(

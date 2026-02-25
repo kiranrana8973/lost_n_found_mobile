@@ -46,7 +46,7 @@ final createItemUsecaseProvider = Provider<CreateItemUsecase>((ref) {
   return CreateItemUsecase(itemRepository: itemRepository);
 });
 
-class CreateItemUsecase implements UsecaseWithParms<bool, CreateItemParams> {
+class CreateItemUsecase implements UsecaseWithParams<bool, CreateItemParams> {
   final IItemRepository _itemRepository;
 
   CreateItemUsecase({required IItemRepository itemRepository})
