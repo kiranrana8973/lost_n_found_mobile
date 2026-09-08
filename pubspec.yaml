@@ -18,7 +18,6 @@ dependencies:
 
   # State Management
   flutter_riverpod: ^3.0.3
-  riverpod_annotation: ^3.0.3
 
   # Local Database (Offline Storage)
   hive: ^2.2.3
@@ -48,11 +47,7 @@ dependencies:
   video_thumbnail: ^0.5.3
   flutter_svg: ^2.0.10+1
 
-  # Real-time Features
-  web_socket_channel: ^3.0.3
-
   # Utilities
-  freezed_annotation: ^3.1.0
   json_annotation: ^4.8.1
   uuid: ^4.3.3
   intl: ^0.20.2
