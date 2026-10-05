@@ -21,8 +21,8 @@ dependencies:
   riverpod_annotation: ^3.0.3
 
   # Local Database (Offline Storage)
-  hive_ce: ^2.20.1
-  hive_ce_flutter: ^2.4.0
+  drift: ^2.35.1
+  drift_flutter: ^0.3.1
   path_provider: ^2.1.2
   path: ^1.9.0
 
@@ -74,9 +74,7 @@ dev_dependencies:
   # Code Generation
   build_runner: ^2.4.13
   json_serializable: ^6.8.0
-  # Capped below 1.11.3, which needs analyzer ^14; flutter_test pins test_api
-  # 0.7.12 -> test 1.31.1 -> analyzer <14. Raise once the Flutter SDK moves on.
-  hive_ce_generator: ^1.11.1
+  drift_dev: ^2.35.1
 
   # Testing
   mocktail: ^1.0.3

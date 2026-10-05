@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lost_n_found/core/error/failures.dart';
 import 'package:lost_n_found/features/auth/data/datasources/auth_datasource.dart';
 import 'package:lost_n_found/features/auth/data/datasources/local/auth_local_datasource.dart';
-import 'package:lost_n_found/features/auth/data/models/auth_hive_model.dart';
+import 'package:lost_n_found/features/auth/data/models/auth_model.dart';
 import 'package:lost_n_found/features/auth/domain/entities/auth_entity.dart';
 import 'package:lost_n_found/features/auth/domain/repositories/auth_repository.dart';
 
@@ -30,16 +30,7 @@ class AuthRepository implements IAuthRepository {
         );
       }
 
-      final authModel = AuthHiveModel(
-        fullName: user.fullName,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
-        username: user.username,
-        password: user.password,
-        batchId: user.batchId,
-        profilePicture: user.profilePicture,
-      );
-      await _authDataSource.register(authModel);
+      await _authDataSource.register(user.toModel());
       return const Right(true);
     } catch (e) {
       return Left(LocalDatabaseFailure(message: e.toString()));

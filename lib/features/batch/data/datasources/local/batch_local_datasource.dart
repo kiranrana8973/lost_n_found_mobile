@@ -1,25 +1,24 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lost_n_found/core/services/hive/hive_service.dart';
+import 'package:lost_n_found/core/services/database/app_database.dart';
 import 'package:lost_n_found/features/batch/data/datasources/batch_datasource.dart';
-import 'package:lost_n_found/features/batch/data/models/batch_hive_model.dart';
 
 // create provider
 final batchLocalDatasourceProvider = Provider<BatchLocalDatasource>((ref) {
-  final hiveService = ref.read(hiveServiceProvider);
-  return BatchLocalDatasource(hiveService: hiveService);
+  final appDatabase = ref.read(appDatabaseProvider);
+  return BatchLocalDatasource(appDatabase: appDatabase);
 });
 
 class BatchLocalDatasource implements IBatchDataSource {
   // Dependency Injection
-  final HiveService _hiveService;
+  final AppDatabase _db;
 
-  BatchLocalDatasource({required HiveService hiveService})
-    : _hiveService = hiveService;
+  BatchLocalDatasource({required AppDatabase appDatabase})
+    : _db = appDatabase;
 
   @override
-  Future<bool> createBatch(BatchHiveModel batch) async {
+  Future<bool> createBatch(BatchModel batch) async {
     try {
-      await _hiveService.createBatch(batch);
+      await _db.createBatch(batch);
       return true;
     } catch (e) {
       return false;
@@ -29,7 +28,7 @@ class BatchLocalDatasource implements IBatchDataSource {
   @override
   Future<bool> deleteBatch(String batchId) async {
     try {
-      await _hiveService.deleteBatch(batchId);
+      await _db.deleteBatch(batchId);
       return true;
     } catch (e) {
       return false;
@@ -37,27 +36,27 @@ class BatchLocalDatasource implements IBatchDataSource {
   }
 
   @override
-  Future<List<BatchHiveModel>> getAllBatches() async {
+  Future<List<BatchModel>> getAllBatches() async {
     try {
-      return _hiveService.getAllBatches();
+      return await _db.getAllBatches();
     } catch (e) {
       return [];
     }
   }
 
   @override
-  Future<BatchHiveModel?> getBatchById(String batchId) async {
+  Future<BatchModel?> getBatchById(String batchId) async {
     try {
-      return _hiveService.getBatchById(batchId);
+      return await _db.getBatchById(batchId);
     } catch (e) {
       return null;
     }
   }
 
   @override
-  Future<bool> updateBatch(BatchHiveModel batch) async {
+  Future<bool> updateBatch(BatchModel batch) async {
     try {
-      _hiveService.updateBatch(batch);
+      await _db.updateBatch(batch);
       return true;
     } catch (e) {
       return false;

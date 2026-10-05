@@ -1,9 +1,9 @@
-import 'package:lost_n_found/features/category/data/models/category_hive_model.dart';
+import 'package:lost_n_found/features/category/data/models/category_model.dart';
 
 abstract interface class ICategoryDataSource {
-  Future<List<CategoryHiveModel>> getAllCategories();
-  Future<CategoryHiveModel?> getCategoryById(String categoryId);
-  Future<bool> createCategory(CategoryHiveModel category);
-  Future<bool> updateCategory(CategoryHiveModel category);
+  Future<List<CategoryModel>> getAllCategories();
+  Future<CategoryModel?> getCategoryById(String categoryId);
+  Future<bool> createCategory(CategoryModel category);
+  Future<bool> updateCategory(CategoryModel category);
   Future<bool> deleteCategory(String categoryId);
 }

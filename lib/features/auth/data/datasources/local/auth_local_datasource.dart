@@ -1,42 +1,41 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lost_n_found/core/services/hive/hive_service.dart';
+import 'package:lost_n_found/core/services/database/app_database.dart';
 import 'package:lost_n_found/core/services/storage/user_session_service.dart';
 import 'package:lost_n_found/features/auth/data/datasources/auth_datasource.dart';
-import 'package:lost_n_found/features/auth/data/models/auth_hive_model.dart';
 
 // Create provider
 final authLocalDatasourceProvider = Provider<AuthLocalDatasource>((ref) {
-  final hiveService = ref.read(hiveServiceProvider);
+  final appDatabase = ref.read(appDatabaseProvider);
   final userSessionService = ref.read(userSessionServiceProvider);
   return AuthLocalDatasource(
-    hiveService: hiveService,
+    appDatabase: appDatabase,
     userSessionService: userSessionService,
   );
 });
 
 class AuthLocalDatasource implements IAuthDataSource {
-  final HiveService _hiveService;
+  final AppDatabase _db;
   final UserSessionService _userSessionService;
 
   AuthLocalDatasource({
-    required HiveService hiveService,
+    required AppDatabase appDatabase,
     required UserSessionService userSessionService,
-  }) : _hiveService = hiveService,
+  }) : _db = appDatabase,
        _userSessionService = userSessionService;
 
   @override
-  Future<AuthHiveModel> register(AuthHiveModel user) async {
-    return await _hiveService.register(user);
+  Future<AuthModel> register(AuthModel user) async {
+    return await _db.register(user);
   }
 
   @override
-  Future<AuthHiveModel?> login(String email, String password) async {
+  Future<AuthModel?> login(String email, String password) async {
     try {
-      final user = _hiveService.login(email, password);
-      if (user != null && user.authId != null) {
+      final user = await _db.login(email, password);
+      if (user != null) {
         // Save user session to SharedPreferences : Pachi app restart vayo vani pani user logged in rahos
         await _userSessionService.saveUserSession(
-          userId: user.authId!,
+          userId: user.authId,
           email: user.email,
           fullName: user.fullName,
           username: user.username,
@@ -52,7 +51,7 @@ class AuthLocalDatasource implements IAuthDataSource {
   }
 
   @override
-  Future<AuthHiveModel?> getCurrentUser() async {
+  Future<AuthModel?> getCurrentUser() async {
     try {
       // Check if user is logged in
       if (!_userSessionService.isLoggedIn()) {
@@ -65,8 +64,8 @@ class AuthLocalDatasource implements IAuthDataSource {
         return null;
       }
 
-      // Fetch user from Hive database
-      return _hiveService.getUserById(userId);
+      // Fetch user from the database
+      return await _db.getUserById(userId);
     } catch (e) {
       return null;
     }
@@ -83,27 +82,27 @@ class AuthLocalDatasource implements IAuthDataSource {
   }
 
   @override
-  Future<AuthHiveModel?> getUserById(String authId) async {
+  Future<AuthModel?> getUserById(String authId) async {
     try {
-      return _hiveService.getUserById(authId);
+      return await _db.getUserById(authId);
     } catch (e) {
       return null;
     }
   }
 
   @override
-  Future<AuthHiveModel?> getUserByEmail(String email) async {
+  Future<AuthModel?> getUserByEmail(String email) async {
     try {
-      return _hiveService.getUserByEmail(email);
+      return await _db.getUserByEmail(email);
     } catch (e) {
       return null;
     }
   }
 
   @override
-  Future<bool> updateUser(AuthHiveModel user) async {
+  Future<bool> updateUser(AuthModel user) async {
     try {
-      return await _hiveService.updateUser(user);
+      return await _db.updateUser(user);
     } catch (e) {
       return false;
     }
@@ -112,7 +111,7 @@ class AuthLocalDatasource implements IAuthDataSource {
   @override
   Future<bool> deleteUser(String authId) async {
     try {
-      await _hiveService.deleteUser(authId);
+      await _db.deleteUser(authId);
       return true;
     } catch (e) {
       return false;

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lost_n_found/core/error/failures.dart';
 import 'package:lost_n_found/features/category/data/datasources/category_datasource.dart';
 import 'package:lost_n_found/features/category/data/datasources/local/category_local_datasource.dart';
-import 'package:lost_n_found/features/category/data/models/category_hive_model.dart';
+import 'package:lost_n_found/features/category/data/models/category_model.dart';
 import 'package:lost_n_found/features/category/domain/entities/category_entity.dart';
 import 'package:lost_n_found/features/category/domain/repositories/category_repository.dart';
 
@@ -21,7 +21,7 @@ class CategoryRepository implements ICategoryRepository {
   @override
   Future<Either<Failure, bool>> createCategory(CategoryEntity category) async {
     try {
-      final categoryModel = CategoryHiveModel.fromEntity(category);
+      final categoryModel = category.toModel();
       final result = await _categoryDataSource.createCategory(categoryModel);
       if (result) {
         return const Right(true);
@@ -53,7 +53,7 @@ class CategoryRepository implements ICategoryRepository {
   Future<Either<Failure, List<CategoryEntity>>> getAllCategories() async {
     try {
       final models = await _categoryDataSource.getAllCategories();
-      final entities = CategoryHiveModel.toEntityList(models);
+      final entities = models.toEntityList();
       return Right(entities);
     } catch (e) {
       return Left(LocalDatabaseFailure(message: e.toString()));
@@ -78,7 +78,7 @@ class CategoryRepository implements ICategoryRepository {
   @override
   Future<Either<Failure, bool>> updateCategory(CategoryEntity category) async {
     try {
-      final categoryModel = CategoryHiveModel.fromEntity(category);
+      final categoryModel = category.toModel();
       final result = await _categoryDataSource.updateCategory(categoryModel);
       if (result) {
         return const Right(true);

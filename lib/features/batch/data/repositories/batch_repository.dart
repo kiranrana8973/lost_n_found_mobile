@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lost_n_found/core/error/failures.dart';
 import 'package:lost_n_found/features/batch/data/datasources/batch_datasource.dart';
 import 'package:lost_n_found/features/batch/data/datasources/local/batch_local_datasource.dart';
-import 'package:lost_n_found/features/batch/data/models/batch_hive_model.dart';
+import 'package:lost_n_found/features/batch/data/models/batch_model.dart';
 import 'package:lost_n_found/features/batch/domain/entities/batch_entity.dart';
 import 'package:lost_n_found/features/batch/domain/repositories/batch_repository.dart';
 
@@ -24,7 +24,7 @@ class BatchRepository implements IBatchRepository {
     try {
       // conversion
       // entity lai model ma convert gara
-      final batchModel = BatchHiveModel.fromEntity(batch);
+      final batchModel = batch.toModel();
       final result = await _batchDataSource.createBatch(batchModel);
       if (result) {
         return const Right(true);
@@ -55,7 +55,7 @@ class BatchRepository implements IBatchRepository {
   Future<Either<Failure, List<BatchEntity>>> getAllBatches() async {
     try {
       final models = await _batchDataSource.getAllBatches();
-      final entities = BatchHiveModel.toEntityList(models);
+      final entities = models.toEntityList();
       return Right(entities);
     } catch (e) {
       return Left(LocalDatabaseFailure(message: e.toString()));
@@ -79,7 +79,7 @@ class BatchRepository implements IBatchRepository {
   @override
   Future<Either<Failure, bool>> updateBatch(BatchEntity batch) async {
     try {
-      final batchModel = BatchHiveModel.fromEntity(batch);
+      final batchModel = batch.toModel();
       final result = await _batchDataSource.updateBatch(batchModel);
       if (result) {
         return const Right(true);

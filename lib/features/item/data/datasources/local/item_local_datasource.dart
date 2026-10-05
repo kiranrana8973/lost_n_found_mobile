@@ -1,23 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lost_n_found/core/services/hive/hive_service.dart';
+import 'package:lost_n_found/core/services/database/app_database.dart';
 import 'package:lost_n_found/features/item/data/datasources/item_datasource.dart';
-import 'package:lost_n_found/features/item/data/models/item_hive_model.dart';
 
 final itemLocalDatasourceProvider = Provider<ItemLocalDatasource>((ref) {
-  final hiveService = ref.read(hiveServiceProvider);
-  return ItemLocalDatasource(hiveService: hiveService);
+  final appDatabase = ref.read(appDatabaseProvider);
+  return ItemLocalDatasource(appDatabase: appDatabase);
 });
 
 class ItemLocalDatasource implements IItemDataSource {
-  final HiveService _hiveService;
+  final AppDatabase _db;
 
-  ItemLocalDatasource({required HiveService hiveService})
-      : _hiveService = hiveService;
+  ItemLocalDatasource({required AppDatabase appDatabase})
+      : _db = appDatabase;
 
   @override
-  Future<bool> createItem(ItemHiveModel item) async {
+  Future<bool> createItem(ItemModel item) async {
     try {
-      await _hiveService.createItem(item);
+      await _db.createItem(item);
       return true;
     } catch (e) {
       return false;
@@ -27,7 +26,7 @@ class ItemLocalDatasource implements IItemDataSource {
   @override
   Future<bool> deleteItem(String itemId) async {
     try {
-      await _hiveService.deleteItem(itemId);
+      await _db.deleteItem(itemId);
       return true;
     } catch (e) {
       return false;
@@ -35,63 +34,63 @@ class ItemLocalDatasource implements IItemDataSource {
   }
 
   @override
-  Future<List<ItemHiveModel>> getAllItems() async {
+  Future<List<ItemModel>> getAllItems() async {
     try {
-      return _hiveService.getAllItems();
+      return await _db.getAllItems();
     } catch (e) {
       return [];
     }
   }
 
   @override
-  Future<ItemHiveModel?> getItemById(String itemId) async {
+  Future<ItemModel?> getItemById(String itemId) async {
     try {
-      return _hiveService.getItemById(itemId);
+      return await _db.getItemById(itemId);
     } catch (e) {
       return null;
     }
   }
 
   @override
-  Future<List<ItemHiveModel>> getItemsByUser(String userId) async {
+  Future<List<ItemModel>> getItemsByUser(String userId) async {
     try {
-      return _hiveService.getItemsByUser(userId);
+      return await _db.getItemsByUser(userId);
     } catch (e) {
       return [];
     }
   }
 
   @override
-  Future<List<ItemHiveModel>> getLostItems() async {
+  Future<List<ItemModel>> getLostItems() async {
     try {
-      return _hiveService.getLostItems();
+      return await _db.getLostItems();
     } catch (e) {
       return [];
     }
   }
 
   @override
-  Future<List<ItemHiveModel>> getFoundItems() async {
+  Future<List<ItemModel>> getFoundItems() async {
     try {
-      return _hiveService.getFoundItems();
+      return await _db.getFoundItems();
     } catch (e) {
       return [];
     }
   }
 
   @override
-  Future<List<ItemHiveModel>> getItemsByCategory(String categoryId) async {
+  Future<List<ItemModel>> getItemsByCategory(String categoryId) async {
     try {
-      return _hiveService.getItemsByCategory(categoryId);
+      return await _db.getItemsByCategory(categoryId);
     } catch (e) {
       return [];
     }
   }
 
   @override
-  Future<bool> updateItem(ItemHiveModel item) async {
+  Future<bool> updateItem(ItemModel item) async {
     try {
-      await _hiveService.updateItem(item);
+      await _db.updateItem(item);
       return true;
     } catch (e) {
       return false;

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lost_n_found/app/app.dart';
-import 'package:lost_n_found/core/services/hive/hive_service.dart';
+import 'package:lost_n_found/core/services/database/app_database.dart';
 import 'package:lost_n_found/core/services/storage/user_session_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -19,8 +19,10 @@ void main() async {
     ),
   );
 
-  // initialize Hive or other services if needed
-  await HiveService().init();
+  // Open the SQLite database and seed the reference data
+  final database = AppDatabase();
+  await database.insertBatchDummyData();
+  await database.insertCategoryDummyData();
 
   // Initialize SharedPreferences : because this is async operation
   // but riverpod providers are sync so we need to initialize it here
@@ -30,6 +32,7 @@ void main() async {
     ProviderScope(
       overrides: [
         sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+        appDatabaseProvider.overrideWithValue(database),
       ],
       child: const MyApp(),
     ),

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lost_n_found/core/error/failures.dart';
 import 'package:lost_n_found/features/item/data/datasources/item_datasource.dart';
 import 'package:lost_n_found/features/item/data/datasources/local/item_local_datasource.dart';
-import 'package:lost_n_found/features/item/data/models/item_hive_model.dart';
+import 'package:lost_n_found/features/item/data/models/item_model.dart';
 import 'package:lost_n_found/features/item/domain/entities/item_entity.dart';
 import 'package:lost_n_found/features/item/domain/repositories/item_repository.dart';
 
@@ -21,7 +21,7 @@ class ItemRepository implements IItemRepository {
   @override
   Future<Either<Failure, bool>> createItem(ItemEntity item) async {
     try {
-      final itemModel = ItemHiveModel.fromEntity(item);
+      final itemModel = item.toModel();
       final result = await _itemDataSource.createItem(itemModel);
       if (result) {
         return const Right(true);
@@ -53,7 +53,7 @@ class ItemRepository implements IItemRepository {
   Future<Either<Failure, List<ItemEntity>>> getAllItems() async {
     try {
       final models = await _itemDataSource.getAllItems();
-      final entities = ItemHiveModel.toEntityList(models);
+      final entities = models.toEntityList();
       return Right(entities);
     } catch (e) {
       return Left(LocalDatabaseFailure(message: e.toString()));
@@ -78,7 +78,7 @@ class ItemRepository implements IItemRepository {
   Future<Either<Failure, List<ItemEntity>>> getItemsByUser(String userId) async {
     try {
       final models = await _itemDataSource.getItemsByUser(userId);
-      final entities = ItemHiveModel.toEntityList(models);
+      final entities = models.toEntityList();
       return Right(entities);
     } catch (e) {
       return Left(LocalDatabaseFailure(message: e.toString()));
@@ -89,7 +89,7 @@ class ItemRepository implements IItemRepository {
   Future<Either<Failure, List<ItemEntity>>> getLostItems() async {
     try {
       final models = await _itemDataSource.getLostItems();
-      final entities = ItemHiveModel.toEntityList(models);
+      final entities = models.toEntityList();
       return Right(entities);
     } catch (e) {
       return Left(LocalDatabaseFailure(message: e.toString()));
@@ -100,7 +100,7 @@ class ItemRepository implements IItemRepository {
   Future<Either<Failure, List<ItemEntity>>> getFoundItems() async {
     try {
       final models = await _itemDataSource.getFoundItems();
-      final entities = ItemHiveModel.toEntityList(models);
+      final entities = models.toEntityList();
       return Right(entities);
     } catch (e) {
       return Left(LocalDatabaseFailure(message: e.toString()));
@@ -111,7 +111,7 @@ class ItemRepository implements IItemRepository {
   Future<Either<Failure, List<ItemEntity>>> getItemsByCategory(String categoryId) async {
     try {
       final models = await _itemDataSource.getItemsByCategory(categoryId);
-      final entities = ItemHiveModel.toEntityList(models);
+      final entities = models.toEntityList();
       return Right(entities);
     } catch (e) {
       return Left(LocalDatabaseFailure(message: e.toString()));
@@ -121,7 +121,7 @@ class ItemRepository implements IItemRepository {
   @override
   Future<Either<Failure, bool>> updateItem(ItemEntity item) async {
     try {
-      final itemModel = ItemHiveModel.fromEntity(item);
+      final itemModel = item.toModel();
       final result = await _itemDataSource.updateItem(itemModel);
       if (result) {
         return const Right(true);
