@@ -1,10 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive_ce.dart';
 import 'package:lost_n_found/core/constants/hive_table_constant.dart';
 import 'package:lost_n_found/features/auth/data/models/auth_hive_model.dart';
 import 'package:lost_n_found/features/batch/data/models/batch_hive_model.dart';
 import 'package:lost_n_found/features/category/data/models/category_hive_model.dart';
 import 'package:lost_n_found/features/item/data/models/item_hive_model.dart';
+import 'package:lost_n_found/hive_registrar.g.dart';
 import 'package:path_provider/path_provider.dart';
 
 final hiveServiceProvider = Provider<HiveService>((ref) {
@@ -88,19 +89,15 @@ class HiveService {
   }
 
   // Adapter register
+  //
+  // registerAdapters() comes from the generated hive_registrar.g.dart and
+  // registers every @HiveType model at once. It is not idempotent -- Hive
+  // throws if a typeId is already registered -- and init() runs again on hot
+  // restart, so guard it. The registrar registers all adapters together, so
+  // checking one typeId tells us whether the whole set is already in place.
   void _registerAdapter() {
-    if (!Hive.isAdapterRegistered(HiveTableConstant.batchTypeId)) {
-      Hive.registerAdapter(BatchHiveModelAdapter());
-    }
-    if (!Hive.isAdapterRegistered(HiveTableConstant.studentTypeId)) {
-      Hive.registerAdapter(AuthHiveModelAdapter());
-    }
-    if (!Hive.isAdapterRegistered(HiveTableConstant.iteTypeId)) {
-      Hive.registerAdapter(ItemHiveModelAdapter());
-    }
-    if (!Hive.isAdapterRegistered(HiveTableConstant.categoryTypeId)) {
-      Hive.registerAdapter(CategoryHiveModelAdapter());
-    }
+    if (Hive.isAdapterRegistered(HiveTableConstant.batchTypeId)) return;
+    Hive.registerAdapters();
   }
 
   // box open

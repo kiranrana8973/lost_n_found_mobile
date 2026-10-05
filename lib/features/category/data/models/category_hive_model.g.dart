@@ -8,7 +8,7 @@ part of 'category_hive_model.dart';
 
 class CategoryHiveModelAdapter extends TypeAdapter<CategoryHiveModel> {
   @override
-  final int typeId = 3;
+  final typeId = 3;
 
   @override
   CategoryHiveModel read(BinaryReader reader) {

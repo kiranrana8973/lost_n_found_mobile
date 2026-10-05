@@ -1,4 +1,4 @@
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive_ce.dart';
 import 'package:lost_n_found/core/constants/hive_table_constant.dart';
 import 'package:lost_n_found/features/auth/domain/entities/auth_entity.dart';
 import 'package:lost_n_found/features/batch/domain/entities/batch_entity.dart';

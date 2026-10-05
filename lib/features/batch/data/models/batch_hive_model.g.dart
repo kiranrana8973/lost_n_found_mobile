@@ -8,7 +8,7 @@ part of 'batch_hive_model.dart';
 
 class BatchHiveModelAdapter extends TypeAdapter<BatchHiveModel> {
   @override
-  final int typeId = 0;
+  final typeId = 0;
 
   @override
   BatchHiveModel read(BinaryReader reader) {

@@ -35,8 +35,7 @@ extension ThemeColorsExtension on BuildContext {
       isDarkMode ? AppColors.darkInputFill : AppColors.inputFill;
 
   /// Border color (adapts to theme)
-  Color get borderColor =>
-      isDarkMode ? AppColors.darkBorder : AppColors.border;
+  Color get borderColor => isDarkMode ? AppColors.darkBorder : AppColors.border;
 
   /// Divider color (adapts to theme)
   Color get dividerColor =>
@@ -51,10 +50,12 @@ extension ThemeColorsExtension on BuildContext {
       isDarkMode ? AppColors.darkSoftShadow : AppColors.softShadow;
 
   /// Text secondary with 60% opacity (adapts to theme)
-  Color get textSecondary60 =>
-      isDarkMode ? AppColors.darkTextSecondary.withOpacity(0.6) : AppColors.textSecondary60;
+  Color get textSecondary60 => isDarkMode
+      ? AppColors.darkTextSecondary.withValues(alpha: 0.6)
+      : AppColors.textSecondary60;
 
   /// Text secondary with 50% opacity (adapts to theme)
-  Color get textSecondary50 =>
-      isDarkMode ? AppColors.darkTextSecondary.withOpacity(0.5) : AppColors.textSecondary50;
+  Color get textSecondary50 => isDarkMode
+      ? AppColors.darkTextSecondary.withValues(alpha: 0.5)
+      : AppColors.textSecondary50;
 }

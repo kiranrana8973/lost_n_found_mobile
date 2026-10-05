@@ -2,7 +2,7 @@
 // 2. Adapater -> conversion : object -> binary or binary -> dart
 
 // Adapter
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive_ce.dart';
 import 'package:lost_n_found/core/constants/hive_table_constant.dart';
 import 'package:lost_n_found/features/batch/domain/entities/batch_entity.dart';
 import 'package:uuid/uuid.dart';
